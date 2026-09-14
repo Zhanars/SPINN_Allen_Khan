@@ -13,15 +13,17 @@ Zhuldyz Issa¹, Adil Nauryzbay¹, Zhanars Abdiramanov¹˒²\* (corresponding), E
 ¹ Department of Mathematics and Mathematical Modeling, Abai Kazakh National Pedagogical University, Almaty 050010, Kazakhstan
 ² Institute of Information and Computational Technologies, Almaty 050010, Kazakhstan
 
-Corresponding author: zh.abdiramanov@abaiuniversity.edu.kz · ORCID (Zh.A.): 0000-0003-3820-7253
+Corresponding author: zh.abdiramanov@abaiuniversity.edu.kz
+
+ORCID: Zh. Issa 0009-0004-9631-6284 · A. Nauryzbay 0009-0002-5513-712X · Zh. Abdiramanov 0000-0003-3820-7253 · E. Zhumazhanov 0009-0008-5187-6105 · D. Urnek 0009-0009-0099-4408
 
 ## Funding
 
-Abai Kazakh National Pedagogical University, intra-university grant competition for young researchers' scientific projects (2026), grant No. 05-04/568 — "Investigation of Physics-Informed Neural Network (PINN) methods for solving the Allen–Cahn equation."
+This research was funded by Abai Kazakh National Pedagogical University, grant number 05-04/568. *(Funding statement intentionally shortened in the manuscript itself — no project title or names — per house style; full grant title is on file with the university.)*
 
 ## Document status
 
-Manuscript compiles cleanly on the official MDPI *Symmetry* LaTeX template (18 pages), zero LaTeX errors, zero undefined references. Targeted at the Special Issue "Selected Papers from the 4th International Conference: Constructive Mathematical Analysis" (ICCMA 2026), as an extended version of the authors' ICCMA 2026 conference abstract. All numerical results are from executed code (local machine + a 64-core Linux server, *ai.atu*, reached over SSH); none are estimated or fabricated. All Lean 4 proofs compile against Lean 4.33.1 + Mathlib with zero uses of `sorry` and depend only on Lean's three standard axioms.
+Manuscript compiles cleanly on the official MDPI *Symmetry* LaTeX template (**19 pages**), zero LaTeX errors, zero undefined references. Targeted at the Special Issue "Selected Papers from the 4th International Conference: Constructive Mathematical Analysis" (ICCMA 2026), as an extended version of the authors' ICCMA 2026 conference abstract. All numerical results are from executed code (local machine + a 64-core Linux server, *ai.atu* — the Almaty Technological University's server, reached over SSH); none are estimated or fabricated. All Lean 4 proofs compile against Lean 4.33.1 + Mathlib with zero uses of `sorry` and depend only on Lean's three standard axioms; Appendix A now also states each result as a conventional mathematical Lemma/Theorem/Proposition/Corollary with a standard proof immediately before the corresponding Lean code, so reviewers do not need to read Lean to verify correctness. Reference list: **45 entries**, all bearing a DOI or a verified alternative link (institutional repository / arXiv ID / conference-proceedings URL), systematically checked against Crossref (one incorrect author attribution found and corrected during this process). Full source (code, data, manuscript, Lean project) is also mirrored at a private GitHub repository for cross-device continuity: `github.com/Zhanars/essim_urnek`.
 
 \newpage
 
@@ -41,6 +43,8 @@ Two aspects of this submission may be of particular interest to reviewers:
 - **Key theoretical claims are machine-verified.** Beyond the standard hand proof of the continuous energy-dissipation theorem, we formalized the theorem itself in Lean 4 with Mathlib, in the general form that any Hilbert-space gradient flow dissipates energy at rate $-\|u_t\|^2$, together with the discrete algebraic lemmas (a polarization identity and a discrete Grönwall step) that a review of earlier, unrelated work from our group had flagged as an error-prone step in this style of proof.
 
 We confirm that neither the manuscript nor any parts of its content are currently under consideration for publication with or published in another journal. All authors have approved the manuscript and agree with its submission to Symmetry.
+
+Appendix A of the manuscript, formalizing the energy-stability lemmas and the continuous energy-dissipation theorem in Lean 4, now also gives a standard mathematical statement and proof of each result immediately before the corresponding Lean code, so that reviewers are not required to read Lean to verify the mathematics.
 
 The authors declare no conflicts of interest. The work was funded by Abai Kazakh National Pedagogical University (grant No. 05-04/568); the funder had no role in the design, analysis, or decision to publish.
 
@@ -155,24 +159,27 @@ Both methods showed near-flat $L^2$ error across $\varepsilon\in\{0.01,0.005,0.0
 
 | Item | Status |
 |---|---|
-| Manuscript on official *Symmetry* LaTeX template | Done — compiles clean, 16 pp. |
+| Manuscript on official *Symmetry* LaTeX template | Done — compiles clean, 19 pp. |
 | Title, abstract, keywords, MSC codes | Done — abstract trimmed to 265 words (journal target: ~200) |
 | Author list & order | Set per author instruction: Issa, Nauryzbay, Abdiramanov (corr.), Zhumazhanov, Urnek |
 | Affiliations | Done (2 affiliations, Zh.A. dual-affiliated) |
 | Corresponding author ORCID | Provided (Zh.A.: 0000-0003-3820-7253) |
-| Co-author ORCIDs | Issa: 0009-0004-9631-6284 ✓; Nauryzbay: 0009-0002-5513-712X ✓; Zhumazhanov & Urnek: **still needed** |
-| Funding statement + grant number | Done — No. 05-04/568 |
+| Co-author ORCIDs | **All five provided** — Issa: 0009-0004-9631-6284; Nauryzbay: 0009-0002-5513-712X; Zhumazhanov: 0009-0008-5187-6105; Urnek: 0009-0009-0099-4408 |
+| Funding statement + grant number | Done — shortened to funder + grant No. 05-04/568, no project title/names in the manuscript text |
 | Author Contributions (CRediT) | Done |
 | Institutional Review Board / Informed Consent | Not applicable (no human/animal subjects) |
-| Data Availability Statement | Done — code/data "upon reasonable request" |
-| Conflicts of Interest | Done — none declared |
-| Reference list format & completeness | Done — 20 references, ACS numeric style |
+| Data Availability Statement | Done — code/data "upon reasonable request"; full source also mirrored on GitHub (private repo) |
+| Acknowledgments | Done — thanks Almaty Technological University for computational support, plus GenAI disclosure |
+| Conflicts of Interest | Done — shortened to a single sentence, none declared |
+| Reference list format & completeness | Done — 45 references, ACS numeric style, all DOI-verified against Crossref |
 | Figures embedded and captioned | Done — 1 figure (energy dissipation) |
 | Tables captioned and numbered | Done — 6 main tables + 2 appendices |
+| Materials and Methods structure | Done — consolidated to 7 subsections (was 15 across the paper; merged baselines, merged implementation details into their parent subsections) |
+| Appendix A mathematical proofs | Done — standard Lemma/Theorem/Proposition/Corollary statements with conventional proofs now precede each Lean code block, so reviewers need not read Lean |
 | Supplementary materials identified | See Section 4 below — not yet uploaded to the portal |
 | Suggested reviewers (optional) | **NOT PREPARED** — optional, consider adding |
 | Cover letter | Draft in Section 1, now includes MDPI's two required verbatim statements |
-| GenAI use disclosure (Materials & Methods + Acknowledgments) | Done — added per your wording (data analysis + translation, manually checked) |
+| GenAI use disclosure | Done — stated once, in Acknowledgments only (removed the duplicate sentence previously also present in Materials and Methods 2.6) |
 | Conference-paper extension disclosure (ICCMA 2026) | Done — dagger footnote on title page, reference list entry, and cover-letter statement, per MDPI's conference-paper policy |
 | Special Issue targeting | Done — cover letter now names "Selected Papers from the 4th International Conference: Constructive Mathematical Analysis" |
 | MDPI author account / submission portal | **ACTION NEEDED** — submit via susy.mdpi.com |
@@ -190,18 +197,15 @@ Location on disk: `D:\Videos\KazNPU\Symmetry_PINN_2026\`
 
 # 5. Outstanding Items Requiring Your Action
 
-- Provide ORCID iDs for Esimkhan Zhumazhanov and Dastan Urnek if they have them (their emails are now on file for the submission portal; Issa and Nauryzbay's ORCIDs are already in the manuscript).
 - Confirm the final author order and that all five co-authors have seen and approved this manuscript version before submission (MDPI requires explicit confirmation at submission; this is now also one of the two verbatim statements in the cover letter).
 - Decide whether to name suggested reviewers (optional but often speeds handling; entered in the submission system, not the cover letter).
 - Finalize and sign the cover letter (Section 1) on institutional letterhead if your workflow requires it.
-- Decide the actual hosting/access mechanism for the Data Availability Statement (currently "upon reasonable request," which matches one of MDPI's own recommended templates) — consider a public repository (e.g., Zenodo, GitHub) if you would prefer open code/data, which MDPI encourages but does not require.
+- The Data Availability Statement text still reads "upon reasonable request"; the underlying code/data/manuscript/Lean project is now also mirrored on a private GitHub repository (`github.com/Zhanars/essim_urnek`) — decide whether to make that repository public and cite it directly in the statement, or leave the request-based wording as is.
 - Create an MDPI account (if not already) and submit via the **direct Special Issue submission link**: https://susy.mdpi.com/user/manuscripts/upload?journal=symmetry&form[special_issue_id]=270508 (this pre-selects the "Selected Papers from ICCMA 2026" Special Issue — do not use the generic Symmetry submission link, or the manuscript will not be routed to the Special Issue).
 - Note the Special Issue's Article Processing Charge: 2400 CHF, and its submission deadline: 31 December 2026.
 
-## GenAI disclosure (final wording, as added to the manuscript)
+## GenAI disclosure (final wording, as it appears in the manuscript)
 
-**Materials and Methods (Implementation Details, closing paragraph):**
-> "Generative AI (Claude, Anthropic) was used to assist with the analysis of the numerical results obtained in this study and with translation. All AI-assisted analysis and translated text were subsequently checked manually by the authors, who take full responsibility for the content of this publication."
+Stated once, in Acknowledgments (the duplicate sentence formerly also present at the end of Materials and Methods \S2.6 has been removed):
 
-**Acknowledgments (appended):**
-> "During the preparation of this manuscript, the authors used Claude (Anthropic) to assist with analysis of the obtained results and with translation. The authors have reviewed and verified this output manually and take full responsibility for the content of this publication."
+> "The authors thank the Almaty Technological University for computational support. During the preparation of this manuscript, the authors used Claude (Anthropic) to assist with analysis of the obtained results and with translation. The authors have reviewed and verified this output manually and take full responsibility for the content of this publication."
