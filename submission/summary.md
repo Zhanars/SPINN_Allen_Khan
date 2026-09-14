@@ -168,7 +168,7 @@ Both methods showed near-flat $L^2$ error across $\varepsilon\in\{0.01,0.005,0.0
 | Funding statement + grant number | Done — shortened to funder + grant No. 05-04/568, no project title/names in the manuscript text |
 | Author Contributions (CRediT) | Done |
 | Institutional Review Board / Informed Consent | Not applicable (no human/animal subjects) |
-| Data Availability Statement | Done — code/data "upon reasonable request"; full source also mirrored on GitHub (private repo) |
+| Data Availability Statement | Done — code/data "upon reasonable request" (kept as-is; GitHub mirror stays private, not cited in the statement) |
 | Acknowledgments | Done — thanks Almaty Technological University for computational support, plus GenAI disclosure |
 | Conflicts of Interest | Done — shortened to a single sentence, none declared |
 | Reference list format & completeness | Done — 45 references, ACS numeric style, all DOI-verified against Crossref |
@@ -200,7 +200,6 @@ Location on disk: `D:\Videos\KazNPU\Symmetry_PINN_2026\`
 - Confirm the final author order and that all five co-authors have seen and approved this manuscript version before submission (MDPI requires explicit confirmation at submission; this is now also one of the two verbatim statements in the cover letter).
 - Decide whether to name suggested reviewers (optional but often speeds handling; entered in the submission system, not the cover letter).
 - Finalize and sign the cover letter (Section 1) on institutional letterhead if your workflow requires it.
-- The Data Availability Statement text still reads "upon reasonable request"; the underlying code/data/manuscript/Lean project is now also mirrored on a private GitHub repository (`github.com/Zhanars/essim_urnek`) — decide whether to make that repository public and cite it directly in the statement, or leave the request-based wording as is.
 - Create an MDPI account (if not already) and submit via the **direct Special Issue submission link**: https://susy.mdpi.com/user/manuscripts/upload?journal=symmetry&form[special_issue_id]=270508 (this pre-selects the "Selected Papers from ICCMA 2026" Special Issue — do not use the generic Symmetry submission link, or the manuscript will not be routed to the Special Issue).
 - Note the Special Issue's Article Processing Charge: 2400 CHF, and its submission deadline: 31 December 2026.
 
