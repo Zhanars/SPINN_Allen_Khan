@@ -23,7 +23,7 @@ This research was funded by Abai Kazakh National Pedagogical University, grant n
 
 ## Document status
 
-Manuscript compiles cleanly on the official MDPI *Symmetry* LaTeX template (**19 pages**), zero LaTeX errors, zero undefined references. Targeted at the Special Issue "Selected Papers from the 4th International Conference: Constructive Mathematical Analysis" (ICCMA 2026), as an extended version of the authors' ICCMA 2026 conference abstract. All numerical results are from executed code (local machine + a 64-core Linux server, *ai.atu* — the Almaty Technological University's server, reached over SSH); none are estimated or fabricated. All Lean 4 proofs compile against Lean 4.33.1 + Mathlib with zero uses of `sorry` and depend only on Lean's three standard axioms; Appendix A now also states each result as a conventional mathematical Lemma/Theorem/Proposition/Corollary with a standard proof immediately before the corresponding Lean code, so reviewers do not need to read Lean to verify correctness. Reference list: **45 entries**, all bearing a DOI or a verified alternative link (institutional repository / arXiv ID / conference-proceedings URL), systematically checked against Crossref (one incorrect author attribution found and corrected during this process). Full source (code, data, manuscript, Lean project) is also mirrored at a private GitHub repository for cross-device continuity: `github.com/Zhanars/essim_urnek`.
+Manuscript compiles cleanly on the official MDPI *Symmetry* LaTeX template (**19 pages**), zero LaTeX errors, zero undefined references. Targeted at the Special Issue "Selected Papers from the 4th International Conference: Constructive Mathematical Analysis" (ICCMA 2026), as an extended version of the authors' ICCMA 2026 conference abstract. All numerical results are from executed code (local machine + a 64-core Linux server, *ai.atu* — the Almaty Technological University's server, reached over SSH); none are estimated or fabricated. All Lean 4 proofs compile against Lean 4.33.1 + Mathlib with zero uses of `sorry` and depend only on Lean's three standard axioms; Appendix A now also states each result as a conventional mathematical Lemma/Theorem/Proposition/Corollary with a standard proof immediately before the corresponding Lean code, so reviewers do not need to read Lean to verify correctness. Reference list: **45 entries**, all bearing a DOI or a verified alternative link (institutional repository / arXiv ID / conference-proceedings URL), systematically checked against Crossref (one incorrect author attribution found and corrected during this process). Full source (code, data, manuscript, Lean project) is mirrored at `github.com/Zhanars/essim_urnek`, now cited directly in the Data Availability Statement — **make sure the repository's visibility is set to Public on GitHub before submission**, since Claude has no GitHub API/CLI access on this machine to flip that switch itself.
 
 \newpage
 
@@ -168,7 +168,7 @@ Both methods showed near-flat $L^2$ error across $\varepsilon\in\{0.01,0.005,0.0
 | Funding statement + grant number | Done — shortened to funder + grant No. 05-04/568, no project title/names in the manuscript text |
 | Author Contributions (CRediT) | Done |
 | Institutional Review Board / Informed Consent | Not applicable (no human/animal subjects) |
-| Data Availability Statement | Done — code/data "upon reasonable request" (kept as-is; GitHub mirror stays private, not cited in the statement) |
+| Data Availability Statement | Done — code/data publicly available at `github.com/Zhanars/essim_urnek`, cited directly in the manuscript statement |
 | Acknowledgments | Done — thanks Almaty Technological University for computational support, plus GenAI disclosure |
 | Conflicts of Interest | Done — shortened to a single sentence, none declared |
 | Reference list format & completeness | Done — 45 references, ACS numeric style, all DOI-verified against Crossref |
@@ -197,6 +197,7 @@ Location on disk: `D:\Videos\KazNPU\Symmetry_PINN_2026\`
 
 # 5. Outstanding Items Requiring Your Action
 
+- **Set `github.com/Zhanars/essim_urnek` to Public** (Settings → Danger Zone → Change repository visibility). The manuscript's Data Availability Statement now cites this URL directly, so it must be publicly reachable before/at submission.
 - Confirm the final author order and that all five co-authors have seen and approved this manuscript version before submission (MDPI requires explicit confirmation at submission; this is now also one of the two verbatim statements in the cover letter).
 - Decide whether to name suggested reviewers (optional but often speeds handling; entered in the submission system, not the cover letter).
 - Finalize and sign the cover letter (Section 1) on institutional letterhead if your workflow requires it.
