@@ -8,14 +8,14 @@
 
 ## Authors
 
-Zhuldyz Issa¹, Adil Nauryzbay¹, Zhanars Abdiramanov¹˒²\* (corresponding), Esimkhan Zhumazhanov¹, Dastan Urnek¹
+Zhuldyz Issa¹, Adil Nauryzbay¹, Zhanars Abdiramanov¹˒²\* (corresponding), Yessimkhan Zhumazhanov¹, Dastan Urnek¹
 
 ¹ Department of Mathematics and Mathematical Modeling, Abai Kazakh National Pedagogical University, Almaty 050010, Kazakhstan
 ² Institute of Information and Computational Technologies, Almaty 050010, Kazakhstan
 
 Corresponding author: zh.abdiramanov@abaiuniversity.edu.kz
 
-ORCID: Zh. Issa 0009-0004-9631-6284 · A. Nauryzbay 0009-0002-5513-712X · Zh. Abdiramanov 0000-0003-3820-7253 · E. Zhumazhanov 0009-0008-5187-6105 · D. Urnek 0009-0009-0099-4408
+ORCID: Zh. Issa 0009-0004-9631-6284 · A. Nauryzbay 0009-0002-5513-712X · Zh. Abdiramanov 0000-0003-3820-7253 · Y. Zhumazhanov 0009-0008-5187-6105 · D. Urnek 0009-0009-0099-4408
 
 ## Funding
 

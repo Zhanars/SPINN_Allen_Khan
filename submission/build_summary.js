@@ -84,7 +84,7 @@ const doc = new Document({
         p("A Spectral–Physics-Informed Neural Network Hybrid with Energy-Constrained Training for the Allen–Cahn Equation: Forward and Inverse Problems", { bold: true }),
 
         heading2("Authors"),
-        p("Zhuldyz Issa \u00b9, Adil Nauryzbay \u00b9, Zhanars Abdiramanov \u00b9\u00b7\u00b2\u002A (corresponding), Esimkhan Zhumazhanov \u00b9, Dastan Urnek \u00b9"),
+        p("Zhuldyz Issa \u00b9, Adil Nauryzbay \u00b9, Zhanars Abdiramanov \u00b9\u00b7\u00b2\u002A (corresponding), Yessimkhan Zhumazhanov \u00b9, Dastan Urnek \u00b9"),
         p("\u00b9 Department of Mathematics and Mathematical Modeling, Abai Kazakh National Pedagogical University, Almaty 050010, Kazakhstan", { size: 20 }),
         p("\u00b2 Institute of Information and Computational Technologies, Almaty 050010, Kazakhstan", { size: 20 }),
         p("Corresponding author: zh.abdiramanov@abaiuniversity.edu.kz \u00b7 ORCID (Zh.A.): 0000-0003-3820-7253", { size: 20 }),
@@ -256,7 +256,7 @@ const doc = new Document({
         bullet("Figure source (figures/energy_dissipation.png) and generation script (code/make_figures.py)"),
 
         heading1("5. Outstanding Items Requiring Your Action"),
-        bullet("Provide ORCID iDs for Zhuldyz Issa, Adil Nauryzbay, Esimkhan Zhumazhanov, and Dastan Urnek (MDPI requests these for all authors where available)."),
+        bullet("Provide ORCID iDs for Zhuldyz Issa, Adil Nauryzbay, Yessimkhan Zhumazhanov, and Dastan Urnek (MDPI requests these for all authors where available)."),
         bullet("Confirm the final author order and that all four co-authors have seen and approved this manuscript version before submission (MDPI requires explicit confirmation at submission)."),
         bullet("Decide whether to name suggested reviewers (optional but often speeds handling)."),
         bullet("Finalize and sign the cover letter (Section 1) on institutional letterhead if your workflow requires it."),
