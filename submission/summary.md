@@ -168,7 +168,7 @@ Both methods showed near-flat $L^2$ error across $\varepsilon\in\{0.01,0.005,0.0
 | Funding statement + grant number | Done — shortened to funder + grant No. 05-04/568, no project title/names in the manuscript text |
 | Author Contributions (CRediT) | Done |
 | Institutional Review Board / Informed Consent | Not applicable (no human/animal subjects) |
-| Data Availability Statement | Done — code/data maintained in a private repository (`github.com/Zhanars/SPINN_Allen_Khan`), URL cited in the manuscript; access granted by the corresponding author upon reasonable request |
+| Data Availability Statement | Revised after MDPI editorial query (see Section 6) — minimal dataset provided as Supporting Information at submission; full repo (`github.com/Zhanars/SPINN_Allen_Khan`) to be made public **upon acceptance**; on-request until then |
 | Acknowledgments | Done — thanks Almaty Technological University for computational support, plus GenAI disclosure |
 | Conflicts of Interest | Done — shortened to a single sentence, none declared |
 | Reference list format & completeness | Done — 45 references, ACS numeric style, all DOI-verified against Crossref |
@@ -209,3 +209,22 @@ Location on disk: `D:\Videos\KazNPU\Symmetry_PINN_2026\`
 Stated once, in Acknowledgments (the duplicate sentence formerly also present at the end of Materials and Methods \S2.6 has been removed):
 
 > "The authors thank the Almaty Technological University for computational support. During the preparation of this manuscript, the authors used Claude (Anthropic) to assist with analysis of the obtained results and with translation. The authors have reviewed and verified this output manually and take full responsibility for the content of this publication."
+
+\newpage
+
+# 6. MDPI Editorial Query on Data Availability (manuscript ID symmetry-4596052)
+
+On 2026-09-15, Managing Editor Ida Li queried the initially submitted Data Availability Statement ("available on request" with no stated reason), citing MDPI's Research Data Policy, and asked for either a justification or an alternative template (public repository, etc.).
+
+**Decision:** keep the repository private for now, but commit to a genuine, stated reason (release upon acceptance) rather than leaving it unexplained. The manuscript's Data Availability Statement (Section~2.4, `\dataavailability{}`) was revised accordingly and the PDF recompiled (still 19 pp., zero errors).
+
+**Suggested reply to the editor** (paste into your response to ida.li@mdpi.com):
+
+> Dear Ms. Li,
+>
+> Thank you for the note. We have revised the Data Availability Statement for symmetry-4596052 as follows: a minimal dataset sufficient to verify the study's conclusions was already provided as Supporting Information at submission. The complete source code, extended experiment logs, and the Lean 4 formal-verification project are maintained in a repository (https://github.com/Zhanars/SPINN_Allen_Khan) that we will make publicly available upon acceptance of the manuscript; until then, they remain available from the corresponding author upon reasonable request. We have updated the manuscript's Data Availability Statement (Section 2.4) to state this explicitly and can re-upload the revised PDF if needed.
+>
+> Best regards,
+> Zhanars Abdiramanov, on behalf of all co-authors
+
+**Action item for you:** when the manuscript is accepted, actually flip `github.com/Zhanars/SPINN_Allen_Khan` to Public — this reply makes it a stated commitment, not just an offer.
