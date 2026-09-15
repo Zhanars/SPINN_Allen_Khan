@@ -222,7 +222,7 @@ On 2026-09-15, Managing Editor Ida Li queried the initially submitted Data Avail
 
 > Dear Ms. Li,
 >
-> Thank you for the note. We have revised the Data Availability Statement for symmetry-4596052 as follows: a minimal dataset sufficient to verify the study's conclusions was already provided as Supporting Information at submission. The complete source code, extended experiment logs, and the Lean 4 formal-verification project are maintained in a repository (https://github.com/Zhanars/SPINN_Allen_Khan) that we will make publicly available upon acceptance of the manuscript; until then, they remain available from the corresponding author upon reasonable request. We have updated the manuscript's Data Availability Statement (Section 2.4) to state this explicitly and can re-upload the revised PDF if needed.
+> Thank you for the note. We have revised the Data Availability Statement for symmetry-4596052 as follows: a minimal dataset sufficient to verify the study's conclusions was already provided as Supporting Information at submission. The complete source code, extended experiment logs, and the Lean 4 formal-verification project are maintained in a repository (https://github.com/Zhanars/SPINN_Allen_Khan) that we will make publicly available upon acceptance of the manuscript. In the meantime, we can grant immediate collaborator access to reviewers or readers who provide a GitHub username, so the repository can be inspected during peer review without delay. We have updated the manuscript's Data Availability Statement (Section 2.4) to state this explicitly and can re-upload the revised PDF if needed.
 >
 > Best regards,
 > Zhanars Abdiramanov, on behalf of all co-authors
