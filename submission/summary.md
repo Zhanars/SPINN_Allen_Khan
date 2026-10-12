@@ -2,6 +2,57 @@
 
 *Symmetry (MDPI) — Research Article*
 
+# Revision 1 — resubmission package (state of 2026-10-12)
+
+**Decision of round 1:** rejected to allow revision; resubmit with the same ID (symmetry-4596052), highlighted changes and a point-by-point response.
+
+**New title:** *A Chebyshev-Coefficient Physics-Informed Neural Network for the Allen–Cahn Equation: Exact Neumann Basis, A-Posteriori Energy Balance and Inverse Identification*
+
+**Files to upload** (all in this repository):
+
+| File | Content |
+|---|---|
+| `manuscript/manuscript_r1_highlighted.pdf` (+ `.tex`) | revised manuscript, all changes in blue (for the editor and reviewers) |
+| `manuscript/manuscript_r1_clean.pdf` (+ `.tex`) | clean revised manuscript |
+| `manuscript/response_r1.pdf` (+ `.tex`) | point-by-point response to both reviewers |
+| `submission/symmetry-4596052_R1_manuscript.zip` | LaTeX source (both versions), MDPI class files, figures, PDFs, response |
+| `submission/symmetry-4596052_R1_supporting_data.zip` | Supporting Information: raw results of every run, trained weights, reference solutions, scripts |
+
+**How it was produced.** All 1D experiments were re-run with the harness in `code/` (`r1_run.py all`, 191 jobs incl. ablations; 42 earlier runs on the workstation, everything else on the ai.atu server, one CPU thread per run), plus clean timing runs (`r1_run.py timing 1`). Every number, table and figure of the revised manuscript is generated from `data_r1/` by `code/make_tex_r1.py` and `code/make_figures_r1.py`; `manuscript/build_r1.py both` assembles and compiles both versions.
+
+**Key results of the revision** (B1: ε=0.01, T=1; B2: ε=0.1, T=1; B3: ε=0.05, T=5; L² error at t=1, t=5 for B3; mean ± SD over seeds):
+
+| | B1 | B2 | B3 |
+|---|---|---|---|
+| Chebyshev collocation N=80, δt=5e-4 | 5.37e-5 | 5.10e-5 | 5.04e-5 |
+| Reaction-only ODE (no diffusion) | 1.89e-3 | 1.47e-1 | 4.64e-1 |
+| Vanilla PINN | (6.76±1.39)e-2 | (1.24±0.49)e-2 | 1.28 |
+| Vanilla PINN + L-BFGS | (7.01±0.39)e-3 | 1.31e-3 (1 seed) | — |
+| Spectral-PINN revised (exact Neumann basis, K=32) | (8.29±1.43)e-4 | (4.28±0.50)e-3 | 9.48e-1 |
+| Spectral-PINN revised + L-BFGS (K=32) | (5.05±0.08)e-4 | 1.97e-3 (1 seed) | — |
+| Spectral-PINN as submitted (soft penalty, K=32) | (1.27±0.25)e-3 | (5.12±1.84)e-2 | — |
+
+- Revised vs vanilla PINN on B1: ratio of seed means 81 (95 % bootstrap interval 66–99); this replaces the inconsistent 49/47 of the first version. With L-BFGS refinement of both: 14 on B1, and on B2 the vanilla PINN is slightly better. Classical solver is 15× (B1) and 84× (B2) more accurate than the revised network. On B3 all PINNs fail.
+- Mode number (B1): as submitted K=64 (9.71±1.43)e-2 vs revised (1.46±0.42)e-3; soft penalty rescaled to unit weight (λ_BC=K⁴) is worse, (3.98±0.49)e-1. Revised K=128 (6.68±1.29)e-3; 2× budget: K=64 2.24e-4, K=128 1.46e-3; K=256 default budget 3.48e-2 (first version: 1.5).
+- Energy penalty: λ_E ∈ {0,…,5000} gives mean errors 8.23e-4…8.30e-4; every trained Spectral-PINN (118 runs, penalized or not, accurate or not) has monotone energy (only the vanilla PINN on B3 has increases); the penalty matters only without warm-up, where it makes the result worse ((4.09±3.32)e-2 vs (6.46±6.88)e-3).
+- Maximum bound: revised networks reach max|u| ≤ 1.0031, vanilla PINNs exceed 1 by up to 8.4e-3, inaccurate networks up to 2.05.
+- A-posteriori energy balance holds to 2e-14 for every trained network; for revised K=32 the residual term is 1.3e-5 against an energy decrease of 7.1e-2. Lean 4 file `PerturbedFlow.lean` (39 theorems, standard axioms only).
+- Inverse problem: joint Adam gives ε̂ ≈ 0.70 ε_init (0.61–0.73 over 20 runs) — the "38 % bias" was the start value. Variable projection: 0.62 % / 0.33 % error without noise, but 11 % / 3.0 % with σ=0.01 (classical least squares on the same noise: 1.8 % / 0.60 %). ε=0.01 is not identifiable at σ=0.01 (Cramér–Rao 45 %).
+- 2D: S(1) between 1.26e-31 and 3.74e-31 in all configurations (range corrected).
+
+**Retracted conclusions of the first version:** degradation with K (boundary-penalty artefact), the 38 % inverse bias (start-value artefact), zero energy violations as an effect of the penalty (penalty inactive). 22 of 77 numerical statements of v1 were wrong, 7 unverifiable (`revision1/audit_numbers/audit_numbers.md`).
+
+**Author actions before resubmission**
+
+1. Read the highlighted PDF and the response letter; all co-authors approve.
+2. Check the GenAI statement in the Acknowledgments (it now describes the actual extent of AI assistance in the revision).
+3. Run `lake build` once in `lean/AllenCahnVerification` on a machine with a fast GitHub connection (the project now includes `PerturbedFlow.lean`). The proofs were re-checked here against Lean 4.35.0-rc2 + Mathlib `b0df0c4`; the pinned Lean 4.33.1 build could not be repeated because cloning Mathlib from GitHub repeatedly failed.
+4. Upload via https://susy.mdpi.com/user/manuscripts/upload?pre_hash_key=760fc201bdbd8cda5fc7fe42d548ad3d&resubmit=1 (keep the manuscript ID).
+
+---
+
+*The sections below describe the original submission (first version) and are kept for reference.*
+
 ## Manuscript
 
 **A Spectral–Physics-Informed Neural Network Hybrid with Energy-Constrained Training for the Allen–Cahn Equation: Forward and Inverse Problems**

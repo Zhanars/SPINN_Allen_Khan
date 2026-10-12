@@ -23,7 +23,12 @@ def flatten_inputs(text):
         fn = m.group(1)
         p = os.path.join(SRC, fn)
         return open(p, encoding="utf-8").read() if os.path.exists(p) else m.group(0)
-    return re.sub(re.escape(BS) + r"input\{([^}]+)\}", rep, text)
+    for _ in range(5):                      # nested inputs (appendix -> 73_app_orig -> tab_orig)
+        new = re.sub(re.escape(BS) + r"input\{([^}]+)\}", rep, text)
+        if new == text:
+            break
+        text = new
+    return text
 
 
 def reorder_bib(body, refs_text):

@@ -1,67 +1,67 @@
-# HANDOFF: Symmetry revision round 1 (symmetry-4596052), state of 2026-10-12
+# HANDOFF: Symmetry revision round 1 (symmetry-4596052), state of 2026-10-12 (evening)
 
-Work stopped here on purpose: the experiments must be run on the server **ai.atu** (64 cores), which is not reachable from the
-machine where the code was written. Everything needed is in this repository. Continue on the PC that can reach ai.atu.
+**Status: the revision is complete up to the author actions in Section 5.** All experiments have been run on ai.atu, every number/table/figure
+is generated from `data_r1/`, both manuscript versions, the response to the reviewers and the upload packages are built.
+(The previous handoff, written before the experiments, is in git history: commit 03649f2.)
 
-## 1. Decision and what the reviewers said
+## 1. Reviewer points and where they are answered
 
-MDPI *Symmetry* rejected the manuscript "to allow revision" (resubmit with the same ID, highlighted changes, point-by-point response).
-Reviewer PDFs: `manuscript/round 1/`. Submitted version (for reference): `manuscript/v1_submitted/`.
-
-| # | Reviewer point | Status |
+| # | Reviewer point | Answer (revised manuscript) |
 |---|---|---|
-| R1-i | Novelty: Xia-Boettcher-Chou 2023 (coefficient networks, Chebyshev) and Kuetuek-Yuecel 2025 (energy penalty) | Accepted. Verified, cited, claims toned down (Intro, drafted). Lit review: `revision1/lit/lit_review.md` |
-| R1-ii | Initial condition x^2 cos(pi x) violates Neumann (u_x(-1,0)=2) | **Confirmed.** New IC u0=(cos(pi x)-cos^2(pi x))/2. Pilot: no change in conclusions of the submitted code |
-| R1-iii | Lean theorem not connected to the trained network | Answered: a-posteriori energy balance dE/dt=-|u_t|^2+<r,u_t>+eps^2[u_x u_t], Lean-verified (`revision1/lean/PerturbedFlow.lean`, 41 theorems, standard axioms only, compiles in ~100 s) + residual measured for every trained net (`balance` in the run JSONs) |
-| R1-minor | abstract too long; MBP discussion; S(t) range wrong | Abstract: TODO (<=200 words). MBP: `max_abs_u` recorded in every run. S(t): text fixed in 30_results.tex draft (true range 1.3e-31..3.7e-31) |
-| R2-1 | 49 vs 47 | 49 = ratio of 5-seed means; 47 = seed 42 only. Bootstrap CI code in `code/r1_tables.py` |
-| R2-2 | lambda_E not reported | lambda_E = 50 (10 checkpoints per unit time). Ablation lambda_E in {0,1,10,50,500,5000}: group `abl_hard` |
-| R2-3 | Figure 1 curves identical | Penalty is inactive (audit: nonzero in 1 of 120 logged epochs; curves differ by 4.5e-7). Group `regimes_hard` looks for regimes where it matters |
-| R2-4 | niche vs classical Chebyshev solver | Honest answer drafted in `manuscript/r1_src/40_discussion.tex` (classical solver wins the forward problem; benchmarks B2, B3 added) |
-| R2-5 | 38 % inverse bias unexplained | **Retracted.** It is an optimisation artefact (see 2) |
+| R1-i | Novelty (Xia et al. 2023; Kuetuek-Yuecel 2025) | Cited; claims toned down; contributions restated (Intro, Sec. 4.1) |
+| R1-ii | IC violates Neumann | New compatible IC; Appendix D repeats the main runs with the original IC (conclusions unchanged) |
+| R1-iii | Lean not connected to the trained net | A-posteriori energy balance (Sec. 2.5, App. B, `PerturbedFlow.lean`, 39 theorems) + measured for every net (Table 4) |
+| R1-minor | abstract; MBP; S(t) range | Abstract < 200 words; max\|u\| for every net (Sec. 3.4); S(t) range corrected (Sec. 3.6) |
+| R2-1 | 49 vs 47 | Ratio of seed means + bootstrap CI: 81 [66, 99] on B1 (14 after L-BFGS; on B2 2.9 with Adam, reversed after L-BFGS) |
+| R2-2 | lambda_E | lambda_E = 50 stated; ablation 0..5000 (Table 3): no effect |
+| R2-3 | Figure 1 curves identical | Penalty inactive (curves differ by 2e-6); Fig. 3(b,c) |
+| R2-4 | niche vs classical solver | Classical solver 15x (B1) / 84x (B2) more accurate; B3: PINNs fail; Sec. 4.1 states it plainly |
+| R2-5 | 38 % bias | Retracted: estimate = 0.70 x eps_init (start value + optimizer step size); variable projection; classical LS; identifiability |
 
-## 2. Findings that change the paper (all from our own audit/runs)
+Response letter: `manuscript/response_r1.tex/.pdf` (references resolve against `manuscript_r1_clean.aux` via `xr-hyper`).
 
-1. **"Accuracy degrades with K" was an implementation artefact.** The Neumann penalty was divided by K^2 and then squared (effective weight lambda_BC/K^4); at K=64 the wall slope of the trained network is ~4 and L2 6e-2 (seed 42, pilot). With the exact Neumann basis (`hard_bc=True`, phi_k = T_k - k^2/(k+2)^2 T_{k+2}) K=64 gives L2 1.7e-3 vs 9.2e-4 at K=32. Gauss-Lobatto collocation (`grid="cgl"`) is a secondary improvement.
-2. **The ~38 % inverse "bias" is the start value.** Joint Adam gives eps_hat ~ 0.68-0.72 x eps_init for every init and eps_true (data weight, K, snapshots irrelevant). Classical least squares recovers eps exactly (noise-free), Fisher-limited otherwise; eps=0.01 is not identifiable for sigma>=0.01. A working neural estimator: variable projection (closed-form eps^2) + data-fit phase + large data weight: pilot (hard basis, lambda_data=2000): eps_hat/eps_true = 0.97 (eps=0.05), 0.96 (eps=0.1).
-3. **Energy penalty is inactive**; unpenalised nets (also the vanilla PINN) already have 0 energy increases. MBP: networks overshoot |u|<=1 by up to ~1e-2 (not guaranteed).
-4. **Benchmark B1 (eps=0.01,T=1) is reaction dominated**: the closed-form diffusion-free ODE already has L2 1.9e-3 (compat IC), as good as the PINN. Added B2 (eps=0.1,T=1: ODE error 0.147) and B3 (eps=0.05,T=5, interfaces; K=32 representation floor 1.2e-2, K=64 floor 1.9e-4).
-5. Reference solver of v1 had first-order wall rows; Chebyshev-baseline row used a wrong norm; 22 of 77 numerical claims of v1 were wrong/unverifiable (`revision1/audit_numbers/audit_numbers.md`).
-6. Certified reference: `code/refsol.py` (Chebyshev + Radau, certified <=1e-8; report `revision1/audit_code/audit_code.md`).
+## 2. Findings of the runs that changed the drafted text (all incorporated)
 
-## 3. Code map (all new code in `code/`)
+1. Rescaling the soft Neumann penalty to unit weight (lambda_BC = K^4) does **not** fix it: L2 0.35 (K=32), 0.40 (K=64), 1.27 (K=128) - ill-conditioned loss. Only the exact basis works.
+2. Revised network at fixed budget still degrades with K (8.3e-4, 1.5e-3, 6.7e-3, 3.5e-2 for K=32..256); 2x budget: K=64 2.2e-4, K=128 1.5e-3.
+3. B3 (eps=0.05, T=5): all PINNs fail (L2 ~0.9 at t=5, already 5e-2 at t=0.2) - wrong trajectory, not a representation floor.
+4. B2: soft penalty harmful already at K=32 (5.1e-2, max|u| 1.30); after L-BFGS the vanilla PINN (1.31e-3) beats the revised Spectral-PINN (1.97e-3), one seed each.
+5. Energy penalty: inactive everywhere except training without warm-up, where it makes results worse (4.1e-2 vs 6.5e-3). All 118 trained Spectral-PINNs (and all vanilla PINNs on B1/B2) have monotone energy, even with L2 ~ 1; only the vanilla PINN on B3 has increases (169 of 250 intervals).
+6. MBP: revised nets max|u| <= 1.0031, vanilla up to 1.0084, inaccurate nets up to 2.05.
+7. Inverse: joint Adam displacement is set by the lr of log eps (multipliers 1/10/100 -> |log| 0.10/0.38/2.5), ~99 % of it in the first 200 epochs. Variable projection: 0.62 %/0.33 % noise-free, but 11 %/3 % low with sigma=0.01, collapses with sigma=0.05, fails with K=64 or 10 obs. points; classical LS on the same noise: 1.8 %/0.6 % (Cramer-Rao limited).
+8. ||r||^2 (degree 6K) is integrated by Clenshaw-Curtis on 4K+8 nodes to 1e-12 relative (checked against 6K+8 nodes, `data_r1/check_quad.json`).
 
-* `r1_core.py` evaluation (errors on the 200-pt grid, MBP, energy violations at 3 resolutions, energy balance diagnostics), `refsol.py` reference.
-* `r1_run.py <group> [nproc]` runs a job group; each job writes `data_r1/runs/<tag>.json` (+ `data_r1/models/<tag>.pt`); finished tags are skipped.
-* `r1_jobs.py` job groups. **`all`** = everything still needed (179 jobs, 35 done, ~960 core-minutes), longest first. Other groups: `forward`, `forward_hard`, `b2`, `abl_hard`, `regimes_hard`, `stress_K_hard`, `variants2`, `lbfgs`, `b3`, `inverse`, `timing`.
-* `r1_inverse.py` inverse problem (modes `adam`, `varpro`).
-* `r1_tables.py` aggregation (mean+-SD, bootstrap ratios), `make_tex_r1.py` (**only the `ode.*`/`cheb.*` number macros are implemented; the table/number generators for the other `\N{...}` keys used in `manuscript/r1_src/30_results.tex` still have to be written**), `make_figures_r1.py` (4 figures, first draft).
-* `spectral_pinn.py` options: `grid="uniform"|"cgl"`, `hard_bc`, `lbfgs_iters`, `T`, `u0`. `vanilla_pinn.py`: `T`, `u0`, `lbfgs_iters`. Defaults reproduce the submitted code.
-* Old pilot/diagnostic scripts: `revision1/pilot/`. Audits: `revision1/audit_*`, Lean: `revision1/lean/`, literature: `revision1/lit/`.
+## 3. Code and data map (additions of this session)
 
-## 4. What to run on ai.atu
+* `code/r1_jobs.py`: new groups `inverse_abl` (joint-Adam ablation, 12 jobs) and `regimes_soft64` (as-submitted K=64 + penalty); both are part of `all` (191 jobs).
+* `code/r1_classical2.py b3|inverse|floor|timing` -> `data_r1/classical2_*.json` (classical solver on B3, classical LS inverse with the *same* noise realisations as the neural runs + 20 extra, polynomial representation floors, server timing of the classical solver).
+* `code/r1_profiles.py` -> `data_r1/profiles_b3.json` (Fig. B3); `code/r1_check_quad.py` -> `data_r1/check_quad.json`; `code/finalize_r1.sh` (server post-processing chain).
+* `code/make_tex_r1.py`: all `\N{...}` keys and the tables `tab_forward, tab_K, tab_energy, tab_balance, tab_inverse (3 tables), tab_2d (2 tables), tab_orig`; prints keys used in the text but missing in the data. Values use `\ensuremath`, so `\N{}` works in and out of math mode.
+* `code/make_figures_r1.py`: `fig_energy, fig_K, fig_balance, fig_inverse (3 panels), fig_b3`.
+* `manuscript/build_r1.py` (nested `\input` now flattened), `manuscript/package_r1.py` (upload zips), `manuscript/r1_src/73_app_orig.tex` (Appendix D).
+* `data_r1/runs_workstation.txt`: the 42 runs computed on the i5-9400F workstation (all others on ai.atu, Xeon Gold 6430).
+* Lean: `lean/AllenCahnVerification/AllenCahnVerification/PerturbedFlow.lean` added and imported by the root file.
+
+## 4. Reproduce
 
 ```bash
-git clone https://github.com/Zhanars/SPINN_Allen_Khan.git && cd SPINN_Allen_Khan/code
-pip install torch numpy scipy matplotlib          # CPU torch is enough; Python 3.10+
-export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1   # IMPORTANT (thread oversubscription bug seen before)
-nohup python r1_run.py all 56 > ../data_r1/all.log 2>&1 &     # ~1000 core-minutes: expect 30-60 min wall (longest single job ~50 min)
-# when finished and the machine is idle (clean timings for the tables):
-python r1_run.py timing 1
+# on ai.atu (repo is private: copy it with `git bundle create spinn.bundle --all` + scp + `git clone spinn.bundle`)
+cd SPINN_Allen_Khan/code
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
+PY=~/spectral_pinn_test/venv/bin/python          # torch 2.14 cpu; no system torch on ai.atu
+nohup $PY r1_run.py all 36 > ../data_r1/all.log 2>&1 &   # finished jobs are skipped; ~95 min wall on 36 processes
+./finalize_r1.sh                                 # waits for "all", then profiles, timing (1 process), classical timing, quadrature check
+# anywhere with numpy/scipy/matplotlib (torch not needed):
+python r1_classical2.py inverse; python r1_classical2.py floor
+python make_tex_r1.py && python make_figures_r1.py
+cd ../manuscript && python build_r1.py both && pdflatex response_r1.tex && pdflatex response_r1.tex && python package_r1.py
 ```
 
-Before trusting the inverse results run first `inv_vp_e0.05_ld2000` and check `ratio_to_true` is about 0.9-1.0: the least-squares eps^2 inside `r1_inverse.py` was just changed to use the same quadrature weights as the PDE loss (the pilot used unweighted sums consistently; the first harness version mixed them and gave 0.1-0.2). If it is far off, revert to unweighted sums for both loss and LS.
+## 5. Remaining author actions
 
-Not yet run at all: `variants2` (soft penalty with lambda_BC=K^4 control), `lbfgs` (stronger PINN baselines), `b3`, `abl_hard`, `regimes_hard`, `stress_K_hard`, `inverse` (only the 10 joint-Adam init-sweep runs exist), `b2`. Already finished (in `data_r1/runs`, 42 JSONs): `fh_K32`, `fh_K32_E50`, `fh_K64` (5 seeds each), `fh_K128` (s42, s7), `fwd_compat_vanilla` s42/123/7/99, `fwd_compat_K64` s42/123/7/2024, `var_K32/K64_*` pilot variants (single seed), `inv_adam_*` (10 runs, eps_true=0.05 only), `smoke`. Preliminary numbers from these (L2 at t=1, B1): vanilla ~7e-2, revised K=32 ~9.8e-4, revised K=64 ~1.5e-3, as-submitted K=64 ~9.6e-2. Their `train_time` was measured under CPU oversubscription: use the `timing` group for the time columns. Delete a JSON to force a rerun.
+1. Read `manuscript/manuscript_r1_highlighted.pdf` and `manuscript/response_r1.pdf`; all co-authors approve. The response is signed by the corresponding author.
+2. Check the GenAI statement in the Acknowledgments (rewritten to describe the actual AI assistance in the revision).
+3. Run `lake build` in `lean/AllenCahnVerification` once on a machine with a fast GitHub connection. `PerturbedFlow.lean`, `Basic.lean` and `GradientFlow.lean` were re-checked here only against Lean 4.35.0-rc2 + Mathlib `b0df0c4` (no errors, no warnings, standard axioms); cloning Mathlib for the pinned 4.33.1 build failed (GitHub git transfer ~50-100 KB/s, then disconnects) on both the PC and ai.atu.
+4. Upload at https://susy.mdpi.com/user/manuscripts/upload?pre_hash_key=760fc201bdbd8cda5fc7fe42d548ad3d&resubmit=1 (keep the manuscript ID): highlighted + clean PDF, response letter, `submission/symmetry-4596052_R1_manuscript.zip`, Supporting Information `submission/symmetry-4596052_R1_supporting_data.zip`.
 
-`data_r1/classical.json` (Chebyshev baseline + ODE) is final; `python r1_classical.py` regenerates it.
-
-## 5. What remains to write (after the runs)
-
-1. Implement the generators for the remaining `\N{...}` keys and the tables `tab_forward.tex, tab_K.tex, tab_energy.tex, tab_balance.tex, tab_inverse.tex, tab_2d.tex` (referenced from `30_results.tex`; the 2D numbers come from the unchanged `data/symmetry_2d_multiseed.json`, `data/stress_2d_sweep.json`, `data/experiment_2d.json`). Re-read every sentence of `30_results.tex` and `40_discussion.tex` against the actual numbers: they were drafted before the data existed and make claims (e.g. "the vanilla PINN overshoots more", "penalty does nothing in all regimes", "variable projection error falls with lambda_data") that **must be checked and rewritten if the data say otherwise**.
-2. `50_conclusions.tex` and `abstract_r1.tex` (<=200 words), `73_app_orig.tex` (original-IC replication; placeholder `%%APP_ORIG%%` in `70_appendix.tex`), update `60_backmatter.tex` (Data availability, GenAI statement), Lean appendix text (`70_appendix.tex` contains `revision1/lean/perturbed_flow.tex`; adapt its Remark about the K^-4 penalty to the revised method, copy `PerturbedFlow.lean` into the Lean project and compile).
-3. `python manuscript/build_r1.py both` builds `manuscript_r1_highlighted.tex/pdf` (changes in blue via `\rev{}`) and the clean version, reorders the bibliography by first citation (all 31 new references are verified in `revision1/lit/verify_*.md`; add pages 26548--26560 for Krishnapriyan2021).
-4. Response to reviewers (point by point, honest: list the three retracted conclusions and the other corrections), update `submission/summary.md`, re-send the PDF/zip, commit/push.
-5. Resubmit at https://susy.mdpi.com/user/manuscripts/upload?pre_hash_key=760fc201bdbd8cda5fc7fe42d548ad3d&resubmit=1 (author action; keep manuscript ID).
-
-Machine notes: GPU (RTX 4060) exists on the writing PC but everything is float64 with tiny networks, so it was not used. The authors' Windows shell mangles backslashes in bash heredocs: write LaTeX/Lean/Python files with an editor, not `cat <<EOF`.
+Machine notes: everything is float64 with tiny networks, CPU only. ai.atu has 32 physical cores / 64 hardware threads and is shared (another user's job uses ~24 threads); 36 processes was a good size. The Windows bash here mangles backslashes in heredocs: write LaTeX/Python with an editor (or build strings with `chr(92)`), not `cat <<EOF`.

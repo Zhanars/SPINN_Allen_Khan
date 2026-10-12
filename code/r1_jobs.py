@@ -132,6 +132,12 @@ def regimes_hard():
     return jobs
 
 
+def regimes_soft64():
+    """The as-submitted K=64 network (soft penalty with effective weight K^-4: wall slopes ~4, L2 ~ 6e-2) with the energy penalty;
+    the same configuration without the penalty is fwd_compat_K64_s* (group forward)."""
+    return [J("spectral", f"reg_K64_E50_s{s}", ic="compat", K=64, seed=s, lam_energy=50.0) for s in (42, 123, 7)]
+
+
 def stress_K_hard():
     return [J("spectral", "kh_K64_x2", ic="compat", K=64, seed=42, epochs=12000, warmup=2000, **HARD),
             J("spectral", "kh_K128_x2", ic="compat", K=128, seed=42, epochs=12000, warmup=2000, **HARD),
@@ -173,6 +179,29 @@ def inverse():
         add(f"vp_e0.05_lpde{lp:g}", eps=0.05, mode="varpro", phaseA=3000, lam_data=2000, lam_dataA=1000, lam_pde=lp)
     add("vp_e0.05_nophaseA", eps=0.05, mode="varpro", phaseA=0, lam_data=2000)
     add("vp_e0.05_K64", eps=0.05, mode="varpro", phaseA=3000, lam_data=2000, lam_dataA=1000, K=64)
+    return jobs
+
+
+def inverse_abl():
+    """Joint Adam (the procedure of the first version) with the revised network, eps_true=0.05, eps_init=2 eps_true:
+    which settings change the estimate?  (data weight, observation design, K, learning-rate multiplier of log eps, budget, PDE weight)"""
+    jobs = []
+    def add(tag, **kw):
+        d = {"method": "inverse", "tag": "inv_ab_" + tag, "ic": "compat", "eps": 0.05, "mode": "adam"}
+        d.update(kw)
+        jobs.append(d)
+    add("ld2000", lam_data=2000.0)
+    add("ld2000_i1.0", lam_data=2000.0, eps_init_f=1.0)
+    add("nx10", n_obs_x=10)
+    add("nx160", n_obs_x=160)
+    add("nt20", obs_times=[round(0.05 * i, 2) for i in range(1, 21)])
+    add("K16", K=16)
+    add("K64", K=64)
+    add("mult1", eps_lr_mult=1.0)
+    add("mult100", eps_lr_mult=100.0)
+    add("ep16000", epochs=16000)
+    add("lpde5", lam_pde=5.0)
+    add("lpde500", lam_pde=500.0)
     return jobs
 
 
@@ -235,7 +264,7 @@ def all_jobs():
     """Everything that is still needed for the revision, without duplicates, longest jobs first.
     (The orig-IC jobs of the group 'forward' are trimmed to 3 seeds / no vanilla: they only serve Appendix D.)"""
     seen, jobs = set(), []
-    for g in (forward_trimmed, forward_hard, b2, abl_hard, regimes_hard, stress_K_hard, variants2, lbfgs, b3, inverse, var128):
+    for g in (forward_trimmed, forward_hard, b2, abl_hard, regimes_hard, stress_K_hard, variants2, lbfgs, b3, inverse, var128, inverse_abl, regimes_soft64):
         for jb in g():
             if jb["tag"] not in seen:
                 seen.add(jb["tag"]); jobs.append(jb)
@@ -258,5 +287,5 @@ def timing():
             J("spectral", "timing_hard_K64_s42", ic="compat", K=64, seed=42, **HARD)]
 
 
-JOBS = {"all": all_jobs, "timing": timing, "lbfgs": lbfgs, "queue2": queue2, "variants2": variants2, "b3": b3, "inverse": inverse, "forward_hard": forward_hard, "b2": b2, "abl_hard": abl_hard, "regimes_hard": regimes_hard, "stress_K_hard": stress_K_hard, "queue1": queue1, "variants": variants, "smoke": smoke, "forward": forward, "ablation_lamE": ablation_lamE, "penalty_regimes": penalty_regimes,
+JOBS = {"all": all_jobs, "timing": timing, "inverse_abl": inverse_abl, "regimes_soft64": regimes_soft64, "lbfgs": lbfgs, "queue2": queue2, "variants2": variants2, "b3": b3, "inverse": inverse, "forward_hard": forward_hard, "b2": b2, "abl_hard": abl_hard, "regimes_hard": regimes_hard, "stress_K_hard": stress_K_hard, "queue1": queue1, "variants": variants, "smoke": smoke, "forward": forward, "ablation_lamE": ablation_lamE, "penalty_regimes": penalty_regimes,
         "stress_K": stress_K, "stress_T": stress_T}
