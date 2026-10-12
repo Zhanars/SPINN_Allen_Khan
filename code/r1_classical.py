@@ -29,3 +29,20 @@ for ic in ("compat", "orig"):
         out[f"{ic}_eps{eps:g}"] = rec
         print(ic, eps, [(c["N"], c["dt"], f"{c['l2']:.2e}", f"{c['linf']:.2e}", f"{c['time_median']:.2f}s") for c in rec["cheb"]], "ODE t=1:", rec["ode"]["1.0"], flush=True)
 json.dump(out, open(os.path.join(HERE, "..", "data_r1", "classical.json"), "w"), indent=1)
+
+# ---- B3: eps = 0.05, T = 5 (error at t = 5)
+import time as _time
+ref5 = r1_core.reference(0.05, "compat", [1.0, 2.0, 3.0, 4.0, 5.0])
+u0 = r1_core.IC["compat"]
+rec = {"cheb": []}
+for N, dt in [(64, 1e-3), (96, 1e-3), (128, 5e-4), (128, 1e-4)]:
+    ts = []
+    for rep in range(2):
+        t0 = _time.time(); x, snaps = solve_chebyshev(0.05, N=N, dt=dt, T=5.0, u0=u0, save_times=[5.0]); ts.append(_time.time() - t0)
+    u5 = refsol.bary_interp(x, snaps[5.0], r1_core.XE)
+    rec["cheb"].append({"N": N, "dt": dt, "l2": r1_core.l2(u5, ref5[5.0]), "linf": r1_core.linf(u5, ref5[5.0]), "time_median": float(np.median(ts))})
+a = u0(r1_core.XE)
+rec["ode"] = {str(t): {"l2": r1_core.l2(a * np.exp(t) / np.sqrt(1 + a ** 2 * (np.exp(2 * t) - 1)), ref5[t])} for t in (1.0, 5.0)}
+out["compat_eps0.05_T5"] = rec
+print("B3", rec["cheb"], rec["ode"], flush=True)
+json.dump(out, open(os.path.join(HERE, "..", "data_r1", "classical.json"), "w"), indent=1)

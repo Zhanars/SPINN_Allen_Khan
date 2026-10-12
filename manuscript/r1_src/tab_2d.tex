@@ -1,0 +1,32 @@
+\begin{table}[H]
+\caption{Reflection-symmetry violation $S(t)$ (Section~\ref{sec:2d}) for the Fourier-Spectral-PINN (single run; architecturally exact regardless of seed) versus a vanilla PINN with the same periodic input encoding (mean $\pm$ SD over 5 seeds). Data of the first version, unchanged.\label{tab:2d}}
+\small
+\begin{tabularx}{\textwidth}{ccc}
+\toprule
+$t$ & Fourier-Spectral-PINN & Vanilla PINN (5 seeds)\\
+\midrule
+0.0 & \ensuremath{8.71\times10^{-32}} & \ensuremath{(4.12\pm1.13)\times10^{-5}}\\
+0.2 & \ensuremath{9.41\times10^{-32}} & \ensuremath{(4.94\pm1.16)\times10^{-5}}\\
+0.5 & \ensuremath{1.03\times10^{-31}} & \ensuremath{(9.46\pm1.81)\times10^{-5}}\\
+1.0 & \ensuremath{1.26\times10^{-31}} & \ensuremath{(2.22\pm0.45)\times10^{-4}}\\
+\bottomrule
+\end{tabularx}
+
+\end{table}
+
+\begin{table}[H]
+\caption{Fourier-Spectral-PINN reflection-symmetry violation $S(1)$ at larger $M$ and smaller $\varepsilon$ (data of the first version, unchanged).\label{tab:stress-2d}}
+\small
+\begin{tabularx}{\textwidth}{cccc}
+\toprule
+$M$ & $\varepsilon$ & epochs & $S(1)$\\
+\midrule
+8 & 0.3 & 3000 & \ensuremath{1.27\times10^{-31}}\\
+16 & 0.3 & 3000 & \ensuremath{1.27\times10^{-31}}\\
+16 & 0.3 & 6000 & \ensuremath{1.26\times10^{-31}}\\
+8 & 0.1 & 3000 & \ensuremath{3.74\times10^{-31}}\\
+16 & 0.1 & 6000 & \ensuremath{3.74\times10^{-31}}\\
+\bottomrule
+\end{tabularx}
+
+\end{table}

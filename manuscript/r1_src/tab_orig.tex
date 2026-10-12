@@ -1,0 +1,13 @@
+\begin{table}[H]
+\caption{\rev{Original initial condition $x^2\cos(\pi x)$ versus the compatible condition~\eqref{eq:IC}: $L^2$ error at $t=1$ ($\varepsilon=0.01$) of the as-submitted Spectral-PINN, mean $\pm$ SD over $n$ seeds, and the largest wall slope $|u_x(\pm1,t)|$.}\label{tab:orig}}
+\small
+\begin{tabularx}{\textwidth}{Xcccccc}
+\toprule
+Variant & $n$ & original: $L^2$ & wall slope & $n$ & compatible: $L^2$ & wall slope\\
+\midrule
+as submitted, $K=32$ & 0 & \textbf{--} & \textbf{--} & 0 & \textbf{--} & \textbf{--}\\
+as submitted, $K=64$ & 0 & \textbf{--} & \textbf{--} & 4 & \ensuremath{(9.93\pm1.56)\times10^{-2}} & 5.67\\
+\bottomrule
+\end{tabularx}
+
+\end{table}

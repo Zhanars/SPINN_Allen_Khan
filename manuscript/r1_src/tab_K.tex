@@ -1,0 +1,27 @@
+\begin{table}[H]
+\caption{\rev{Effect of the mode number $K$ for different treatments of the Neumann condition and of the collocation grid (B1, $L^2$ error at $t=1$). Budget is the number of epochs relative to $6000+1000$ warm-up epochs. Single-seed rows have $n=1$ (SD not defined). The wall slope is the maximum of $|u_x(\pm1,t)|$ over the trained trajectory. Times marked $^\dagger$ come from concurrently executed runs.}\label{tab:K}}
+\small
+\begin{tabularx}{\textwidth}{p{4.8cm}cccccc}
+\toprule
+\textbf{Variant} & $K$ & Budget & $L^2$ error & max $|u_x(\pm1)|$ & $n$ & Time (s)\\
+\midrule
+soft penalty, equispaced grid (as submitted) & 32 & $1\times$ & \textbf{--} & \textbf{--} & 0 & \textbf{--}\\
+ & 64 & $1\times$ & \ensuremath{(9.93\pm1.56)\times10^{-2}} & 5.67 & 4 & 410$^\dagger$\\
+ & 128 & $1\times$ & \textbf{--} & \textbf{--} & 0 & \textbf{--}\\
+soft penalty, Gauss--Lobatto grid & 32 & $1\times$ & \ensuremath{9.33\times10^{-4}} & 0.55 & 1 & 192$^\dagger$\\
+ & 64 & $1\times$ & \ensuremath{1.52\times10^{-2}} & 4.02 & 1 & 446$^\dagger$\\
+soft penalty rescaled ($\lambda_{\rm BC}=K^4$) & 32 & $1\times$ & \textbf{--} & \textbf{--} & 0 & \textbf{--}\\
+ & 64 & $1\times$ & \textbf{--} & \textbf{--} & 0 & \textbf{--}\\
+ & 128 & $1\times$ & \textbf{--} & \textbf{--} & 0 & \textbf{--}\\
+\midrule
+exact Neumann basis, equispaced grid & 64 & $1\times$ & \ensuremath{2.07\times10^{-3}} & 0.00 & 1 & 475$^\dagger$\\
+exact Neumann basis, Gauss--Lobatto grid (revised) & 32 & $1\times$ & \ensuremath{(8.29\pm1.43)\times10^{-4}} & 0.00 & 5 & 251$^\dagger$\\
+ & 64 & $1\times$ & \ensuremath{(1.46\pm0.42)\times10^{-3}} & 0.00 & 5 & 587$^\dagger$\\
+ & 128 & $1\times$ & \ensuremath{(6.57\pm1.80)\times10^{-3}} & 0.00 & 2 & 732$^\dagger$\\
+ & 64 & $2\times$ & \textbf{--} & \textbf{--} & 0 & \textbf{--}\\
+ & 128 & $2\times$ & \textbf{--} & \textbf{--} & 0 & \textbf{--}\\
+ & 256 & $1\times$ & \textbf{--} & \textbf{--} & 0 & \textbf{--}\\
+\bottomrule
+\end{tabularx}
+
+\end{table}

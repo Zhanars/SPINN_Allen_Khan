@@ -327,13 +327,14 @@ The maxima exist and the continuity hypotheses of \eqref{eq:integrated-L2} hold 
 \begin{Remark}[What this does and does not say about the trained network]\label{rem:compute}
 (i) The theorem is conditional: it converts a bound on the PDE residual and on the Neumann defect into a bound on energy growth. It does not prove that training makes $\delta$ or $b$ small, and the resulting bound $\frac{\delta^2}{2}T$ can be far larger than the actual energy variation.
 The values of $\delta$ and $b$ must be reported for each trained network before any quantitative conclusion is drawn; they are computable to rounding error, because $r(\cdot,t)$ is a polynomial of degree $\le3K$ in $x$, so $\|r(\cdot,t)\|^2$ is integrated exactly by Gauss--Legendre quadrature with $N\ge3K+1$ nodes, and $u_x(\pm1,t)$, $u_t(\pm1,t)$ are evaluated directly from the coefficients.
-(ii) The training objective contains the mean-square residual at collocation points and a boundary penalty on $u_x(\pm1,t)$.
-In the code accompanying the submission (\texttt{spectral\_pinn.py}, default settings) the residual is evaluated on $100$ uniformly spaced times and $300$ uniformly spaced points of $[-1,1]$, so the PDE loss is a mean over this grid, which approximates $\frac{1}{2T}\int_0^T\|r\|^2\,dt$ (the factor $2=|\Omega|$) but is not an exact quadrature of the degree-$6K$ polynomial $r^2$; and the boundary term penalizes $u_x(\pm1,t)/K^2$ (the boundary rows are rescaled by $K^2$), i.e.\ $u_x(\pm1,t)^2$ with weight $K^{-4}\lambda_{\mathrm{bc}}$, which is a very weak control of $b$ for large $K$.
-Hence the loss values reported during training are proxies for $\delta$ and $b$ and must not be substituted for them; both should be evaluated on the trained network as described in (i).
+(ii) The training objective contains the mean-square residual at collocation points and, in the as-submitted variant, a penalty on $u_x(\pm1,t)$.
+In the as-submitted code the residual is evaluated on $100$ uniformly spaced times and $300$ equispaced points of $[-1,1]$ (a plain mean, not an exact quadrature of the degree-$6K$ polynomial $r^2$), and the boundary penalty acts on $u_x(\pm1,t)/K^2$, i.e.\ on $u_x(\pm1,t)^2$ with weight $K^{-4}\lambda_{\mathrm{BC}}$, which is a very weak control of $b$ for large $K$ (Section~\ref{sec:results-k}).
+In the revised variant the PDE loss is the Clenshaw--Curtis quadrature of $\frac12\|r\|^2$ on $\max(300,4K+8)$ Gauss--Lobatto nodes, and the Neumann condition holds identically, so $\beta\equiv0$ and $b=0$.
+In both variants the loss values reported during training are proxies for $\delta$ and $b$ and must not be substituted for them; both are evaluated on the trained network as described in (i) (Table~\ref{tab:balance}).
 With the integral form \eqref{eq:integrated-L2}, the energy increase is controlled by the time-integrated squared residual and the boundary term, which are the two quantities that the PDE and boundary losses are designed to make small.
 (iii) The bound does not involve the energy-penalty term of the loss.
 This is consistent with the observation that the energy curves with and without the penalty are nearly indistinguishable, but it does not prove why: it only shows that a small residual and a small Neumann defect already constrain the energy growth.
-(iv) The initial condition $u_0(x)=x^2\cos(\pi x)$ of the submitted version has $u_{0,x}(-1)=2\neq0$, so for a network that fits $u_0$ the factor $u_x(-1,0)$ in the defect term is not small at $t=0$; whether $b$ is small then depends on $u_t(\pm1,t)$ and has to be measured, not assumed. With a Neumann-compatible initial condition this particular source of a non-zero defect at $t=0$ disappears.
+(iv) The initial condition $u_0(x)=x^2\cos(\pi x)$ of the first version has $u_{0,x}(-1)=2\neq0$, so for a network that fits $u_0$ the factor $u_x(-1,0)$ in the defect term is not small at $t=0$. With the Neumann-compatible initial condition~\eqref{eq:IC} and the exact Neumann basis this source of a non-zero defect is absent.
 \end{Remark}
 
 \subsection{Machine Verification}\label{app:perturbed-lean}
@@ -370,6 +371,6 @@ Not machine-checked are: Step~1 of Proposition~\ref{prop:pde-identity} (that $\m
 
 For the two-dimensional experiment of Section~\ref{sec:2d}, the reflection-symmetry violation $S(t)$ was evaluated on an endpoint-inclusive grid $x_i=-\pi+ih$, $h=2\pi/(n-1)$, $i=0,\dots,n-1$ ($n=49$), so that $x_{n-1-i}=-x_i$ exactly; this avoids an artificial, purely discretization-induced violation that would otherwise arise from comparing a periodic (endpoint-excluded) training grid against its naive array reversal.
 
-%%APP_ORIG%%
+\input{73_app_orig.tex}
 \input{72_app_ref.tex}
 

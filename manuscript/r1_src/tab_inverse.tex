@@ -1,0 +1,78 @@
+\begin{table}[H]
+\caption{\rev{Joint Adam training of the network and $\log\varepsilon$ (as in the first version): recovered $\hat\varepsilon$ for different starting values $\varepsilon_{\rm init}$ (noise-free data, 5 snapshots, 40 points, $\lambda_{\rm data}=2$, one run each). The ratio to the starting value is nearly constant, and data and truth have little influence.}\label{tab:inverse1}}
+\small
+\begin{tabularx}{\textwidth}{cccccc}
+\toprule
+$\varepsilon_{\rm init}/\varepsilon_{\rm true}$ & variant & $\varepsilon_{\rm true}$ & $\hat\varepsilon/\varepsilon_{\rm true}$ & $\hat\varepsilon/\varepsilon_{\rm init}$ & data misfit (RMS)\\
+\midrule
+0.5 & as submitted & 0.05 & 0.36 & 0.72 & 2.8e-02\\
+0.5 & revised & 0.05 & 0.31 & 0.61 & 7.9e-03\\
+1 & as submitted & 0.05 & 0.71 & 0.71 & 5.1e-02\\
+1 & revised & 0.05 & 0.68 & 0.68 & 6.7e-03\\
+1.5 & as submitted & 0.05 & 1.08 & 0.72 & 6.7e-02\\
+1.5 & revised & 0.05 & 1.10 & 0.73 & 7.8e-03\\
+2 & as submitted & 0.05 & 1.43 & 0.72 & 8.2e-02\\
+2 & revised & 0.05 & 1.37 & 0.69 & 1.4e-02\\
+4 & as submitted & 0.05 & 2.87 & 0.72 & 1.3e-01\\
+4 & revised & 0.05 & 2.73 & 0.68 & 5.1e-02\\
+0.5 & soft & 0.1 & \textbf{--} & \textbf{--} & \textbf{--}\\
+0.5 & hard & 0.1 & \textbf{--} & \textbf{--} & \textbf{--}\\
+1 & soft & 0.1 & \textbf{--} & \textbf{--} & \textbf{--}\\
+1 & hard & 0.1 & \textbf{--} & \textbf{--} & \textbf{--}\\
+1.5 & soft & 0.1 & \textbf{--} & \textbf{--} & \textbf{--}\\
+1.5 & hard & 0.1 & \textbf{--} & \textbf{--} & \textbf{--}\\
+2 & soft & 0.1 & \textbf{--} & \textbf{--} & \textbf{--}\\
+2 & hard & 0.1 & \textbf{--} & \textbf{--} & \textbf{--}\\
+4 & soft & 0.1 & \textbf{--} & \textbf{--} & \textbf{--}\\
+4 & hard & 0.1 & \textbf{--} & \textbf{--} & \textbf{--}\\
+\bottomrule
+\end{tabularx}
+
+\end{table}
+
+\begin{table}[H]
+\caption{\rev{Variable-projection estimator: noise-free data, effect of the data weight (upper part) and of the observation design and loss weights (lower part, $\varepsilon_{\rm true}=0.05$).}\label{tab:inverse2}}
+\small
+\begin{tabularx}{\textwidth}{Xcccc}
+\toprule
+Setting & $n$ & $\varepsilon_{\rm true}$ & rel. error of $\hat\varepsilon$ (\%) & data misfit (RMS)\\
+\midrule
+variable projection, $\lambda_{\rm data}=20$ & 0 & 0.05 & \textbf{--} & \textbf{--}\\
+variable projection, $\lambda_{\rm data}=200$ & 0 & 0.05 & \textbf{--} & \textbf{--}\\
+variable projection, $\lambda_{\rm data}=2000$ & 0 & 0.05 & \textbf{--} & \textbf{--}\\
+variable projection, $\lambda_{\rm data}=20000$ & 0 & 0.05 & \textbf{--} & \textbf{--}\\
+variable projection, $\lambda_{\rm data}=20$ & 0 & 0.1 & \textbf{--} & \textbf{--}\\
+variable projection, $\lambda_{\rm data}=200$ & 0 & 0.1 & \textbf{--} & \textbf{--}\\
+variable projection, $\lambda_{\rm data}=2000$ & 0 & 0.1 & \textbf{--} & \textbf{--}\\
+variable projection, $\lambda_{\rm data}=20000$ & 0 & 0.1 & \textbf{--} & \textbf{--}\\
+\midrule
+10 observation points, $\lambda_{\rm data}=2000$ & 0 & 0.05 & \textbf{--} & \textbf{--}\\
+160 observation points, $\lambda_{\rm data}=2000$ & 0 & 0.05 & \textbf{--} & \textbf{--}\\
+3 snapshots, $\lambda_{\rm data}=2000$ & 0 & 0.05 & \textbf{--} & \textbf{--}\\
+20 snapshots, $\lambda_{\rm data}=2000$ & 0 & 0.05 & \textbf{--} & \textbf{--}\\
+$\lambda_{\rm PDE}=5$, $\lambda_{\rm data}=2000$ & 0 & 0.05 & \textbf{--} & \textbf{--}\\
+$\lambda_{\rm PDE}=500$, $\lambda_{\rm data}=2000$ & 0 & 0.05 & \textbf{--} & \textbf{--}\\
+no data-fitting phase, $\lambda_{\rm data}=2000$ & 0 & 0.05 & \textbf{--} & \textbf{--}\\
+$K=64$, $\lambda_{\rm data}=2000$ & 0 & 0.05 & \textbf{--} & \textbf{--}\\
+\bottomrule
+\end{tabularx}
+
+\end{table}
+
+\begin{table}[H]
+\caption{\rev{Inverse problem with noisy data: neural variable-projection estimator (5 noise realizations; $\lambda_{\rm data}=2000$) against the classical least-squares estimator with the Chebyshev solver (20 realizations) and the Cram\'er--Rao bound $\sigma/\|\partial_{\log\varepsilon}\mathbf d\|$. At $\varepsilon=0.01$ the problem is not identifiable for $\sigma\ge0.01$.}\label{tab:inverse3}}
+\small
+\begin{tabularx}{\textwidth}{ccXcc}
+\toprule
+$\varepsilon_{\rm true}$ & $\sigma$ & neural (variable projection): mean $|$rel. err.$|$ (\%) & classical LS: RMSE (\%) & Cram\'er--Rao (\%)\\
+\midrule
+0.05 & 0.01 & \textbf{--} & 2.6 & 2.0\\
+0.05 & 0.05 & \textbf{--} & 8.8 & 10.2\\
+0.1 & 0.01 & \textbf{--} & 0.7 & 0.7\\
+0.1 & 0.05 & \textbf{--} & 2.6 & 3.4\\
+0.01 & 0 & \textbf{--} & 0.0 & 0.0\\
+0.01 & 0.01 & \textbf{--} & 53.2 & 45.4\\
+\bottomrule
+\end{tabularx}
+
+\end{table}

@@ -24,6 +24,7 @@
 % highlighted-changes switch: \hltrue = changes shown in blue (version for the editor), \hlfalse = clean version
 \newif\ifhl
 \HLSWITCH
+\newcommand{\TODO}[1]{{\color{red}\textbf{[TODO: #1]}}}
 \newcommand{\rev}[1]{\ifhl{\color{blue}#1}\else#1\fi}
 \input{numbers_r1.tex}
 

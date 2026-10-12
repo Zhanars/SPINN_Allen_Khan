@@ -23,7 +23,12 @@ def flatten_inputs(text):
         fn = m.group(1)
         p = os.path.join(SRC, fn)
         return open(p, encoding="utf-8").read() if os.path.exists(p) else m.group(0)
-    return re.sub(re.escape(BS) + r"input\{([^}]+)\}", rep, text)
+    for _ in range(5):                      # nested inputs
+        new = re.sub(re.escape(BS) + r"input\{([^}]+)\}", rep, text)
+        if new == text:
+            break
+        text = new
+    return text
 
 
 def reorder_bib(body, refs_text):
@@ -64,9 +69,13 @@ def build(mode):
         log = r.stdout
     errs = re.findall(r"(?m)^! .*", log)
     undef = re.findall(r"(?m)^.*(?:undefined|Undefined).*$", log)
-    qq = doc.count("??[")
+    try:
+        txt = subprocess.run(["pdftotext", name + ".pdf", "-"], cwd=HERE, capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
+        qq = f"{txt.count('[TODO:')} TODO + {txt.count('[n/a:')} missing numbers"
+    except Exception:
+        qq = "?"
     pages = re.findall(r"Output written on .*\((\d+) pages", log)
-    print(f"[{mode}] pages={pages} errors={len(errs)} undefined-warnings={len(undef)} unresolved-numbers={qq} missing-bib={missing} unused-bib={len(unused)}")
+    print(f"[{mode}] pages={pages} errors={len(errs)} undefined-warnings={len(undef)} TODO-markers={qq} missing-bib={missing} unused-bib={len(unused)}")
     for e in errs[:8]:
         print("   ", e)
     for u in undef[:8]:

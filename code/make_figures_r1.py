@@ -34,11 +34,11 @@ def fig_energy():
     fig, ax = plt.subplots(1, 3, figsize=(7.2, 2.5))
     ax[0].plot(t, Ea, "-", color="#3498db", lw=1.8, label=r"$\lambda_E=0$")
     ax[0].plot(t, Eb, "--", color="#e74c3c", lw=1.4, label=r"$\lambda_E=50$")
-    ax[0].set_xlabel("t"); ax[0].set_ylabel("E(t)"); ax[0].legend(); ax[0].set_title("(a) energy of the trained trajectory")
+    ax[0].set_xlabel("t"); ax[0].set_ylabel("E(t)"); ax[0].legend(); ax[0].set_title("(a) energy E(t)")
     ax[1].semilogy(t, np.abs(Eb - Ea) + 1e-18, color="k")
     step = np.abs(np.diff(Ea)).min()
     ax[1].axhline(step, color="gray", ls=":", label="smallest decrement per step")
-    ax[1].set_xlabel("t"); ax[1].set_ylabel(r"$|E_{50}-E_{0}|$"); ax[1].legend(fontsize=6); ax[1].set_title("(b) difference between the two")
+    ax[1].set_xlabel("t"); ax[1].set_ylabel(r"$|E_{50}-E_{0}|$"); ax[1].legend(fontsize=6); ax[1].set_title("(b) difference")
     # (c) penalty activity vs lambda_E over seeds: number of epochs with nonzero L_E and max lam*L_E
     lams = [0.0, 1.0, 10.0, 50.0, 500.0, 5000.0]
     pats = {0.0: "fh_K32_s*", 1.0: "ah_lamE1_s*", 10.0: "ah_lamE10_s*", 50.0: "fh_K32_E50_s*", 500.0: "ah_lamE500_s*", 5000.0: "ah_lamE5000_s*"}
@@ -49,7 +49,7 @@ def fig_energy():
             continue
         xs.append(max(lam, 0.3)); ys.append(np.mean([r["errors"]["1.0"]["l2"] for r in rr]))
     ax[2].semilogx(xs, ys, "o-", color="#2c3e50")
-    ax[2].set_xlabel(r"$\lambda_E$ (0 plotted at 0.3)"); ax[2].set_ylabel(r"mean $L^2$ error at $t=1$"); ax[2].set_title("(c) accuracy vs penalty weight")
+    ax[2].set_xlabel(r"$\lambda_E$ (0 plotted at 0.3)"); ax[2].set_ylabel(r"mean $L^2$ error at $t=1$"); ax[2].set_title("(c) error vs weight")
     plt.tight_layout(); plt.savefig(os.path.join(FIG, "fig_energy.png")); plt.close()
 
 
@@ -125,8 +125,38 @@ def fig_inverse():
     plt.tight_layout(); plt.savefig(os.path.join(FIG, "fig_inverse.png")); plt.close()
 
 
+def fig_b3():
+    """Fig. B3: profiles at t = 5 (eps = 0.05): reference, vanilla PINN, revised Spectral-PINN K=32 and K=64 (needs data_r1/models)."""
+    import torch
+    from vanilla_pinn import MLP
+    import spectral_pinn as sp
+    import r1_core
+    tags = {"K=64": "b3_K64_E0_s42", "K=32": "b3_K32_E0_s42", "vanilla": "b3_vanilla_s42"}
+    ref = r1_core.reference(0.05, "compat", [1.0, 2.0, 3.0, 4.0, 5.0])
+    fig, ax = plt.subplots(1, 2, figsize=(7.0, 2.6))
+    ax[0].plot(r1_core.XE, ref[5.0], "k-", lw=2, label="reference")
+    for lab, tag in tags.items():
+        f = os.path.join(HERE, "..", "data_r1", "models", tag + ".pt")
+        if not os.path.exists(f):
+            continue
+        if lab == "vanilla":
+            net = MLP([2, 64, 64, 64, 1]); net.load_state_dict(torch.load(f)); 
+            from vanilla_pinn import eval_on_grid
+            u = eval_on_grid(net, r1_core.XE, 5.0)
+        else:
+            K = int(lab.split("=")[1])
+            m = sp.SpectralPINN(0.05, K=K, u0=r1_core.IC["compat"], grid="cgl", hard_bc=True)
+            m.net.load_state_dict(torch.load(f))
+            u = sp.eval_on_grid(m, 5.0, r1_core.XE)
+        ax[0].plot(r1_core.XE, u, "--", lw=1.2, label=lab)
+        ax[1].semilogy(r1_core.XE, np.abs(u - ref[5.0]) + 1e-12, lw=1.0, label=lab)
+    ax[0].set_xlabel("x"); ax[0].set_ylabel("u(x, 5)"); ax[0].legend(fontsize=6); ax[0].set_title("(a) profile at t = 5")
+    ax[1].set_xlabel("x"); ax[1].set_ylabel("|u - u_ref|"); ax[1].legend(fontsize=6); ax[1].set_title("(b) pointwise error")
+    plt.tight_layout(); plt.savefig(os.path.join(FIG, "fig_b3.png")); plt.close()
+
+
 if __name__ == "__main__":
-    for f in (fig_energy, fig_K, fig_balance, fig_inverse):
+    for f in (fig_energy, fig_K, fig_balance, fig_inverse, fig_b3):
         try:
             f(); print("ok", f.__name__)
         except Exception as ex:

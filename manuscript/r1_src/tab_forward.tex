@@ -1,0 +1,43 @@
+\begin{table}[H]
+\caption{\rev{Forward problem on the three benchmarks. Errors against the certified reference on the common 200-point grid, mean $\pm$ SD over $n$ seeds; ``Energy incr.'' = number of increases of the energy over the intervals of a grid of spacing $0.02$ (total over seeds, $50T$ intervals per run); $\max|u|$ is the largest value over all runs of the row. Time is the training time of one run on an idle single core (rows with $^\dagger$: mean over the main runs, which were executed concurrently and are not a clean timing); the classical time is the median of three solves. The vanilla PINN has 8000 Adam epochs, the Spectral-PINN 6000 (+1000 warm-up) for $T=1$.}\label{tab:forward}}
+\footnotesize
+\begin{tabularx}{\textwidth}{Xccccccc}
+\toprule
+\textbf{Method} & \textbf{Params} & $L^2$ error & $L^\infty$ error & $n$ & Time (s) & $\max|u|$ & Energy incr.\\
+\midrule
+\multicolumn{8}{l}{\textit{B1: $\varepsilon=0.01$, $T=1$ (error at $t=1$)}}\\
+Chebyshev collocation, $N=80$, $\delta t=0.0005$ & 81 & \ensuremath{5.37\times10^{-5}} & \ensuremath{6.48\times10^{-5}} & 1 & 0.21 & -- & --\\
+Chebyshev collocation, $N=80$, $\delta t=0.0001$ & 81 & \ensuremath{1.07\times10^{-5}} & \ensuremath{1.30\times10^{-5}} & 1 & 1.29 & -- & --\\
+Reaction-only ODE ($\varepsilon=0$) & 0 & \ensuremath{1.89\times10^{-3}} & \textbf{--} & 1 & -- & -- & --\\
+Vanilla PINN & 8577 & \ensuremath{(6.86\pm1.59)\times10^{-2}} & \ensuremath{(9.80\pm2.18)\times10^{-2}} & 4 & 2081$^\dagger$ & 1.0084 & 0/200\\
+Vanilla PINN + L-BFGS & 8577 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+Spectral-PINN, as submitted, $K=32$ & 6433 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+\quad + energy penalty ($\lambda_E=50$) & 6433 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+Spectral-PINN, as submitted, $K=64$ & 8513 & \ensuremath{(9.93\pm1.56)\times10^{-2}} & \ensuremath{(1.71\pm0.30)\times10^{-1}} & 4 & 410$^\dagger$ & 1.0162 & 0/200\\
+Spectral-PINN, revised, $K=32$ & 6303 & \ensuremath{(8.29\pm1.43)\times10^{-4}} & \ensuremath{(1.92\pm0.36)\times10^{-3}} & 5 & 251$^\dagger$ & 1.0013 & 0/250\\
+\quad + energy penalty ($\lambda_E=50$) & 6303 & \ensuremath{(8.29\pm1.45)\times10^{-4}} & \ensuremath{(1.92\pm0.36)\times10^{-3}} & 5 & 214$^\dagger$ & 1.0013 & 0/250\\
+\quad + L-BFGS & 6303 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+Spectral-PINN, revised, $K=64$ & 8383 & \ensuremath{(1.46\pm0.42)\times10^{-3}} & \ensuremath{(3.66\pm0.92)\times10^{-3}} & 5 & 587$^\dagger$ & 1.0014 & 0/250\\
+Spectral-PINN, revised, $K=128$ & 12543 & \ensuremath{(6.57\pm1.80)\times10^{-3}} & \ensuremath{(1.24\pm0.01)\times10^{-2}} & 2 & 732$^\dagger$ & 1.0014 & 0/100\\
+\midrule
+\multicolumn{8}{l}{\textit{B2: $\varepsilon=0.1$, $T=1$}}\\
+Chebyshev collocation, $N=80$, $\delta t=0.0005$ & 81 & \ensuremath{5.10\times10^{-5}} & \ensuremath{6.95\times10^{-5}} & 1 & 0.21 & -- & --\\
+Reaction-only ODE ($\varepsilon=0$) & 0 & \ensuremath{1.47\times10^{-1}} & \textbf{--} & 1 & -- & -- & --\\
+Vanilla PINN & 8577 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+Vanilla PINN + L-BFGS & 8577 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+Spectral-PINN, as submitted, $K=32$ & 6433 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+Spectral-PINN, revised, $K=32$ & 6303 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+\quad + L-BFGS & 6303 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+\midrule
+\multicolumn{8}{l}{\textit{B3: $\varepsilon=0.05$, $T=5$ (error at $t=5$)}}\\
+Chebyshev collocation, $N=96$, $\delta t=10^{-3}$ & 97 & \ensuremath{2.89\times10^{-5}} & \ensuremath{7.24\times10^{-5}} & 1 & 0.43 & -- & --\\
+Reaction-only ODE ($\varepsilon=0$) & 0 & \ensuremath{4.64\times10^{-1}} & \textbf{--} & 1 & -- & -- & --\\
+Vanilla PINN & 8577 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+Spectral-PINN, revised, $K=32$ & 6303 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+\quad + energy penalty & 6303 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+Spectral-PINN, revised, $K=64$ & 8383 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+\quad + energy penalty & 8383 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+\bottomrule
+\end{tabularx}
+
+\end{table}

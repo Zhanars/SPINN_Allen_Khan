@@ -1,0 +1,18 @@
+\begin{table}[H]
+\caption{\rev{A-posteriori energy balance of the trained trajectories (Section~\ref{sec:balance}): wall slope, time-integrated residual $\frac12\int_0^T\|r\|^2dt$, time-integrated boundary defect, actual energy decrease, and relative error of the identity~\eqref{eq:balance-main} checked against the autograd derivative of $E(t)$ (maximum over seeds). Means over seeds.}\label{tab:balance}}
+\small
+\begin{tabularx}{\textwidth}{Xcccccc}
+\toprule
+\textbf{Network} & $n$ & max $|u_x(\pm1)|$ & $\frac12\!\int\!\|r\|^2$ & $\int|\beta|$ & $E(0)-E(T)$ & id. error\\
+\midrule
+revised $K=32$ & 5 & 3.6e-15 & \ensuremath{1.28\times10^{-5}} & \ensuremath{3.72\times10^{-22}} & 0.071 & \ensuremath{3.4\times10^{-16}}\\
+revised $K=32$, $\lambda_E=50$ & 5 & 3.6e-15 & \ensuremath{1.28\times10^{-5}} & \ensuremath{4.12\times10^{-22}} & 0.071 & \ensuremath{3.4\times10^{-16}}\\
+revised $K=64$ & 5 & 4.4e-15 & \ensuremath{2.08\times10^{-5}} & \ensuremath{4.01\times10^{-22}} & 0.071 & \ensuremath{3.4\times10^{-16}}\\
+revised $K=128$ & 2 & 7.1e-15 & \ensuremath{5.86\times10^{-5}} & \ensuremath{1.94\times10^{-21}} & 0.070 & \ensuremath{3.4\times10^{-16}}\\
+as submitted $K=64$ & 4 & 5.7e+00 & \ensuremath{4.57\times10^{-4}} & \ensuremath{4.11\times10^{-6}} & 0.058 & \ensuremath{4.4\times10^{-16}}\\
+revised, B2 & 0 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+revised $K=64$, B3 & 0 & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--}\\
+\bottomrule
+\end{tabularx}
+
+\end{table}

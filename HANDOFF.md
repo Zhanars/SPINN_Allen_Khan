@@ -56,6 +56,13 @@ Not yet run at all: `variants2` (soft penalty with lambda_BC=K^4 control), `lbfg
 
 `data_r1/classical.json` (Chebyshev baseline + ODE) is final; `python r1_classical.py` regenerates it.
 
+## 4b. Update (same day, after the first commit): what was written afterwards without new experiments
+
+* `code/make_tex_r1.py` is now complete: it writes `manuscript/r1_src/numbers_r1.tex` and all table fragments (`tab_forward/K/energy/balance/inverse/2d/orig.tex`) from `data_r1`; missing data never stop the build (they show as `--` or `[n/a: key]`). Run it after the experiments, then `python manuscript/build_r1.py both` (prints pages, LaTeX errors, undefined references, number of TODO markers and missing numbers; currently 31 pages, 0 errors, 3 TODO + 16 missing numbers because the data are not there yet). `code/make_figures_r1.py` makes 5 figures (energy, K, balance, inverse, B3 profiles; the last needs the saved models).
+* Written: Introduction, Methods (all subsections), Results/Discussion drafts (check against data!), Conclusions, abstract (`abstract_r1.tex`), Appendices (Lean A, perturbed flow B, symmetry C, original IC D, certified reference E), back matter (GenAI statement extended: please confirm the wording), `submission/response_to_reviewers_round1.md` (draft with TODOs). Lean: `PerturbedFlow.lean` is now part of the Lean project (`lake build` OK, 8710 jobs).
+* `code/r1_classical.py` also computes the classical solver on B3 (stored in `data_r1/classical.json`); `data_r1/ident.json` = classical least-squares / Cramer-Rao study (from `revision1/pilot/classical_inverse.py`).
+* The `[TODO: ...]` markers in the manuscript text mark the sentences that can only be written after the data exist (regimes of the energy penalty; B2/B3 sentence in the Conclusions); `[n/a: key]` markers are numbers that will be filled automatically.
+
 ## 5. What remains to write (after the runs)
 
 1. Implement the generators for the remaining `\N{...}` keys and the tables `tab_forward.tex, tab_K.tex, tab_energy.tex, tab_balance.tex, tab_inverse.tex, tab_2d.tex` (referenced from `30_results.tex`; the 2D numbers come from the unchanged `data/symmetry_2d_multiseed.json`, `data/stress_2d_sweep.json`, `data/experiment_2d.json`). Re-read every sentence of `30_results.tex` and `40_discussion.tex` against the actual numbers: they were drafted before the data existed and make claims (e.g. "the vanilla PINN overshoots more", "penalty does nothing in all regimes", "variable projection error falls with lambda_data") that **must be checked and rewritten if the data say otherwise**.
