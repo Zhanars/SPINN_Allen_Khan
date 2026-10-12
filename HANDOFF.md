@@ -31,6 +31,10 @@ Response letter: `manuscript/response_r1.tex/.pdf` (references resolve against `
 7. Inverse: joint Adam displacement is set by the lr of log eps (multipliers 1/10/100 -> |log| 0.10/0.38/2.5), ~99 % of it in the first 200 epochs. Variable projection: 0.62 %/0.33 % noise-free, but 11 %/3 % low with sigma=0.01, collapses with sigma=0.05, fails with K=64 or 10 obs. points; classical LS on the same noise: 1.8 %/0.6 % (Cramer-Rao limited).
 8. ||r||^2 (degree 6K) is integrated by Clenshaw-Curtis on 4K+8 nodes to 1e-12 relative (checked against 6K+8 nodes, `data_r1/check_quad.json`).
 
+## 2b. Parallel commit ae7911f
+
+While the experiments ran, a second session on the writing PC pushed ae7911f (generators, drafts, response draft) without the new data. It was merged with the data-based versions kept for every overlapping file. Kept from it: the B3 entry of `data_r1/classical.json` (`code/r1_classical.py`), `data_r1/ident.json` (pilot Cramer-Rao study), the `\TODO` macro in the preamble, and `submission/response_to_reviewers_round1.md` (marked SUPERSEDED). The generator uses `data_r1/classical2_*.json` for B3, the classical inverse estimator and the timings; these two extra files are not used.
+
 ## 3. Code and data map (additions of this session)
 
 * `code/r1_jobs.py`: new groups `inverse_abl` (joint-Adam ablation, 12 jobs) and `regimes_soft64` (as-submitted K=64 + penalty); both are part of `all` (191 jobs).
@@ -61,7 +65,7 @@ cd ../manuscript && python build_r1.py both && pdflatex response_r1.tex && pdfla
 
 1. Read `manuscript/manuscript_r1_highlighted.pdf` and `manuscript/response_r1.pdf`; all co-authors approve. The response is signed by the corresponding author.
 2. Check the GenAI statement in the Acknowledgments (rewritten to describe the actual AI assistance in the revision).
-3. Run `lake build` in `lean/AllenCahnVerification` once on a machine with a fast GitHub connection. `PerturbedFlow.lean`, `Basic.lean` and `GradientFlow.lean` were re-checked here only against Lean 4.35.0-rc2 + Mathlib `b0df0c4` (no errors, no warnings, standard axioms); cloning Mathlib for the pinned 4.33.1 build failed (GitHub git transfer ~50-100 KB/s, then disconnects) on both the PC and ai.atu.
+3. Lean: the parallel session on the writing PC reported `lake build` OK with the pinned Lean 4.33.1 project including `PerturbedFlow.lean` (commit ae7911f, 8710 jobs). If you want to repeat it, run `lake build` in `lean/AllenCahnVerification` on a machine with a fast GitHub connection. `PerturbedFlow.lean`, `Basic.lean` and `GradientFlow.lean` were re-checked here only against Lean 4.35.0-rc2 + Mathlib `b0df0c4` (no errors, no warnings, standard axioms); cloning Mathlib for the pinned 4.33.1 build failed (GitHub git transfer ~50-100 KB/s, then disconnects) on both the PC and ai.atu.
 4. Upload at https://susy.mdpi.com/user/manuscripts/upload?pre_hash_key=760fc201bdbd8cda5fc7fe42d548ad3d&resubmit=1 (keep the manuscript ID): highlighted + clean PDF, response letter, `submission/symmetry-4596052_R1_manuscript.zip`, Supporting Information `submission/symmetry-4596052_R1_supporting_data.zip`.
 
 Machine notes: everything is float64 with tiny networks, CPU only. ai.atu has 32 physical cores / 64 hardware threads and is shared (another user's job uses ~24 threads); 36 processes was a good size. The Windows bash here mangles backslashes in heredocs: write LaTeX/Python with an editor (or build strings with `chr(92)`), not `cat <<EOF`.

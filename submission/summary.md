@@ -46,7 +46,7 @@
 
 1. Read the highlighted PDF and the response letter; all co-authors approve.
 2. Check the GenAI statement in the Acknowledgments (it now describes the actual extent of AI assistance in the revision).
-3. Run `lake build` once in `lean/AllenCahnVerification` on a machine with a fast GitHub connection (the project now includes `PerturbedFlow.lean`). The proofs were re-checked here against Lean 4.35.0-rc2 + Mathlib `b0df0c4`; the pinned Lean 4.33.1 build could not be repeated because cloning Mathlib from GitHub repeatedly failed.
+3. Lean: `lake build` of the pinned project (Lean 4.33.1, now including `PerturbedFlow.lean`) was reported OK on the writing PC (commit ae7911f); the proofs were also re-checked against Lean 4.35.0-rc2 + Mathlib `b0df0c4`.
 4. Upload via https://susy.mdpi.com/user/manuscripts/upload?pre_hash_key=760fc201bdbd8cda5fc7fe42d548ad3d&resubmit=1 (keep the manuscript ID).
 
 ---
