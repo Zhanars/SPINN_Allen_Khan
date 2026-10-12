@@ -14,7 +14,7 @@ This file is deliberately *not* an attempt to formalize the full PDE
 theory (weak derivatives, Sobolev spaces, ...) in Mathlib. Instead it
 isolates the finite-dimensional algebraic steps that, in the numerical
 PDE literature, are the most common source of silent errors -- e.g. a
-peer review of an earlier, related Allen-Cahn manuscript from the same
+peer review of an earlier, unrelated Allen-Cahn manuscript from the same
 research group flagged exactly this kind of slip: forgetting a term
 when moving a squared-norm quantity from one side of an inequality to
 the other before invoking a discrete Gronwall argument. Both lemmas
@@ -42,7 +42,7 @@ Suppose a one-step error estimate of the form
 has been derived for a semi-implicit scheme, where `a = ‖e^{n+1}‖`,
 `b = ‖e^{n}‖`, `L` is the Lipschitz constant of the nonlinearity, and
 `τ` is the time step. (This is exactly the point at which the review
-of an earlier draft in this project flagged a missing step: the term
+of that earlier, unrelated manuscript flagged a missing step: the term
 `τ(L+1) a^2` on the right-hand side must be moved to the left and the
 inequality divided by `1 - τ(L+1)` -- *not* dropped.) Under the
 stability restriction `τ(L+1) < 1`, this lemma proves the sharpened,

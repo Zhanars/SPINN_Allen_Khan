@@ -496,7 +496,7 @@ theorem perturbedFlow_energy_growth_bound
   intro s hs t ht hst
   have hDE : ∀ u ∈ Set.Icc 0 T,
       fderiv ℝ E (c u) (deriv c u)
-        = ⟪gradient E (c u), (ContinuousLinearMap.id ℝ F) (deriv c u)⟫_ℝ + (fun _ => (0 : ℝ)) u := by
+        = ⟪gradient E (c u), (ContinuousLinearMap.id ℝ F) (deriv c u)⟫_ℝ + (fun _ ↦ (0 : ℝ)) u := by
     intro u _
     rw [← toDual_gradient, toDual_apply_apply]
     simp
@@ -529,7 +529,7 @@ theorem perturbedFlow_energy_bound_quarter
     ∀ t ∈ Set.Icc 0 T, E (c t) ≤ E (c 0) + δ ^ 2 / 4 * t := by
   have hDE : ∀ u ∈ Set.Icc 0 T,
       fderiv ℝ E (c u) (deriv c u)
-        = ⟪gradient E (c u), (ContinuousLinearMap.id ℝ F) (deriv c u)⟫_ℝ + (fun _ => (0 : ℝ)) u := by
+        = ⟪gradient E (c u), (ContinuousLinearMap.id ℝ F) (deriv c u)⟫_ℝ + (fun _ ↦ (0 : ℝ)) u := by
     intro u _
     rw [← toDual_gradient, toDual_apply_apply]
     simp
@@ -643,7 +643,7 @@ splitting `DE(u)[w] = <G, w>_{L^2} + β(w)` of Section 3, the strong-form gradie
 `G = -eps^2 u_xx + f(u)` (with `f(u) = u^3 - u`) and the defect functional
 `β(w) = eps^2 [u_x w]_{x=-1}^{x=1}` (which vanishes iff `u_x(±1) = 0`).
 (The differentiation of `E` under the integral sign is *not* formalized here; see
-`perturbed_flow.tex` for its proof.) -/
+Steps 1-2 of the proof of Proposition A2 (Appendix B.2) of the accompanying article.) -/
 
 section PolynomialIBP
 

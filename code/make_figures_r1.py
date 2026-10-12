@@ -87,16 +87,17 @@ def fig_balance():
     s = r["balance"]["t_series"]
     t = np.array(s["t"]); n_r = np.array(s["n_r"]); n_ut2 = np.array(s["n_ut2"]); dEdt = np.array(s["dEdt"]); rhs = np.array(s["rhs"])
     fig, ax = plt.subplots(1, 2, figsize=(7.0, 2.5))
-    ax[0].plot(t, dEdt, "-", color="#2c3e50", label=r"$dE/dt$ (autodiff)")
+    ax[0].plot(t, dEdt, "-", color="#2c3e50", label=r"$dE/dt=\int(\varepsilon^2u_xu_{xt}+f(u)u_t)\,dx$")
     ax[0].plot(t, rhs, "--", color="#e67e22", label=r"$-\|u_t\|^2+\langle r,u_t\rangle+\beta$")
     ax[0].plot(t, -n_ut2, ":", color="#7f8c8d", label=r"$-\|u_t\|^2$")
     ax[0].set_xlabel("t"); ax[0].legend(fontsize=6); ax[0].set_title("(a) identity, trained network")
-    for tag, c in (("fh_K32_s42", "#3498db"), ("fh_K64_s42", "#27ae60"), ("fh_K32_E50_s42", "#e74c3c")):
+    for tag, c, ls, lab in (("fh_K32_s42", "#3498db", "-", r"revised $K=32$, $\lambda_E=0$"), ("fh_K64_s42", "#27ae60", "-", r"revised $K=64$, $\lambda_E=0$"),
+                            ("fh_K32_E50_s42", "#e74c3c", "--", r"revised $K=32$, $\lambda_E=50$")):
         try:
             q = run(tag)["balance"]["t_series"]
         except Exception:
             continue
-        ax[1].semilogy(q["t"], np.array(q["n_r"]), color=c, label=tag)
+        ax[1].semilogy(q["t"], np.array(q["n_r"]), ls, color=c, label=lab)
     ax[1].set_xlabel("t"); ax[1].set_ylabel(r"$\|r(\cdot,t)\|_{L^2}$"); ax[1].legend(fontsize=6); ax[1].set_title("(b) PDE residual of the trained networks")
     plt.tight_layout(); plt.savefig(os.path.join(FIG, "fig_balance.png")); plt.close()
 
@@ -146,7 +147,7 @@ def fig_inverse():
                 ax[2].plot([xpos + 0.12] * len(w), w, "s", color="#2c3e50", ms=3, alpha=0.8, label="classical least squares" if xpos == 0 else None)
             labels.append(f"{e:g} / {nz:g}"); xpos += 1
     ax[2].set_yscale("log"); ax[2].set_xticks(range(len(labels))); ax[2].set_xticklabels(labels, fontsize=6)
-    ax[2].set_xlabel(r"$\varepsilon_{\rm true}$ / $\sigma$"); ax[2].set_ylabel("relative error (%)"); ax[2].legend(fontsize=5)
+    ax[2].set_xlabel(r"$\varepsilon_{\rm true}$ / $\sigma$"); ax[2].set_ylabel("relative error (%)"); ax[2].set_ylim(1e-2, 3e2); ax[2].legend(fontsize=5, loc="lower center")
     ax[2].set_title("(c) noisy data (paired)")
     plt.tight_layout(); plt.savefig(os.path.join(FIG, "fig_inverse.png")); plt.close()
 

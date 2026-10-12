@@ -62,7 +62,7 @@ import Mathlib\\[4pt]
 \end{quote}
 
 \begin{Theorem}[Gradient-flow energy dissipation, abstract Hilbert-space form]\label{thm:app-gradflow}
-Let $F$ be a real Hilbert space and $E:F\to\mathbb{R}$ Fr\'echet differentiable at $c(t_0)\in F$, with gradient $\nabla E(c(t_0))\in F$ defined by $DE(c(t_0))[v]=\langle\nabla E(c(t_0)),v\rangle$ for all $v\in F$. Let $c:\mathbb{R}\to F$ be differentiable at $t_0$ and satisfy the gradient-flow relation
+Let $X$ be a real Hilbert space and $E:X\to\mathbb{R}$ Fr\'echet differentiable at $c(t_0)\in X$, with gradient $\nabla E(c(t_0))\in X$ defined by $DE(c(t_0))[v]=\langle\nabla E(c(t_0)),v\rangle$ for all $v\in X$. Let $c:\mathbb{R}\to X$ be differentiable at $t_0$ and satisfy the gradient-flow relation
 \begin{equation}\label{eq:app-gradflow}
 c'(t_0) = -\nabla E(c(t_0)).
 \end{equation}
@@ -77,18 +77,18 @@ By the chain rule for the composition of a Fr\'echet-differentiable map with a d
 \[
 \frac{d}{dt}\bigg|_{t_0} E(c(t)) = DE(c(t_0))[c'(t_0)] = \langle \nabla E(c(t_0)),\,c'(t_0)\rangle.
 \]
-Substituting the gradient-flow relation \eqref{eq:app-gradflow} for $\nabla E(c(t_0))=-c'(t_0)$,
+Substituting $\nabla E(c(t_0))=-c'(t_0)$ from the gradient-flow relation \eqref{eq:app-gradflow},
 \[
 \langle \nabla E(c(t_0)),\,c'(t_0)\rangle = \langle -c'(t_0),\,c'(t_0)\rangle = -\|c'(t_0)\|^2,
 \]
 using $\langle v,v\rangle=\|v\|^2$ for the real inner product. This proves \eqref{eq:app-diss}; equality holds iff $\|c'(t_0)\|=0$, i.e., $c'(t_0)=0$.
 \end{proof}
 
-\begin{Corollary}[Recovery of Theorem~\ref{thm:energy}]
-Instantiate $F=L^2(\Omega)$ and let $E$ be the Ginzburg--Landau functional of Section~\ref{sec:problem}. The manuscript's proof of Theorem~\ref{thm:energy} (integration by parts under the homogeneous Neumann condition) shows precisely that the $L^2$ gradient of $E$ is $\nabla E(u)=-\varepsilon^2u_{xx}+f(u)$, so that the Allen--Cahn equation $u_t=\varepsilon^2u_{xx}-f(u)$ is exactly the gradient-flow relation \eqref{eq:app-gradflow}. Theorem~\ref{thm:app-gradflow} then gives $dE/dt=-\|u_t\|^2_{L^2}\le0$, which is Theorem~\ref{thm:energy}.
+\begin{Corollary}[Formal recovery of Theorem~\ref{thm:energy}]
+Instantiate $X=L^2(\Omega)$ and let $E$ be the Ginzburg--Landau functional of Section~\ref{sec:problem}. Formally (by Remark~\ref{rem:sharp}(iii), $E$ is not Fr\'echet differentiable on $L^2$, and Theorem~\ref{thm:defect} is the rigorous version), the manuscript's proof of Theorem~\ref{thm:energy} (integration by parts under the homogeneous Neumann condition) shows that the $L^2$ gradient of $E$ is $\nabla E(u)=-\varepsilon^2u_{xx}+f(u)$, so that the Allen--Cahn equation $u_t=\varepsilon^2u_{xx}-f(u)$ is exactly the gradient-flow relation \eqref{eq:app-gradflow}. Theorem~\ref{thm:app-gradflow} then gives $dE/dt=-\|u_t\|^2_{L^2}\le0$, which is Theorem~\ref{thm:energy}.
 \end{Corollary}
 
-Theorem~\ref{thm:app-gradflow} was additionally machine-verified in Lean~4 with Mathlib (project file \texttt{AllenCahnVerification/GradientFlow.lean}); \texttt{gradient} below denotes Mathlib's \texttt{HasGradientAt}-derived Riesz-dual gradient. The Lean file compiles with zero errors and zero uses of \texttt{sorry}.
+Theorem~\ref{thm:app-gradflow} was additionally machine-verified in Lean~4 with Mathlib (project file \texttt{AllenCahnVerification/GradientFlow.lean}); \texttt{gradient E x} below denotes Mathlib's gradient, defined as the Riesz representative \texttt{(toDual $\mathbb{R}$ F).symm (fderiv $\mathbb{R}$ E x)} of the Fr\'echet derivative; the hypothesis \texttt{hE} (\texttt{HasGradientAt}) states that $E$ is Fr\'echet differentiable at \texttt{c t} with this gradient. The Lean file compiles with zero errors and zero uses of \texttt{sorry}; in the listing, the type \texttt{F} is the Hilbert space $X$.
 
 \begin{quote}\small\ttfamily\raggedright
 \textbf{variable} \{F~:~Type*\} [NormedAddCommGroup F] [InnerProductSpace $\mathbb{R}$ F] [CompleteSpace F]\\[6pt]
@@ -96,27 +96,31 @@ Theorem~\ref{thm:app-gradflow} was additionally machine-verified in Lean~4 with 
 \phantom{xx}(E~:~F~$\to$~$\mathbb{R}$) (c~:~$\mathbb{R}$~$\to$~F) (t~:~$\mathbb{R}$)\\
 \phantom{xx}(hE~:~HasGradientAt E (gradient E (c t)) (c t))\\
 \phantom{xx}(hflow~:~HasDerivAt c (-(gradient E (c t))) t) :\\
-\phantom{xx}HasDerivAt (\textbf{fun} s~$\Rightarrow$~E (c s)) (-\textbar\textbar deriv c t\textbar\textbar~\^{}~2) t~:=~\textbf{by}\\
+\phantom{xx}HasDerivAt (\textbf{fun} s~$\mapsto$~E (c s)) (-$\Vert$deriv c t$\Vert$~\^{}~2) t~:=~\textbf{by}\\
 \phantom{xx}\textbf{have} hderiv\_c~:~deriv c t~=~-gradient E (c t)~:=~hflow.deriv\\
-\phantom{xx}\textbf{have} hFD~:~HasFDerivAt E (toDual $\mathbb{R}$ F (gradient E (c t))) (c t)~:=~hE.hasFDerivAt\\
+\phantom{xx}\textbf{have} hFD~:~HasFDerivAt E (toDual $\mathbb{R}$ F (gradient E (c t)))\\
+\phantom{xxxxxx}(c t)~:=~hE.hasFDerivAt\\
 \phantom{xx}\textbf{have} hcomp~:~HasDerivAt (E~$\circ$~c)\\
 \phantom{xxxx}(toDual $\mathbb{R}$ F (gradient E (c t)) (-(gradient E (c t)))) t~:=\\
 \phantom{xxxx}HasFDerivAt.comp\_hasDerivAt\_of\_eq t hFD hflow rfl\\
-\phantom{xx}\textbf{have} hval~:~toDual $\mathbb{R}$ F (gradient E (c t)) (-(gradient E (c t)))~=~-\textbar\textbar deriv c t\textbar\textbar~\^{}~2~:=~\textbf{by}\\
-\phantom{xxxx}rw~[toDual\_apply\_apply, inner\_neg\_right, real\_inner\_self\_eq\_norm\_sq, hderiv\_c, norm\_neg]\\
+\phantom{xx}\textbf{have} hval~:~toDual $\mathbb{R}$ F (gradient E (c t)) (-(gradient E (c t)))\\
+\phantom{xxxxxx}=~-$\Vert$deriv c t$\Vert$~\^{}~2~:=~\textbf{by}\\
+\phantom{xxxx}rw~[toDual\_apply\_apply, inner\_neg\_right, real\_inner\_self\_eq\_norm\_sq,\\
+\phantom{xxxxxx}hderiv\_c, norm\_neg]\\
 \phantom{xx}rw~[hval] \textbf{at} hcomp;~\textbf{exact} hcomp\\[6pt]
 \textbf{theorem} gradientFlow\_deriv\_energy\_nonpos\\
 \phantom{xx}(E~:~F~$\to$~$\mathbb{R}$) (c~:~$\mathbb{R}$~$\to$~F) (t~:~$\mathbb{R}$)\\
 \phantom{xx}(hE~:~HasGradientAt E (gradient E (c t)) (c t))\\
 \phantom{xx}(hflow~:~HasDerivAt c (-(gradient E (c t))) t) :\\
-\phantom{xx}deriv (\textbf{fun} s~$\Rightarrow$~E (c s)) t~$\le$~0~:=~\textbf{by}\\
+\phantom{xx}deriv (\textbf{fun} s~$\mapsto$~E (c s)) t~$\le$~0~:=~\textbf{by}\\
 \phantom{xx}rw~[(gradientFlow\_hasDerivAt\_energy E c t hE hflow).deriv]\\
 \phantom{xx}\textbf{exact} neg\_nonpos.mpr (sq\_nonneg \_)
 \end{quote}
 
-A third theorem in the same file, \texttt{gradientFlow\_deriv\_energy\_eq\_zero\_iff}, additionally proves the equality case: $dE/dt=0$ at $t$ if and only if $c'(t)=0$, matching the manuscript's remark that the continuous energy is strictly decreasing except at critical points of the flow.
+A third theorem in the same file, \texttt{gradientFlow\_deriv\_energy\_eq\_zero\_iff}, additionally proves the equality case: $dE/dt=0$ at $t$ if and only if $c'(t)=0$, which is the equality clause of Theorem~\ref{thm:app-gradflow}: along an exact gradient flow, $dE/dt<0$ at every $t$ with $c'(t)\neq0$.
 
 
+\ifhl\color{blue}\fi
 \section{A-Posteriori Energy Balance for an Arbitrary Trajectory}\label{app:perturbed}
 
 Theorem~\ref{thm:app-gradflow} assumes that the curve $c$ is an \emph{exact} gradient flow, $c'=-\nabla E(c)$.
@@ -145,8 +149,8 @@ The two inequalities follow by dropping $-\tfrac12\|G\|^2\le0$ in \eqref{eq:bal2
 \end{proof}
 
 \begin{Theorem}[A-posteriori energy balance, perturbed gradient flow]\label{thm:perturbed}
-Let $F$ be a real Hilbert space and let $E:F\to\mathbb{R}$ be Fr\'echet differentiable at $c(t_0)$ with gradient $\nabla E(c(t_0))$.
-Let $c:\mathbb{R}\to F$ be differentiable at $t_0$ and put
+Let $X$ be a real Hilbert space and let $E:X\to\mathbb{R}$ be Fr\'echet differentiable at $c(t_0)$ with gradient $\nabla E(c(t_0))$.
+Let $c:\mathbb{R}\to X$ be differentiable at $t_0$ and put
 \[
 r:=c'(t_0)+\nabla E(c(t_0)),\qquad\text{i.e.}\qquad c'(t_0)=-\nabla E(c(t_0))+r .
 \]
@@ -169,10 +173,10 @@ If $\|r\|\le\theta\|w\|$, the Cauchy--Schwarz inequality gives $\langle r,w\rang
 (i) For $r=0$, \eqref{eq:pert-id} is $dE/dt=-\|c'\|^2$, i.e.\ Theorem~\ref{thm:app-gradflow}.
 (ii) Inequality \eqref{eq:pert-ineq} keeps the dissipation $-\tfrac12\|c'\|^2$ and costs the constant $\tfrac12$ in front of $\|r\|^2$.
 If the dissipation is discarded, the sharp constant is $\tfrac14$: equality in $\frac{d}{dt}E\le\frac14\|r\|^2$ holds iff $\nabla E(c)=\tfrac12 r$, i.e.\ iff $c'=\tfrac12 r=\nabla E(c)$ (the curve climbs the energy at half the residual speed), by \eqref{eq:bal3}.
-The constant $\tfrac14$ is optimal for a bound in terms of $\|r\|$ alone: for $F=\mathbb{R}$, $E(x)=x$, $c(t)=t$ one has $\nabla E=1$, $c'=1$, $r=2$ and $dE/dt=1=\tfrac14r^2$.
+The constant $\tfrac14$ is optimal for a bound in terms of $\|r\|$ alone: for $X=\mathbb{R}$, $E(x)=x$, $c(t)=t$ one has $\nabla E=1$, $c'=1$, $r=2$ and $dE/dt=1=\tfrac14r^2$.
 This is a statement about the best possible bound, not a statement that it is attained by a trained network.
-(iii) The Corollary following Theorem~\ref{thm:app-gradflow} instantiates $F=L^2(\Omega)$ for the Ginzburg--Landau functional.
-This is formal only: $E[u]=\int(\frac{\varepsilon^2}{2}u_x^2+F(u))\,dx$ is not defined on all of $L^2$ and is not Fr\'echet differentiable there with an $L^2$ gradient unless $u$ has two derivatives and satisfies the Neumann condition.
+(iii) The Corollary following Theorem~\ref{thm:app-gradflow} instantiates $X=L^2(\Omega)$ for the Ginzburg--Landau functional.
+This is formal only: $E[u]=\int(\frac{\varepsilon^2}{2}u_x^2+F(u))\,dx$ is finite only on $H^1$, not on all of $L^2$, so it is not Fr\'echet differentiable on $L^2$ at any point. It is Fr\'echet differentiable on $H^1$, and its differential has the $L^2$ form $DE(u)[v]=\langle-\varepsilon^2u_{xx}+f(u),v\rangle$ for all $v\in H^1$ if and only if $u\in H^2$ and $u$ satisfies the Neumann condition.
 Theorem~\ref{thm:defect} below, in which $E$ lives on a smaller space $V$ embedded in $H=L^2$, is the rigorous formulation; it also makes the role of the Neumann condition explicit.
 \end{Remark}
 
@@ -206,7 +210,7 @@ Suppose $\|r(t)\|\le\delta$ and $|\beta(t)|\le b$ for all $t\in[0,T]$. Then for 
 E(c(t))\le E(c(s))+\Bigl(\frac{\delta^2}{2}+b\Bigr)(t-s),
 \end{equation}
 and the constant $\delta^2/2$ may be replaced by the sharp constant $\delta^2/4$.
-In particular (no defect, $V=H=F$, $\iota=\mathrm{id}$, $G=\nabla E(c)$): if $c'=-\nabla E(c)+r$ with $\|r(t)\|\le\delta$, then $E(c(t))\le E(c(0))+\frac{\delta^2}{2}\,t$; for $\delta=0$ the energy is non-increasing on $[0,T]$.
+In particular (no defect, $V=H=X$, $\iota=\mathrm{id}$, $G=\nabla E(c)$): if $c'=-\nabla E(c)+r$ with $\|r(t)\|\le\delta$, then $E(c(t))\le E(c(0))+\frac{\delta^2}{2}\,t$; for $\delta=0$ the energy is non-increasing on $[0,T]$.
 
 If moreover $t\mapsto DE(c(t))[c'(t)]$, $\|r(t)\|^2$, $\|\iota c'(t)\|^2$ and $\beta(t)$ are continuous on $[0,T]$, then
 \begin{equation}\label{eq:integrated-L2}
@@ -237,7 +241,7 @@ The weighted statement is the same computation with the weights $\tau_n$.
 
 \begin{Remark}[Where the discrete hypothesis comes from]
 For a time-stepping scheme the hypothesis of Corollary~\ref{cor:discrete} is a one-step energy inequality.
-For the checkpoint energies $E_n=E(c(t_n))$ of a trained network in the defect-free case it holds with the non-negative numbers $R_n,D_n$ defined by $R_n^2:=\int_{t_n}^{t_{n+1}}\|r\|^2\,dt$ and $D_n^2:=\int_{t_n}^{t_{n+1}}\|\iota c'\|^2\,dt$ in place of $\|r_n\|,\|d_n\|$, by integrating Theorem~\ref{thm:perturbed} over $[t_n,t_{n+1}]$ (the energy of a polynomial state is a polynomial in the coefficients, hence $t\mapsto E(c(t))$ is $C^1$ and the fundamental theorem of calculus applies).
+For the checkpoint energies $E_n=E(c(t_n))$ of a trained network in the defect-free case it holds with the non-negative numbers $R_n,D_n$ defined by $R_n^2:=\int_{t_n}^{t_{n+1}}\|r\|^2\,dt$ and $D_n^2:=\int_{t_n}^{t_{n+1}}\|\iota c'\|^2\,dt$ in place of $\|r_n\|,\|d_n\|$, by integrating the inequality of Theorem~\ref{thm:defect} with $\beta=0$ over $[t_n,t_{n+1}]$ (the energy of a polynomial state is a polynomial in the coefficients, hence $t\mapsto E(c(t))$ is $C^1$ and the fundamental theorem of calculus applies).
 With a boundary defect, the term $\int_{t_n}^{t_{n+1}}\beta\,dt$ has to be added on the right.
 That integration step is not part of the machine-checked file; Corollary~\ref{cor:discrete} is checked as a statement about arbitrary real sequences.
 \end{Remark}
@@ -326,10 +330,10 @@ The maxima exist and the continuity hypotheses of \eqref{eq:integrated-L2} hold 
 
 \begin{Remark}[What this does and does not say about the trained network]\label{rem:compute}
 (i) The theorem is conditional: it converts a bound on the PDE residual and on the Neumann defect into a bound on energy growth. It does not prove that training makes $\delta$ or $b$ small, and the resulting bound $\frac{\delta^2}{2}T$ can be far larger than the actual energy variation.
-The values of $\delta$ and $b$ must be reported for each trained network before any quantitative conclusion is drawn; they are computable to rounding error, because $r(\cdot,t)$ is a polynomial of degree $\le3K$ in $x$, so $\|r(\cdot,t)\|^2$ is integrated exactly by any quadrature rule that is exact for polynomials of degree $6K$, and $u_x(\pm1,t)$, $u_t(\pm1,t)$ are evaluated directly from the coefficients.
-\rev{In our implementation the energy and every term of the identity~\eqref{eq:pde-identity} (polynomials of degree $\le4K$ in $x$) are integrated exactly by Clenshaw--Curtis quadrature on $4K+8$ nodes; $\|r\|^2$ is integrated by the same rule, and its relative deviation from the exact value (Clenshaw--Curtis on $6K+8$ nodes) is at most \N{quad.max_rel} for the networks of Table~\ref{tab:balance}.}
+The values of $\delta$ and $b$, or the time integrals $\frac12\int_0^T\|r\|^2\,dt$ and $\int_0^T|\beta|\,dt$ that bound the energy growth in~\eqref{eq:integrated-L2} (Table~\ref{tab:balance}), must be measured for each trained network before any quantitative conclusion is drawn; $\|r(\cdot,t)\|$ and $\beta(t)$ are computable to rounding error at every $t$, because $r(\cdot,t)$ is a polynomial of degree $\le3K$ in $x$, so $\|r(\cdot,t)\|^2$ is integrated exactly by any quadrature rule that is exact for polynomials of degree $6K$, and $u_x(\pm1,t)$, $u_t(\pm1,t)$ are evaluated directly from the coefficients.
+\rev{In our implementation the energy and the terms of the first line of~\eqref{eq:pde-identity} (polynomials of degree $\le4K$ in $x$) are integrated exactly by Clenshaw--Curtis quadrature on $4K+9$ nodes; $\|r\|^2$ is integrated by the same rule, and its relative deviation from the exact value (Clenshaw--Curtis on $6K+9$ nodes) is at most of the order of \N{quad.max_rel} for the seed-42 network of each configuration of Table~\ref{tab:balance}.}
 (ii) The training objective contains the mean-square residual at collocation points and, \rev{in the soft variant,} a boundary penalty on $u_x(\pm1,t)$.
-\rev{In the revised Spectral-PINN the PDE loss is the Clenshaw--Curtis quadrature of $\frac12\|r\|^2$ on $\max(300,4K+8)$ Gauss--Lobatto nodes, averaged over $100\,T$ times (exact in $x$ as long as $6K\le300$), and the Neumann condition holds identically, so $b=0$. In the variant of the first version (\texttt{spectral\_pinn.py} with \texttt{grid="uniform"}, \texttt{hard\_bc=False}) the residual is a plain mean over $300$ equispaced points, which approximates $\frac{1}{2T}\int_0^T\|r\|^2\,dt$ but is not an exact quadrature of the degree-$6K$ polynomial $r^2$, and the boundary term penalizes $u_x(\pm1,t)/K^2$, i.e.\ $u_x(\pm1,t)^2$ with weight $K^{-4}\lambda_{\mathrm{BC}}$, which is a very weak control of $b$ for large $K$; this is the cause of the loss of accuracy at large $K$ reported in the first version (Section~\ref{sec:results-k}).}
+\rev{In the revised Spectral-PINN the PDE loss is the Clenshaw--Curtis quadrature of $\frac12\|r\|^2$ on $N+1$ Gauss--Lobatto nodes, $N=\max(300,4K+8)$, averaged over $100\,T$ times, or $250$ times for B3 (exact in $x$ as long as $6K\le300$), and the Neumann condition holds identically, so $b=0$. In the variant of the first version (\texttt{spectral\_pinn.py} with \texttt{grid="uniform"}, \texttt{hard\_bc=False}) the residual is a plain mean over $300$ equispaced points, which approximates $\frac{1}{2T}\int_0^T\|r\|^2\,dt$ but is not an exact quadrature of the degree-$6K$ polynomial $r^2$, and the boundary term penalizes $u_x(\pm1,t)/K^2$, i.e.\ $u_x(\pm1,t)^2$ with weight $K^{-4}\lambda_{\mathrm{BC}}$, which is a very weak control of $b$ for large $K$; this is the cause of the loss of accuracy at large $K$ reported in the first version (Section~\ref{sec:results-k}).}
 In either case the loss values reported during training are proxies for $\delta$ and $b$ and must not be substituted for them; both should be evaluated on the trained network as described in (i).
 With the integral form \eqref{eq:integrated-L2}, the energy increase is controlled by the time-integrated squared residual and the boundary term, which are the two quantities that the PDE and boundary losses are designed to make small.
 (iii) The bound does not involve the energy-penalty term of the loss.
@@ -339,8 +343,8 @@ This is consistent with the observation that the energy curves with and without 
 
 \subsection{Machine Verification}\label{app:perturbed-lean}
 
-All statements of Section~\ref{app:perturbed-abstract} and the spatial integration by parts of Step~3 above were machine-checked in Lean~4 with Mathlib (file \texttt{PerturbedFlow.lean}); the file compiles against Lean~4.33.1 and the corresponding Mathlib release (the versions pinned in the repository) and, as an independent cross-check, against Lean~4.35.0-rc2 with Mathlib commit 	exttt{b0df0c4}, with no errors, no warnings and no unproven placeholders, and each of its 39 theorems depends only on the axioms \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound} (checked with \texttt{\#print axioms}).
-The abstract statements are proved for general real Hilbert (or normed) spaces by Mathlib's chain rule (\texttt{HasFDerivAt.comp\_hasDerivAt\_of\_eq}) and mean-value theorem (\texttt{Convex.image\_sub\_le\_mul\_sub\_of\_deriv\_le}), the integral form by the fundamental theorem of calculus, and the integration by parts for polynomials by \texttt{intervalIntegral.}\allowbreak\texttt{integral\_mul\_deriv\_eq\_deriv\_mul}.
+The lemma, the theorems and the corollaries of Appendix~\ref{app:perturbed-abstract} and the spatial integration by parts of Step~3 above were machine-checked in Lean~4 with Mathlib (file \texttt{PerturbedFlow.lean}); the file compiles against Lean~4.33.1 and the corresponding Mathlib release (the versions pinned in the repository) and, as an independent cross-check, against Lean~4.35.0-rc2 with Mathlib commit \texttt{b0df0c4}, with no errors, no warnings and no unproven placeholders, and each of its 39 theorems depends only on the axioms \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound} (checked with \texttt{\#print axioms}).
+The abstract statements are proved for general real Hilbert (or normed) spaces by Mathlib's chain rule (\texttt{HasFDerivAt.comp\_hasDerivAt\_of\_eq}) and mean-value theorem (\texttt{Convex.image\_sub\_le\_mul\_sub\_of\_deriv\_le}), the integral form by the fundamental theorem of calculus, and the integration by parts for polynomials by \texttt{intervalIntegral.}\allowbreak\texttt{integral\_mul\_deriv\_eq\_deriv\_mul}. Table~\ref{tab:lean-perturbed} lists the Lean theorems behind each machine-checked statement.
 
 \begin{table}[H]
 \caption{Correspondence between the statements of this appendix and the Lean theorems of \texttt{PerturbedFlow.lean}.\label{tab:lean-perturbed}}
@@ -367,9 +371,10 @@ Proposition~\ref{prop:pde-identity}, Step~3 and \eqref{eq:DE-split} & \texttt{ib
 
 Not machine-checked are: Step~1 of Proposition~\ref{prop:pde-identity} (that $\mathcal{E}$ is a polynomial in the coefficients), the identification of the abstract objects $E,G,\beta,r$ with the Allen--Cahn quantities in Corollary~\ref{cor:spinn-bound} (this identification is the content of Steps~2--4 and uses only the verified integration by parts), the fundamental-theorem-of-calculus step in the remark following Corollary~\ref{cor:discrete}, and, of course, the empirical values of $\delta$ and $b$ for the trained networks.
 
+\ifhl\color{black}\fi
 \section{Symmetry-Preservation Diagnostic}\label{app:sym}
 
-For the two-dimensional experiment of Section~\ref{sec:2d}, the reflection-symmetry violation $S(t)$ was evaluated on an endpoint-inclusive grid $x_i=-\pi+ih$, $h=2\pi/(n-1)$, $i=0,\dots,n-1$ ($n=49$), so that $x_{n-1-i}=-x_i$ exactly; this avoids an artificial, purely discretization-induced violation that would otherwise arise from comparing a periodic (endpoint-excluded) training grid against its naive array reversal.
+For the two-dimensional experiment of Section~\ref{sec:2d}, the reflection-symmetry violation $S(t)$ was evaluated on an endpoint-inclusive grid $x_i=-\pi+ih$, $h=2\pi/(n-1)$, $i=0,\dots,n-1$ ($n=49$), so that $x_{n-1-i}=-x_i$ up to floating-point round-off (for the computed nodes $|x_{n-1-i}+x_i|\le9\times10^{-16}$); this avoids an artificial, purely discretization-induced violation that would otherwise arise from comparing a periodic (endpoint-excluded) training grid against its naive array reversal. The remaining round-off of the nodes, not the network, produces the nonzero values of order $10^{-31}$ of $S$ for the Fourier-Spectral-PINN in Tables~\ref{tab:2d} and~\ref{tab:stress-2d}: on an exactly mirrored grid the cosine basis gives $S=0$, whereas on the computed grid the field $0.4\cos(2x)\cos(2y)$ by itself already gives $S=8.7\times10^{-32}$.
 
 \input{73_app_orig.tex}
 \input{72_app_ref.tex}

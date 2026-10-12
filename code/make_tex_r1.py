@@ -1,5 +1,5 @@
 """Generate numbers_r1.tex (\\N{key} macros) and the tables tab_*.tex of the revised manuscript from data_r1.
-Every number in the revised manuscript that comes from an experiment is produced here (no manual transcription).
+Every result of the training runs and classical baselines of revision 1 quoted in the manuscript is produced here (no manual transcription).
 
 usage: python make_tex_r1.py
   -> manuscript/r1_src/numbers_r1.tex, manuscript/r1_src/tab_{forward,K,energy,balance,inverse,2d,orig}.tex, data_r1/numbers.json
@@ -359,8 +359,10 @@ b1spec = []
 for p in B1_SPEC:
     b1spec += runs(p)
 if b1spec:
-    inc = {k: sum(1 for r in b1spec if r["energy"][k]["n_increases"] > 0) for k in ("dt0.02", "dt0.002", "dt0.0002")}
-    put("en.n_runs", str(len(b1spec)))
+    # every B1 Spectral-PINN with the compatible IC: B1_SPEC + poor-trajectory regimes + spectral timing repeats
+    b1en = b1spec + runs("rh_*_s*") + [r for r in runs("timing_*_s*") if r["job"]["method"] == "spectral"]
+    inc = {k: sum(1 for r in b1en if r["energy"][k]["n_increases"] > 0) for k in ("dt0.02", "dt0.002", "dt0.0002")}
+    put("en.n_runs", str(len(b1en)))
     put("en.n_runs_viol", str(max(inc.values())))
     put("en.min_step_all", f_sci(min(-r["energy"]["dt0.02"]["max_step"] for r in b1spec), 1))
     put("en.max_l2", num(max(r["errors"]["1.0"]["l2"] for r in b1spec), 2))
@@ -384,8 +386,8 @@ if b3v:
     put("en.b3van_inc", str(b3v[0]["energy"]["dt0.02"]["n_increases"]))
     put("en.b3van_int", str(b3v[0]["energy"]["dt0.02"]["n_points"] - 1))
 if van:
-    put("en.van_viol", str(sum(r["energy"]["dt0.02"]["n_increases"] for r in van)))
-    put("en.van_n", str(len(van)))
+    put("en.van_viol", str(sum(r["energy"]["dt0.02"]["n_increases"] for r in van + lbvan + runs("timing_vanilla_s*"))))
+    put("en.van_n", str(len(van + lbvan + runs("timing_vanilla_s*"))))
 put("reg.short_epochs", "300")
 _lam = [fh32, runs("ah_lamE1_s*"), runs("ah_lamE10_s*"), fh32E, runs("ah_lamE500_s*"), runs("ah_lamE5000_s*")]
 _lam = [rr for rr in _lam if rr]
@@ -419,19 +421,25 @@ for k, rr in (("K32", b3K32), ("K64", b3K64)):
     if rr:
         put(f"b3.{k}.t02", f_stat(l2(rr, "0.2")))
         put(f"b3.{k}.t1", f_stat(l2(rr, "1.0")))
-_reg_all = [r for p in ("rh_*_s*", "reg_K64_E50_s*") for r in runs(p)]
+_reg_all = [r for p in ("rh_*_s*", "reg_K64_E50_s*") for r in runs(p)] + [r for r in so64 if seed(r) in {seed(q) for q in runs("reg_K64_E50_s*")}]
 if _reg_all:
     put("reg.n_runs", str(len(_reg_all)))
     put("reg.n_viol", str(sum(r["energy"][k]["n_increases"] for r in _reg_all for k in r["energy"])))
 
 # ================================================================================================ maximum bound
-b1van_all = van + lbvan
+b1van_all = van + lbvan + runs("timing_vanilla_s*")
 if b1spec:
     put("mbp.max_b1", m(f"{max(r['max_abs_u'] for r in b1spec):.4f}"))
-    hard = [r for r in b1spec if r["job"].get("hard_bc")]
+    # "revised" = exact Neumann basis AND Gauss-Lobatto grid; regimes reported separately
+    hard = [r for r in b1spec + runs("timing_hard_K*_s*") if r["job"].get("hard_bc") and r["job"].get("grid") == "cgl"]
     if hard:
         put("mbp.max_hard", m(f"{max(r['max_abs_u'] for r in hard):.4f}"))
         put("mbp.excess", f_sci(max(r["max_abs_u"] for r in hard) - 1, 1))
+    hreg = [r for r in runs("rh_*_s*") if r["job"].get("hard_bc") and r["job"].get("grid") == "cgl"]
+    if hreg:
+        put("mbp.n_hard_reg", str(len(hreg)))
+        put("mbp.max_hard_reg", m(f"{max(r['max_abs_u'] for r in hreg):.4f}"))
+        put("mbp.excess_reg", f_sci(max(r["max_abs_u"] for r in hreg) - 1, 1))
 if b1van_all:
     put("mbp.max_van", m(f"{max(r['max_abs_u'] for r in b1van_all):.4f}"))
 if b1spec and b1van_all:
@@ -439,7 +447,7 @@ if b1spec and b1van_all:
     allb1 = b1spec + b1van_all
     put("mbp.n_b1", str(len(allb1)))
     put("mbp.n_over", str(sum(1 for r in allb1 if r["max_abs_u"] > 1.0)))
-    hard = [r for r in b1spec if r["job"].get("hard_bc")]
+    hard = [r for r in b1spec + runs("timing_hard_K*_s*") if r["job"].get("hard_bc") and r["job"].get("grid") == "cgl"]
     put("mbp.n_hard", str(len(hard)))
     put("mbp.n_hard_over", str(sum(1 for r in hard if r["max_abs_u"] > 1.0)))
     put("mbp.n_van", str(len(b1van_all)))
@@ -456,7 +464,7 @@ if os.path.exists(_zr):
 # ================================================================================================ energy balance
 allbal = [r for r in glob.glob(os.path.join(RUNS, "*.json"))]
 allbal = [json.load(open(f)) for f in allbal]
-allbal = [r for r in allbal if "balance" in r]
+allbal = [r for r in allbal if "balance" in r and not r["job"]["tag"].startswith("smoke")]
 if allbal:
     put("bal.id_err", f_sci(max(r["balance"]["identity_rel_err"] for r in allbal), 0))
     put("bal.n", str(len(allbal)))
@@ -466,6 +474,8 @@ if fh32:
     put("bal.int_r_hard", f_sci(ir, 1))
     put("bal.dE_hard", f_sci(dE, 1))
     put("bal.frac_hard", f_sci(ir / dE, 0))
+    put("bal.int_r_hard_max", f_sci(max(r["balance"]["int_half_r2"] for r in fh32), 1))
+    put("bal.frac_hard_max", f_sci(max(r["balance"]["int_half_r2"] / (r["balance"]["E_first"] - r["balance"]["E_last"]) for r in fh32), 0))
 for tag, rr in (("soft32", so32), ("soft64", so64)):
     if rr:
         put(f"bal.int_b_{tag}", f_sci(np.mean([r["balance"]["int_abs_bterm"] for r in rr]), 1))
@@ -752,7 +762,7 @@ def tab_energy():
     for lab, base in ((r"300 epochs (100 warm-up)", "rh_short"), (r"no warm-up", "rh_nowarm"), (r"1500 epochs, lr $10^{-4}$", "rh_pde0")):
         for lam in (0, 50):
             R.append(erow(lab + f", $" + BS + f"lambda_E={lam}$", runs(f"{base}_E{lam}_s*")))
-    R.append(erow(r"$K=64$ as submitted, $\lambda_E=0$", so64))
+    R.append(erow(r"$K=64$ as submitted, $\lambda_E=0$", [r for r in so64 if seed(r) in {seed(q) for q in runs("reg_K64_E50_s*")}]))
     R.append(erow(r"$K=64$ as submitted, $\lambda_E=50$", runs("reg_K64_E50_s*")))
     cap = (r"Energy penalty: accuracy at $t=1$ (B1), number of energy increases of the trained trajectory on grids of spacing $0.02$, $0.002$ and $2\times10^{-4}$ "
            r"(total over the seeds; in parentheses the number of runs with at least one increase), number of training epochs in which the penalty was nonzero (summed over the seeds), "
@@ -779,7 +789,7 @@ def tab_balance():
                      f_sci(np.mean(dE), 2), f_sci(max(g("max_abs_ux_wall")), 1), f_sci(max(g("identity_rel_err")), 0)))
     cap = (r"A-posteriori energy balance~\eqref{eq:balance-int} of the trained networks (means over the seeds): time-RMS of the residual norm, the integrated residual term, "
            r"the integrated boundary term $\beta=\varepsilon^2[u_xu_t]_{-1}^{1}$, the actual energy decrease, the largest wall slope, and the largest relative deviation "
-           r"between $dE/dt$ (automatic differentiation) and the right-hand side of~\eqref{eq:balance-main} over 201 times.")
+           r"between $dE/dt$, evaluated as $\int(\varepsilon^2u_xu_{xt}+f(u)u_t)\,dx$ with $\dot{\mathbf c}$ from automatic differentiation, and the right-hand side of~\eqref{eq:balance-main} over 201 times.")
     return wide(cap, "tab:balance", "p{4.4cm}cCCCCCc", H, R)
 
 
@@ -849,14 +859,14 @@ def tab_inverse():
             rr = [r for r in rr if r]
             if rr:
                 v = [r["rel_err_pct"] for r in rr]
-                neu = m(f"{np.mean(v):.2g}" + (BS + f"pm{np.std(v, ddof=1):.2g}" if len(v) > 1 else "")) + BS + "%"
+                neu = m(num(np.mean(v)) + (BS + "pm" + num(np.std(v, ddof=1)) if len(v) > 1 else "")) + BS + "%"
             else:
                 neu = DASH
             if CL2_INV:
                 c = CL2_INV[str(e)]["runs"][str(nz)]
                 if nz > 0:
                     p5 = [100 * abs(c["eps_hat"][str(s)] - e) / e for s in range(1, 6)]
-                    cl5 = m(f"{np.mean(p5):.2g}" + BS + f"pm{np.std(p5, ddof=1):.2g}") + BS + "%"
+                    cl5 = m(num(np.mean(p5)) + BS + "pm" + num(np.std(p5, ddof=1))) + BS + "%"
                     cl25 = pct(c["rel_rmse_pct"]); fis = pct(c["fisher_rel_se_pct"])
                 else:
                     cl5, cl25, fis = pct(c["rel_err_pct_mean"], 1) if c["rel_err_pct_mean"] > 1e-3 else m("<10^{-3}") + BS + "%", DASH, DASH
