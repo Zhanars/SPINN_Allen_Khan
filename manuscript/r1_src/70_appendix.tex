@@ -1,0 +1,375 @@
+\appendixtitles{yes}
+\appendixstart
+\appendix
+\section{Lean 4 Formalization of the Energy-Stability Lemmas}\label{app:lean}
+
+This appendix first states each result as an ordinary mathematical lemma or theorem, with a conventional proof that can be checked without reading Lean, and then gives the corresponding Lean~4 source that was mechanically verified to prove the same statement.
+
+\begin{Lemma}[Polarization identity]\label{lem:polar}
+For all $a,b\in\mathbb{R}$, $2a(a-b) = a^2-b^2+(a-b)^2$.
+\end{Lemma}
+\begin{proof}
+Expand the right-hand side: $a^2-b^2+(a-b)^2 = a^2-b^2+a^2-2ab+b^2 = 2a^2-2ab = 2a(a-b)$.
+\end{proof}
+
+\begin{Lemma}[Discrete Gr\"onwall step]\label{lem:gronwall}
+Let $a,b,L,\tau\in\mathbb{R}$ with $L\ge0$, $\tau>0$, and $\tau(L+1)<1$. If
+\begin{equation}\label{eq:gronwall-hyp}
+a^2 \le b^2+\tau(L+1)(a^2+b^2),
+\end{equation}
+then
+\begin{equation}\label{eq:gronwall-concl}
+a^2 \le \frac{1+\tau(L+1)}{1-\tau(L+1)}\,b^2.
+\end{equation}
+\end{Lemma}
+\begin{proof}
+Set $c:=\tau(L+1)$. Since $\tau>0$ and $L+1>0$ (as $L\ge0$), $c\ge0$; the hypothesis $\tau(L+1)<1$ gives $c<1$, so $1-c>0$. Expanding \eqref{eq:gronwall-hyp}, $a^2\le b^2+ca^2+cb^2$, i.e., $(1-c)a^2\le(1+c)b^2$. Dividing both sides by $1-c>0$ yields \eqref{eq:gronwall-concl}.
+\end{proof}
+
+\begin{Proposition}[Existence of an admissible step size]\label{prop:stepsize}
+For every $L\ge0$ there exists $\tau>0$ with $\tau(L+1)<1$.
+\end{Proposition}
+\begin{proof}
+Take $\tau=\frac{1}{2(L+1)}$ (well defined since $L+1>0$); then $\tau(L+1)=\tfrac12<1$.
+\end{proof}
+
+Lemmas~\ref{lem:polar} and~\ref{lem:gronwall} and Proposition~\ref{prop:stepsize} were additionally machine-verified in Lean~4 with Mathlib (project file \texttt{AllenCahnVerification/Basic.lean}), compiled with \texttt{lake build} against Lean~4.33.1 and the corresponding Mathlib release, with zero errors, zero warnings other than cosmetic style-linter notices, and zero uses of \texttt{sorry}:
+
+\begin{quote}\small\ttfamily\raggedright
+import Mathlib\\[4pt]
+\textbf{theorem} polarization\_identity (a b~:~$\mathbb{R}$) :\\
+\phantom{xx}2~*~a~*~(a~-~b)~=~a~\^{}~2~-~b~\^{}~2~+~(a~-~b)~\^{}~2~:=~\textbf{by} ring\\[6pt]
+\textbf{theorem} discrete\_gronwall\_step (a b L $\tau$~:~$\mathbb{R}$) (hL~:~0~$\le$~L) (h$\tau$~:~0~$<$~$\tau$)\\
+\phantom{xx}(h$\tau$L~:~$\tau$~*~(L~+~1)~$<$~1)\\
+\phantom{xx}(h~:~a~\^{}~2~$\le$~b~\^{}~2~+~$\tau$~*~(L~+~1)~*~(a~\^{}~2~+~b~\^{}~2)) :\\
+\phantom{xx}a~\^{}~2~$\le$~(1~+~$\tau$~*~(L~+~1))~/~(1~-~$\tau$~*~(L~+~1))~*~b~\^{}~2~:=~\textbf{by}\\
+\phantom{xx}\textbf{set} c~:=~$\tau$~*~(L~+~1) \textbf{with} hc\_def\\
+\phantom{xx}\textbf{have} hc\_nonneg~:~0~$\le$~c~:=~\textbf{by}\\
+\phantom{xxxx}\textbf{have} hL1~:~(0~:~$\mathbb{R}$)~$\le$~L~+~1~:=~\textbf{by} linarith\\
+\phantom{xxxx}\textbf{exact} mul\_nonneg h$\tau$.le hL1\\
+\phantom{xx}\textbf{have} hc\_lt\_one~:~c~$<$~1~:=~h$\tau$L\\
+\phantom{xx}\textbf{have} hpos~:~(0~:~$\mathbb{R}$)~$<$~1~-~c~:=~\textbf{by} linarith\\
+\phantom{xx}\textbf{have} key~:~(1~-~c)~*~a~\^{}~2~$\le$~(1~+~c)~*~b~\^{}~2~:=~\textbf{by} nlinarith~[h]\\
+\phantom{xx}rw~[div\_mul\_eq\_mul\_div, le\_div\_iff\textsubscript{0} hpos]\\
+\phantom{xx}nlinarith~[key]\\[6pt]
+\textbf{theorem} stability\_step\_size\_exists (L~:~$\mathbb{R}$) (hL~:~0~$\le$~L) :\\
+\phantom{xx}$\exists$~$\tau$~:~$\mathbb{R}$,~0~$<$~$\tau$~$\land$~$\tau$~*~(L~+~1)~$<$~1~:=~\textbf{by}\\
+\phantom{xx}\textbf{have} hL1~:~(0~:~$\mathbb{R}$)~$<$~L~+~1~:=~\textbf{by} linarith\\
+\phantom{xx}\textbf{have} hden~:~(0~:~$\mathbb{R}$)~$<$~2~*~(L~+~1)~:=~\textbf{by} linarith\\
+\phantom{xx}\textbf{refine}~$\langle$1~/~(2~*~(L~+~1)),~div\_pos one\_pos hden,~?\_$\rangle$\\
+\phantom{xx}rw~[div\_mul\_eq\_mul\_div, div\_lt\_one hden]\\
+\phantom{xx}linarith
+\end{quote}
+
+\begin{Theorem}[Gradient-flow energy dissipation, abstract Hilbert-space form]\label{thm:app-gradflow}
+Let $F$ be a real Hilbert space and $E:F\to\mathbb{R}$ Fr\'echet differentiable at $c(t_0)\in F$, with gradient $\nabla E(c(t_0))\in F$ defined by $DE(c(t_0))[v]=\langle\nabla E(c(t_0)),v\rangle$ for all $v\in F$. Let $c:\mathbb{R}\to F$ be differentiable at $t_0$ and satisfy the gradient-flow relation
+\begin{equation}\label{eq:app-gradflow}
+c'(t_0) = -\nabla E(c(t_0)).
+\end{equation}
+Then $t\mapsto E(c(t))$ is differentiable at $t_0$ with
+\begin{equation}\label{eq:app-diss}
+\frac{d}{dt}\bigg|_{t_0} E(c(t)) = -\|c'(t_0)\|^2 \le 0,
+\end{equation}
+with equality if and only if $c'(t_0)=0$.
+\end{Theorem}
+\begin{proof}
+By the chain rule for the composition of a Fr\'echet-differentiable map with a differentiable curve,
+\[
+\frac{d}{dt}\bigg|_{t_0} E(c(t)) = DE(c(t_0))[c'(t_0)] = \langle \nabla E(c(t_0)),\,c'(t_0)\rangle.
+\]
+Substituting the gradient-flow relation \eqref{eq:app-gradflow} for $\nabla E(c(t_0))=-c'(t_0)$,
+\[
+\langle \nabla E(c(t_0)),\,c'(t_0)\rangle = \langle -c'(t_0),\,c'(t_0)\rangle = -\|c'(t_0)\|^2,
+\]
+using $\langle v,v\rangle=\|v\|^2$ for the real inner product. This proves \eqref{eq:app-diss}; equality holds iff $\|c'(t_0)\|=0$, i.e., $c'(t_0)=0$.
+\end{proof}
+
+\begin{Corollary}[Recovery of Theorem~\ref{thm:energy}]
+Instantiate $F=L^2(\Omega)$ and let $E$ be the Ginzburg--Landau functional of Section~\ref{sec:problem}. The manuscript's proof of Theorem~\ref{thm:energy} (integration by parts under the homogeneous Neumann condition) shows precisely that the $L^2$ gradient of $E$ is $\nabla E(u)=-\varepsilon^2u_{xx}+f(u)$, so that the Allen--Cahn equation $u_t=\varepsilon^2u_{xx}-f(u)$ is exactly the gradient-flow relation \eqref{eq:app-gradflow}. Theorem~\ref{thm:app-gradflow} then gives $dE/dt=-\|u_t\|^2_{L^2}\le0$, which is Theorem~\ref{thm:energy}.
+\end{Corollary}
+
+Theorem~\ref{thm:app-gradflow} was additionally machine-verified in Lean~4 with Mathlib (project file \texttt{AllenCahnVerification/GradientFlow.lean}); \texttt{gradient} below denotes Mathlib's \texttt{HasGradientAt}-derived Riesz-dual gradient. The Lean file compiles with zero errors and zero uses of \texttt{sorry}.
+
+\begin{quote}\small\ttfamily\raggedright
+\textbf{variable} \{F~:~Type*\} [NormedAddCommGroup F] [InnerProductSpace $\mathbb{R}$ F] [CompleteSpace F]\\[6pt]
+\textbf{theorem} gradientFlow\_hasDerivAt\_energy\\
+\phantom{xx}(E~:~F~$\to$~$\mathbb{R}$) (c~:~$\mathbb{R}$~$\to$~F) (t~:~$\mathbb{R}$)\\
+\phantom{xx}(hE~:~HasGradientAt E (gradient E (c t)) (c t))\\
+\phantom{xx}(hflow~:~HasDerivAt c (-(gradient E (c t))) t) :\\
+\phantom{xx}HasDerivAt (\textbf{fun} s~$\Rightarrow$~E (c s)) (-\textbar\textbar deriv c t\textbar\textbar~\^{}~2) t~:=~\textbf{by}\\
+\phantom{xx}\textbf{have} hderiv\_c~:~deriv c t~=~-gradient E (c t)~:=~hflow.deriv\\
+\phantom{xx}\textbf{have} hFD~:~HasFDerivAt E (toDual $\mathbb{R}$ F (gradient E (c t))) (c t)~:=~hE.hasFDerivAt\\
+\phantom{xx}\textbf{have} hcomp~:~HasDerivAt (E~$\circ$~c)\\
+\phantom{xxxx}(toDual $\mathbb{R}$ F (gradient E (c t)) (-(gradient E (c t)))) t~:=\\
+\phantom{xxxx}HasFDerivAt.comp\_hasDerivAt\_of\_eq t hFD hflow rfl\\
+\phantom{xx}\textbf{have} hval~:~toDual $\mathbb{R}$ F (gradient E (c t)) (-(gradient E (c t)))~=~-\textbar\textbar deriv c t\textbar\textbar~\^{}~2~:=~\textbf{by}\\
+\phantom{xxxx}rw~[toDual\_apply\_apply, inner\_neg\_right, real\_inner\_self\_eq\_norm\_sq, hderiv\_c, norm\_neg]\\
+\phantom{xx}rw~[hval] \textbf{at} hcomp;~\textbf{exact} hcomp\\[6pt]
+\textbf{theorem} gradientFlow\_deriv\_energy\_nonpos\\
+\phantom{xx}(E~:~F~$\to$~$\mathbb{R}$) (c~:~$\mathbb{R}$~$\to$~F) (t~:~$\mathbb{R}$)\\
+\phantom{xx}(hE~:~HasGradientAt E (gradient E (c t)) (c t))\\
+\phantom{xx}(hflow~:~HasDerivAt c (-(gradient E (c t))) t) :\\
+\phantom{xx}deriv (\textbf{fun} s~$\Rightarrow$~E (c s)) t~$\le$~0~:=~\textbf{by}\\
+\phantom{xx}rw~[(gradientFlow\_hasDerivAt\_energy E c t hE hflow).deriv]\\
+\phantom{xx}\textbf{exact} neg\_nonpos.mpr (sq\_nonneg \_)
+\end{quote}
+
+A third theorem in the same file, \texttt{gradientFlow\_deriv\_energy\_eq\_zero\_iff}, additionally proves the equality case: $dE/dt=0$ at $t$ if and only if $c'(t)=0$, matching the manuscript's remark that the continuous energy is strictly decreasing except at critical points of the flow.
+
+
+\section{A-Posteriori Energy Balance for an Arbitrary Trajectory}\label{app:perturbed}
+
+Theorem~\ref{thm:app-gradflow} assumes that the curve $c$ is an \emph{exact} gradient flow, $c'=-\nabla E(c)$.
+A trained Spectral-PINN is not: the coefficient trajectory $c(t)$ satisfies the Allen--Cahn equation only up to a \emph{residual}, and the Neumann condition only up to a boundary defect.
+This appendix removes the exactness assumption.
+It proves, for an \emph{arbitrary} differentiable trajectory, an energy balance whose right-hand side contains only the residual, the boundary defect and the dissipation, and it identifies these quantities for the polynomial states $u(x,t)=\sum_{k=0}^{K}c_k(t)T_k(x)$ produced by the network.
+The exact gradient flow is the special case of zero residual and zero defect.
+Nothing in this appendix asserts that the trained network has a small residual; the residual and the defect are \emph{a-posteriori} quantities that can be computed for a given network (Remark~\ref{rem:compute}).
+
+\subsection{Abstract Statements}\label{app:perturbed-abstract}
+
+\begin{Lemma}[Algebra of one instant]\label{lem:balance}
+Let $H$ be a real inner-product space and let $G,r,w\in H$ satisfy $w=-G+r$. Then
+\begin{align}
+\langle G,w\rangle &= -\|w\|^2+\langle r,w\rangle, \label{eq:bal1}\\
+\langle G,w\rangle &= \tfrac12\|r\|^2-\tfrac12\|w\|^2-\tfrac12\|G\|^2, \label{eq:bal2}\\
+\langle G,w\rangle &= \tfrac14\|r\|^2-\bigl\|G-\tfrac12 r\bigr\|^2. \label{eq:bal3}
+\end{align}
+In particular $\langle G,w\rangle\le\tfrac12\|r\|^2-\tfrac12\|w\|^2$ and $\langle G,w\rangle\le\tfrac14\|r\|^2$.
+\end{Lemma}
+\begin{proof}
+Since $G=r-w$, $\langle G,w\rangle=\langle r,w\rangle-\langle w,w\rangle$, which is \eqref{eq:bal1}.
+Since $r=w+G$, $\|r\|^2=\|w\|^2+2\langle w,G\rangle+\|G\|^2$; solving for $\langle G,w\rangle$ gives \eqref{eq:bal2}.
+Finally $\bigl\|G-\tfrac12 r\bigr\|^2=\|G\|^2-\langle G,r\rangle+\tfrac14\|r\|^2$, so $\tfrac14\|r\|^2-\|G-\tfrac12 r\|^2=\langle G,r\rangle-\|G\|^2=\langle G,r-G\rangle=\langle G,w\rangle$, which is \eqref{eq:bal3}.
+The two inequalities follow by dropping $-\tfrac12\|G\|^2\le0$ in \eqref{eq:bal2} and $-\|G-\tfrac12 r\|^2\le0$ in \eqref{eq:bal3}.
+\end{proof}
+
+\begin{Theorem}[A-posteriori energy balance, perturbed gradient flow]\label{thm:perturbed}
+Let $F$ be a real Hilbert space and let $E:F\to\mathbb{R}$ be Fr\'echet differentiable at $c(t_0)$ with gradient $\nabla E(c(t_0))$.
+Let $c:\mathbb{R}\to F$ be differentiable at $t_0$ and put
+\[
+r:=c'(t_0)+\nabla E(c(t_0)),\qquad\text{i.e.}\qquad c'(t_0)=-\nabla E(c(t_0))+r .
+\]
+(Every differentiable curve has such a residual $r$; $r=0$ is the exact gradient flow of Theorem~\ref{thm:app-gradflow}.)
+Then $t\mapsto E(c(t))$ is differentiable at $t_0$ and
+\begin{align}
+\frac{d}{dt}\bigg|_{t_0}E(c(t)) &= -\|c'\|^2+\langle r,c'\rangle \label{eq:pert-id}\\
+&=\tfrac12\|r\|^2-\tfrac12\|c'\|^2-\tfrac12\|\nabla E(c)\|^2 \label{eq:pert-exact}\\
+&\le \tfrac12\|r\|^2-\tfrac12\|c'\|^2, \label{eq:pert-ineq}
+\end{align}
+and also $\frac{d}{dt}E(c(t))\le\tfrac14\|r\|^2$ (all quantities at $t_0$). Moreover, if $\|r\|\le\theta\|c'\|$ for some $\theta\ge0$, then $\frac{d}{dt}E(c(t))\le-(1-\theta)\|c'\|^2$; in particular the energy is non-increasing at $t_0$ whenever $\|r\|\le\|c'\|$.
+\end{Theorem}
+\begin{proof}
+By the chain rule, $\frac{d}{dt}E(c(t))\big|_{t_0}=DE(c(t_0))[c'(t_0)]=\langle\nabla E(c(t_0)),c'(t_0)\rangle=\langle G,w\rangle$ with $G:=\nabla E(c(t_0))$ and $w:=c'(t_0)=-G+r$.
+Equations \eqref{eq:pert-id}--\eqref{eq:pert-ineq} and the bound $\tfrac14\|r\|^2$ are \eqref{eq:bal1}, \eqref{eq:bal2} and the inequalities of Lemma~\ref{lem:balance}.
+If $\|r\|\le\theta\|w\|$, the Cauchy--Schwarz inequality gives $\langle r,w\rangle\le\|r\|\|w\|\le\theta\|w\|^2$, and \eqref{eq:pert-id} yields the last claim.
+\end{proof}
+
+\begin{Remark}\label{rem:sharp}
+(i) For $r=0$, \eqref{eq:pert-id} is $dE/dt=-\|c'\|^2$, i.e.\ Theorem~\ref{thm:app-gradflow}.
+(ii) Inequality \eqref{eq:pert-ineq} keeps the dissipation $-\tfrac12\|c'\|^2$ and costs the constant $\tfrac12$ in front of $\|r\|^2$.
+If the dissipation is discarded, the sharp constant is $\tfrac14$: equality in $\frac{d}{dt}E\le\frac14\|r\|^2$ holds iff $\nabla E(c)=\tfrac12 r$, i.e.\ iff $c'=\tfrac12 r=\nabla E(c)$ (the curve climbs the energy at half the residual speed), by \eqref{eq:bal3}.
+The constant $\tfrac14$ is optimal for a bound in terms of $\|r\|$ alone: for $F=\mathbb{R}$, $E(x)=x$, $c(t)=t$ one has $\nabla E=1$, $c'=1$, $r=2$ and $dE/dt=1=\tfrac14r^2$.
+This is a statement about the best possible bound, not a statement that it is attained by a trained network.
+(iii) The Corollary following Theorem~\ref{thm:app-gradflow} instantiates $F=L^2(\Omega)$ for the Ginzburg--Landau functional.
+This is formal only: $E[u]=\int(\frac{\varepsilon^2}{2}u_x^2+F(u))\,dx$ is not defined on all of $L^2$ and is not Fr\'echet differentiable there with an $L^2$ gradient unless $u$ has two derivatives and satisfies the Neumann condition.
+Theorem~\ref{thm:defect} below, in which $E$ lives on a smaller space $V$ embedded in $H=L^2$, is the rigorous formulation; it also makes the role of the Neumann condition explicit.
+\end{Remark}
+
+\begin{Theorem}[Energy balance with a boundary defect]\label{thm:defect}
+Let $V$ be a real normed space, $H$ a real inner-product space and $\iota:V\to H$ a continuous linear map (for Allen--Cahn: the coefficient space $V=\mathbb{R}^{K+1}$ or $H^1$, embedded in $H=L^2(-1,1)$).
+Let $E:V\to\mathbb{R}$ be Fr\'echet differentiable at $c(t_0)$ with differential $DE(c(t_0))\in V'$, and let $c:\mathbb{R}\to V$ be differentiable at $t_0$.
+Assume that there are $G\in H$ and a real number $\beta$ (the value $\beta=\beta(c')$ of a defect functional $\beta\in V'$) such that, at $t_0$,
+\begin{equation}\label{eq:defect-split}
+DE(c)[c']=\langle G,\iota c'\rangle+\beta
+\end{equation}
+(for every direction $v$: $DE(c)[v]=\langle G,\iota v\rangle+\beta(v)$), and put $r:=\iota c'+G\in H$, i.e.\ $\iota c'=-G+r$.
+Then $t\mapsto E(c(t))$ is differentiable at $t_0$ and
+\begin{equation}\label{eq:defect-id}
+\begin{aligned}
+\frac{d}{dt}E(c(t)) &= -\|\iota c'\|^2+\langle r,\iota c'\rangle+\beta\\
+&=\tfrac12\|r\|^2-\tfrac12\|\iota c'\|^2-\tfrac12\|G\|^2+\beta\\
+&\le\tfrac12\|r\|^2-\tfrac12\|\iota c'\|^2+\beta,
+\end{aligned}
+\end{equation}
+and also $\frac{d}{dt}E(c(t))\le\tfrac14\|r\|^2+\beta$.
+\end{Theorem}
+\begin{proof}
+The chain rule gives $\frac{d}{dt}E(c(t))=DE(c)[c']$, which equals $\langle G,\iota c'\rangle+\beta$ by \eqref{eq:defect-split}.
+Apply Lemma~\ref{lem:balance} in $H$ with $w=\iota c'$.
+\end{proof}
+
+\begin{Corollary}[Integrated bounds]\label{cor:integrated}
+Let $c$ and $E$ be as in Theorem~\ref{thm:defect}, but now on a time interval: assume that $c$ is defined and differentiable on an open interval containing $[0,T]$, that $E$ is differentiable at every $c(t)$, and that \eqref{eq:defect-split} holds at every $t\in[0,T]$ with $G(t)$, $\beta(t)$ and residual $r(t)=\iota c'(t)+G(t)$.
+Suppose $\|r(t)\|\le\delta$ and $|\beta(t)|\le b$ for all $t\in[0,T]$. Then for $0\le s\le t\le T$,
+\begin{equation}\label{eq:integrated}
+E(c(t))\le E(c(s))+\Bigl(\frac{\delta^2}{2}+b\Bigr)(t-s),
+\end{equation}
+and the constant $\delta^2/2$ may be replaced by the sharp constant $\delta^2/4$.
+In particular (no defect, $V=H=F$, $\iota=\mathrm{id}$, $G=\nabla E(c)$): if $c'=-\nabla E(c)+r$ with $\|r(t)\|\le\delta$, then $E(c(t))\le E(c(0))+\frac{\delta^2}{2}\,t$; for $\delta=0$ the energy is non-increasing on $[0,T]$.
+
+If moreover $t\mapsto DE(c(t))[c'(t)]$, $\|r(t)\|^2$, $\|\iota c'(t)\|^2$ and $\beta(t)$ are continuous on $[0,T]$, then
+\begin{equation}\label{eq:integrated-L2}
+E(c(t))+\frac12\int_0^t\|\iota c'(s)\|^2\,ds\;\le\;E(c(0))+\frac12\int_0^t\|r(s)\|^2\,ds+\int_0^t\beta(s)\,ds,\qquad t\in[0,T].
+\end{equation}
+\end{Corollary}
+\begin{proof}
+By the chain rule $\psi(t):=E(c(t))$ is differentiable on $[0,T]$, hence continuous there, and by Theorem~\ref{thm:defect} $\psi'(\xi)\le\tfrac12\|r(\xi)\|^2+\beta(\xi)\le\tfrac12\delta^2+b$ for every $\xi\in(0,T)$ (the term $-\tfrac12\|\iota c'\|^2\le0$ is dropped).
+The mean-value theorem on $[s,t]$ gives $\psi(t)-\psi(s)=\psi'(\xi)(t-s)\le(\tfrac12\delta^2+b)(t-s)$.
+The same argument with $\psi'\le\tfrac14\|r\|^2+\beta$ gives the constant $\delta^2/4$.
+For \eqref{eq:integrated-L2}, the continuity assumptions make $\psi'(s)=DE(c(s))[c'(s)]$ continuous, so by the fundamental theorem of calculus $\psi(t)-\psi(0)=\int_0^t\psi'(s)\,ds$, and integrating $\psi'\le\frac12\|r\|^2-\frac12\|\iota c'\|^2+\beta$ over $[0,t]$ gives the claim.
+\end{proof}
+
+\begin{Corollary}[Discrete-time form]\label{cor:discrete}
+Let $E_0,E_1,\dots,E_N$ be real numbers and let $r_n,d_n$ ($n<N$) be vectors of a normed space such that $E_{n+1}-E_n\le\tfrac12\|r_n\|^2-\tfrac12\|d_n\|^2$ for $n=0,\dots,N-1$. Then
+\[
+E_N+\tfrac12\sum_{n=0}^{N-1}\|d_n\|^2\le E_0+\tfrac12\sum_{n=0}^{N-1}\|r_n\|^2,
+\qquad\text{hence}\qquad E_N\le E_0+\tfrac12\sum_{n=0}^{N-1}\|r_n\|^2 ,
+\]
+and $E_N\le E_0+\frac N2\delta^2$ if $\|r_n\|\le\delta$ for all $n$.
+With step weights $\tau_n\ge0$ and $E_{n+1}-E_n\le\tau_n\bigl(\tfrac12\|r_n\|^2-\tfrac12\|d_n\|^2\bigr)$ one obtains $E_N+\tfrac12\sum\tau_n\|d_n\|^2\le E_0+\tfrac12\sum\tau_n\|r_n\|^2$ and $E_N\le E_0+\frac{\delta^2}{2}\sum_{n<N}\tau_n$.
+\end{Corollary}
+\begin{proof}
+Sum the hypothesis over $n=0,\dots,N-1$; the left-hand sides telescope to $E_N-E_0$.
+The second and third claims drop the non-negative term $\frac12\sum\|d_n\|^2$ and bound $\|r_n\|^2\le\delta^2$.
+The weighted statement is the same computation with the weights $\tau_n$.
+\end{proof}
+
+\begin{Remark}[Where the discrete hypothesis comes from]
+For a time-stepping scheme the hypothesis of Corollary~\ref{cor:discrete} is a one-step energy inequality.
+For the checkpoint energies $E_n=E(c(t_n))$ of a trained network in the defect-free case it holds with the non-negative numbers $R_n,D_n$ defined by $R_n^2:=\int_{t_n}^{t_{n+1}}\|r\|^2\,dt$ and $D_n^2:=\int_{t_n}^{t_{n+1}}\|\iota c'\|^2\,dt$ in place of $\|r_n\|,\|d_n\|$, by integrating Theorem~\ref{thm:perturbed} over $[t_n,t_{n+1}]$ (the energy of a polynomial state is a polynomial in the coefficients, hence $t\mapsto E(c(t))$ is $C^1$ and the fundamental theorem of calculus applies).
+With a boundary defect, the term $\int_{t_n}^{t_{n+1}}\beta\,dt$ has to be added on the right.
+That integration step is not part of the machine-checked file; Corollary~\ref{cor:discrete} is checked as a statement about arbitrary real sequences.
+\end{Remark}
+
+\subsection{Link to the Allen--Cahn Equation}\label{app:perturbed-pde}
+
+Let $\varepsilon>0$, $f(u)=u^3-u=F'(u)$, $F(u)=\tfrac14(u^2-1)^2$, $L^2=L^2(-1,1)$ with $\langle v,w\rangle=\int_{-1}^{1}vw\,dx$ and $\|\cdot\|=\|\cdot\|_{L^2}$.
+Let $I\supset[0,T]$ be an open interval, $c=(c_0,\dots,c_K)\in C^1(I;\mathbb{R}^{K+1})$, and
+\[
+u(x,t)=\sum_{k=0}^{K}c_k(t)\,T_k(x),
+\]
+where $T_k$ are the Chebyshev polynomials (the argument uses only that the $T_k$ are fixed real polynomials; no property of the network is used beyond $c\in C^1$).
+Define the PDE residual and the energy of the learned trajectory,
+\[
+r(x,t):=u_t-\varepsilon^2u_{xx}+f(u),\qquad E(t):=\int_{-1}^{1}\Bigl(\frac{\varepsilon^2}{2}u_x^2+F(u)\Bigr)dx .
+\]
+Note that $r(\cdot,t)$ is a polynomial in $x$ of degree at most $3K$, so $r(\cdot,t)\in L^2$ and all norms below are finite.
+
+\begin{Proposition}[Energy identity for polynomial-in-$x$ states]\label{prop:pde-identity}
+$E\in C^1(I)$ and, for every $t\in I$,
+\begin{equation}\label{eq:pde-identity}
+\begin{aligned}
+\frac{dE}{dt}&=-\|u_t\|^2+\langle r,u_t\rangle+\varepsilon^2\bigl[u_xu_t\bigr]_{x=-1}^{x=1}\\
+&=\tfrac12\|r\|^2-\tfrac12\|u_t\|^2-\tfrac12\bigl\|{-\varepsilon^2u_{xx}}+f(u)\bigr\|^2+\varepsilon^2\bigl[u_xu_t\bigr]_{x=-1}^{x=1},
+\end{aligned}
+\end{equation}
+where $[g]_{x=-1}^{x=1}=g(1,t)-g(-1,t)$.
+\end{Proposition}
+\begin{proof}
+\emph{Step 1: $E$ is a polynomial in the coefficients; this is why differentiation under the integral sign is legitimate.}
+For $a=(a_0,\dots,a_K)\in\mathbb{R}^{K+1}$ put $u_a(x)=\sum_ka_kT_k(x)$ and
+\[
+\mathcal{E}(a):=\int_{-1}^{1}\Bigl(\frac{\varepsilon^2}{2}(u_a')^2+\tfrac14u_a^4-\tfrac12u_a^2+\tfrac14\Bigr)dx .
+\]
+Expanding the powers, $(u_a')^2=\sum_{j,k}a_ja_kT_j'T_k'$ and $u_a^m=\sum_{k_1,\dots,k_m}a_{k_1}\cdots a_{k_m}T_{k_1}\cdots T_{k_m}$; hence the integrand is a finite sum $\sum_\alpha a^\alpha q_\alpha(x)$ with $|\alpha|\le4$ and real polynomials $q_\alpha$, and
+$\mathcal{E}(a)=\sum_\alpha a^\alpha\int_{-1}^{1}q_\alpha\,dx$ is a real polynomial in $a$.
+Thus $\mathcal{E}\in C^\infty(\mathbb{R}^{K+1})$, and since $c\in C^1$ and $E(t)=\mathcal{E}(c(t))$, the chain rule gives $E\in C^1(I)$ and $E'(t)=D\mathcal{E}(c(t))[c'(t)]$.
+
+\emph{Step 2: the differential of $\mathcal{E}$.}
+Fix $a,v\in\mathbb{R}^{K+1}$, write $w:=u_v$, so that $u_{a+sv}=u_a+sw$.
+The integrand of $\mathcal{E}(a+sv)$ is $\frac{\varepsilon^2}{2}(u_a'+sw')^2+F(u_a+sw)$, a polynomial of degree at most $4$ in $s$ whose coefficients are polynomials in $x$.
+Integration over $[-1,1]$ commutes with finite sums, so $s\mapsto\mathcal{E}(a+sv)$ is a polynomial in $s$ whose coefficient of $s$ is the integral of the coefficient of $s$ in the integrand, namely $\varepsilon^2u_a'w'+F'(u_a)w$. Hence
+\begin{equation}\label{eq:DE}
+D\mathcal{E}(a)[v]=\int_{-1}^{1}\bigl(\varepsilon^2u_a'w'+f(u_a)\,w\bigr)dx .
+\end{equation}
+No limit of integrals is exchanged with a derivative except for a finite sum, so no dominated-convergence argument is needed.
+
+\emph{Step 3: integration by parts in $x$.}
+Let $p,q$ be real polynomials. Then $(pq)'=p'q+pq'$, and by the fundamental theorem of calculus $\int_{-1}^{1}(pq)'dx=p(1)q(1)-p(-1)q(-1)$; hence $\int_{-1}^{1}p\,q'\,dx=[pq]_{-1}^{1}-\int_{-1}^{1}p'q\,dx$.
+Apply this with $p=u_a'$ and $q=w$ in \eqref{eq:DE}:
+\begin{equation}\label{eq:DE-split}
+D\mathcal{E}(a)[v]=\underbrace{\int_{-1}^{1}\bigl(-\varepsilon^2u_a''+f(u_a)\bigr)\,w\,dx}_{=\ \langle G_a,\,\iota v\rangle}\;+\;\underbrace{\varepsilon^2\bigl[u_a'\,w\bigr]_{x=-1}^{x=1}}_{=\ \beta_a(v)},
+\end{equation}
+with $G_a:=-\varepsilon^2u_a''+f(u_a)\in L^2$ and $\iota v:=u_v=w$.
+This is exactly the splitting \eqref{eq:defect-split}, with the defect functional $\beta_a(v)=\varepsilon^2[u_a'u_v]_{-1}^{1}$; it vanishes for all $v$ iff $u_a'(\pm1)=0$, i.e.\ iff the Neumann condition holds.
+
+\emph{Step 4: insert the trajectory.}
+Take $a=c(t)$ and $v=c'(t)$. Since the $T_k$ do not depend on $t$ and $c_k\in C^1$, $u_t=\sum_kc_k'T_k=u_{c'}$ and $u_{xt}=\partial_x(u_t)$.
+Thus $E'(t)=\langle G,u_t\rangle+\varepsilon^2[u_xu_t]_{-1}^{1}$ with $G=-\varepsilon^2u_{xx}+f(u)$.
+By the definition of $r$, $u_t=-G+r$ in $L^2$, so Lemma~\ref{lem:balance} with $w=u_t$ gives $\langle G,u_t\rangle=-\|u_t\|^2+\langle r,u_t\rangle=\frac12\|r\|^2-\frac12\|u_t\|^2-\frac12\|G\|^2$, which is \eqref{eq:pde-identity}.
+\end{proof}
+
+% Numerical sanity check of the signs/forms in (eq:pde-identity): see check_identity.py (same folder).
+(As a sanity check of signs and constants, \eqref{eq:pde-identity} was compared with a central finite difference of $E(t)$, evaluated with exact Gauss--Legendre quadrature, for a random smooth coefficient trajectory with $K=7$ and $\varepsilon=0.3$ at three times: the relative difference was below $10^{-9}$, which is the accuracy of the finite difference. This is a plausibility check, not part of the proof.)
+
+\begin{Corollary}[The trained trajectory has controlled energy growth]\label{cor:spinn-bound}
+Let $u$ be as above and $0\le s\le t\le T$. Put
+\[
+\delta:=\max_{\tau\in[0,T]}\|r(\cdot,\tau)\|_{L^2},\qquad
+b:=\varepsilon^2\max_{\tau\in[0,T]}\Bigl(|u_x(1,\tau)\,u_t(1,\tau)|+|u_x(-1,\tau)\,u_t(-1,\tau)|\Bigr).
+\]
+Then
+\[
+E(t)\le E(s)+\Bigl(\frac{\delta^2}{2}+b\Bigr)(t-s),
+\]
+and, with $\beta(\tau):=\varepsilon^2[u_xu_t]_{x=-1}^{x=1}(\tau)$,
+\[
+E(t)+\frac12\int_0^t\|u_t\|^2\,d\tau\le E(0)+\frac12\int_0^t\|r\|^2\,d\tau+\int_0^t\beta\,d\tau .
+\]
+If the Neumann condition holds exactly, $u_x(\pm1,\tau)=0$, then $b=0$ and $\beta\equiv0$, and the bound reduces to $E(t)\le E(s)+\frac{\delta^2}{2}(t-s)$; if moreover the PDE holds exactly ($\delta=0$) one recovers $dE/dt=-\|u_t\|^2\le0$ (Theorem~\ref{thm:energy}).
+\end{Corollary}
+\begin{proof}
+Apply Corollary~\ref{cor:integrated} with $V=\mathbb{R}^{K+1}$, $H=L^2$, $\iota c=u_c$, $E=\mathcal{E}$, $G(t)=-\varepsilon^2u_{xx}+f(u)$ and $\beta(t)=\varepsilon^2[u_xu_t]_{-1}^{1}$; the splitting \eqref{eq:defect-split} holds for every $t$ by \eqref{eq:DE-split}.
+The maxima exist and the continuity hypotheses of \eqref{eq:integrated-L2} hold because the coefficients (in $x$) of $r$, $u_t$, $u_x$ and of the integrand of $D\mathcal{E}(c)[c']$ are polynomials in the continuous functions $c_k,c_k'$ ($r$ contains $u_t=\sum_kc_k'T_k$ but no second time derivative), so $\tau\mapsto\|r(\cdot,\tau)\|^2$, $\|u_t(\cdot,\tau)\|^2$, $\beta(\tau)$ and $D\mathcal{E}(c(\tau))[c'(\tau)]$ are continuous on the compact interval $[0,T]$ when $c\in C^1$.
+\end{proof}
+
+\begin{Remark}[What this does and does not say about the trained network]\label{rem:compute}
+(i) The theorem is conditional: it converts a bound on the PDE residual and on the Neumann defect into a bound on energy growth. It does not prove that training makes $\delta$ or $b$ small, and the resulting bound $\frac{\delta^2}{2}T$ can be far larger than the actual energy variation.
+The values of $\delta$ and $b$ must be reported for each trained network before any quantitative conclusion is drawn; they are computable to rounding error, because $r(\cdot,t)$ is a polynomial of degree $\le3K$ in $x$, so $\|r(\cdot,t)\|^2$ is integrated exactly by Gauss--Legendre quadrature with $N\ge3K+1$ nodes, and $u_x(\pm1,t)$, $u_t(\pm1,t)$ are evaluated directly from the coefficients.
+(ii) The training objective contains the mean-square residual at collocation points and a boundary penalty on $u_x(\pm1,t)$.
+In the code accompanying the submission (\texttt{spectral\_pinn.py}, default settings) the residual is evaluated on $100$ uniformly spaced times and $300$ uniformly spaced points of $[-1,1]$, so the PDE loss is a mean over this grid, which approximates $\frac{1}{2T}\int_0^T\|r\|^2\,dt$ (the factor $2=|\Omega|$) but is not an exact quadrature of the degree-$6K$ polynomial $r^2$; and the boundary term penalizes $u_x(\pm1,t)/K^2$ (the boundary rows are rescaled by $K^2$), i.e.\ $u_x(\pm1,t)^2$ with weight $K^{-4}\lambda_{\mathrm{bc}}$, which is a very weak control of $b$ for large $K$.
+Hence the loss values reported during training are proxies for $\delta$ and $b$ and must not be substituted for them; both should be evaluated on the trained network as described in (i).
+With the integral form \eqref{eq:integrated-L2}, the energy increase is controlled by the time-integrated squared residual and the boundary term, which are the two quantities that the PDE and boundary losses are designed to make small.
+(iii) The bound does not involve the energy-penalty term of the loss.
+This is consistent with the observation that the energy curves with and without the penalty are nearly indistinguishable, but it does not prove why: it only shows that a small residual and a small Neumann defect already constrain the energy growth.
+(iv) The initial condition $u_0(x)=x^2\cos(\pi x)$ of the submitted version has $u_{0,x}(-1)=2\neq0$, so for a network that fits $u_0$ the factor $u_x(-1,0)$ in the defect term is not small at $t=0$; whether $b$ is small then depends on $u_t(\pm1,t)$ and has to be measured, not assumed. With a Neumann-compatible initial condition this particular source of a non-zero defect at $t=0$ disappears.
+\end{Remark}
+
+\subsection{Machine Verification}\label{app:perturbed-lean}
+
+All statements of Section~\ref{app:perturbed-abstract} and the spatial integration by parts of Step~3 above were machine-checked in Lean~4 with Mathlib (file \texttt{PerturbedFlow.lean}); the file compiles against Lean~4.33.1 and the corresponding Mathlib release with no errors, no warnings and no unproven placeholders, and each theorem depends only on the axioms \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound} (checked with \texttt{\#print axioms}).
+The abstract statements are proved for general real Hilbert (or normed) spaces by Mathlib's chain rule (\texttt{HasFDerivAt.comp\_hasDerivAt\_of\_eq}) and mean-value theorem (\texttt{Convex.image\_sub\_le\_mul\_sub\_of\_deriv\_le}), the integral form by the fundamental theorem of calculus, and the integration by parts for polynomials by \texttt{intervalIntegral.}\allowbreak\texttt{integral\_mul\_deriv\_eq\_deriv\_mul}.
+
+\begin{table}[H]
+\caption{Correspondence between the statements of this appendix and the Lean theorems of \texttt{PerturbedFlow.lean}.\label{tab:lean-perturbed}}
+\small
+\begin{tabularx}{\textwidth}{l>{\raggedright\arraybackslash}X}
+\toprule
+\textbf{Statement} & \textbf{Lean theorem(s)}\\
+\midrule
+Lemma~\ref{lem:balance} & \texttt{inner\_balance}, \texttt{inner\_balance\_exact}, \texttt{inner\_balance\_quarter}, \texttt{inner\_balance\_le}, \texttt{inner\_balance\_le\_quarter}\\
+Theorem~\ref{thm:perturbed}, \eqref{eq:pert-id} & \texttt{perturbedFlow\_hasDerivAt\_energy}, \texttt{perturbedFlow\_hasDerivAt\_energy\_gradient}\\
+Theorem~\ref{thm:perturbed}, \eqref{eq:pert-exact} & \texttt{perturbedFlow\_hasDerivAt\_energy\_exact}\\
+Theorem~\ref{thm:perturbed}, \eqref{eq:pert-ineq} & \texttt{perturbedFlow\_deriv\_energy\_le}, \texttt{perturbedFlow\_deriv\_energy\_le\_deriv}\\
+Theorem~\ref{thm:perturbed}, $\|r\|\le\theta\|c'\|$ & \texttt{perturbedFlow\_deriv\_energy\_le\_of\_relative}, \texttt{perturbedFlow\_deriv\_energy\_nonpos\_of\_residual\_le}\\
+Remark~\ref{rem:sharp}(i) ($r=0$) & \texttt{perturbedFlow\_exact\_case}\\
+Theorem~\ref{thm:defect}, identity & \texttt{defectFlow\_hasDerivAt\_energy}, \texttt{defectFlow\_hasDerivAt\_energy\_functional}, \texttt{defectFlow\_hasDerivAt\_energy\_exact}\\
+Theorem~\ref{thm:defect}, inequalities & \texttt{defectFlow\_deriv\_energy\_le}, \texttt{defectFlow\_deriv\_energy\_le\_quarter}\\
+Corollary~\ref{cor:integrated}, \eqref{eq:integrated} & \texttt{energy\_le\_of\_deriv\_le}, \texttt{defectFlow\_energy\_growth\_bound}, \texttt{defectFlow\_energy\_bound}, \texttt{defectFlow\_energy\_bound\_quarter}, \texttt{perturbedFlow\_energy\_growth\_bound}, \texttt{perturbedFlow\_energy\_bound}, \texttt{perturbedFlow\_energy\_bound\_quarter}, \texttt{gradientFlow\_energy\_le\_initial}\\
+Corollary~\ref{cor:integrated}, \eqref{eq:integrated-L2} & \texttt{energy\_integral\_le}, \texttt{defectFlow\_energy\_integral\_bound}, \texttt{defectFree\_energy\_integral\_bound}\\
+Corollary~\ref{cor:discrete} & \texttt{energy\_le\_of\_increment\_le}, \texttt{discrete\_energy\_balance}, \texttt{discrete\_energy\_bound}, \texttt{discrete\_energy\_bound\_uniform}, \texttt{discrete\_energy\_balance\_weighted}, \texttt{discrete\_energy\_bound\_weighted}\\
+Proposition~\ref{prop:pde-identity}, Step~3 and \eqref{eq:DE-split} & \texttt{ibp\_polynomial}, \texttt{first\_variation\_split}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Not machine-checked are: Step~1 of Proposition~\ref{prop:pde-identity} (that $\mathcal{E}$ is a polynomial in the coefficients), the identification of the abstract objects $E,G,\beta,r$ with the Allen--Cahn quantities in Corollary~\ref{cor:spinn-bound} (this identification is the content of Steps~2--4 and uses only the verified integration by parts), the fundamental-theorem-of-calculus step in the remark following Corollary~\ref{cor:discrete}, and, of course, the empirical values of $\delta$ and $b$ for the trained networks.
+
+\section{Symmetry-Preservation Diagnostic}\label{app:sym}
+
+For the two-dimensional experiment of Section~\ref{sec:2d}, the reflection-symmetry violation $S(t)$ was evaluated on an endpoint-inclusive grid $x_i=-\pi+ih$, $h=2\pi/(n-1)$, $i=0,\dots,n-1$ ($n=49$), so that $x_{n-1-i}=-x_i$ exactly; this avoids an artificial, purely discretization-induced violation that would otherwise arise from comparing a periodic (endpoint-excluded) training grid against its naive array reversal.
+
+%%APP_ORIG%%
+\input{72_app_ref.tex}
+

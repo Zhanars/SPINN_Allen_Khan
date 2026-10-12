@@ -1,0 +1,47 @@
+=== PART 1: Table 1 Chebyshev row (eps=0.01, N=40/60/80), reference = FD Nx=500, dt=1e-4 ===
+dx_ref=4.0000e-03, (N+1)*dx_ref for N=80: 0.3240 (true measure 2.0) => code norm scale sqrt(0.3240/2)=0.4025
+PINN-row protocol: 200*dx = 2.0101 (true measure 2.0)
+N=40 dt=0.002  (rerun 0.02s; stored l2=7.5782e-05 linf=5.5000e-04)
+   A_code=7.5782e-05  B_cc=1.6626e-04  C_pinnprotocol=1.7978e-04  D_trap_refgrid=1.7074e-04  Linf_nodes=5.5000e-04  Linf_200=5.5000e-04  Linf_refgrid=5.5000e-04  weight_sum_code=1.6400e-01
+   ratio proper(PINN-protocol)/code-norm = 2.372 ; CC/code = 2.194 ; trapezoid-refgrid/code = 2.253
+N=60 dt=0.001  (rerun 0.05s; stored l2=7.7796e-05 linf=5.5276e-04)
+   A_code=7.7796e-05  B_cc=9.3608e-05  C_pinnprotocol=1.1395e-04  D_trap_refgrid=9.7459e-05  Linf_nodes=5.5276e-04  Linf_200=5.5276e-04  Linf_refgrid=5.5276e-04  weight_sum_code=2.4400e-01
+   ratio proper(PINN-protocol)/code-norm = 1.465 ; CC/code = 1.203 ; trapezoid-refgrid/code = 1.253
+N=80 dt=0.0005  (rerun 0.14s; stored l2=8.5110e-05 linf=5.5627e-04)
+   A_code=8.5110e-05  B_cc=6.7955e-05  C_pinnprotocol=9.3099e-05  D_trap_refgrid=7.0573e-05  Linf_nodes=5.5627e-04  Linf_200=5.5627e-04  Linf_refgrid=5.5627e-04  weight_sum_code=3.2400e-01
+   ratio proper(PINN-protocol)/code-norm = 1.094 ; CC/code = 0.798 ; trapezoid-refgrid/code = 0.829
+
+=== PART 2: how accurate is the reference itself? (Chebyshev N=80 solution and PINN-protocol errors vs finer FD) ===
+FD Nx=500 dt=0.0001 computed in 0.6s
+FD Nx=1000 dt=5e-05 computed in 1.7s
+FD Nx=2000 dt=2.5e-05 computed in 5.0s
+FD Nx=4000 dt=1e-05 computed in 21.4s
+FD(500, 0.0001) vs FD(4000,1e-5): L2(trapezoid)=5.4661e-05  Linf=4.8516e-04
+FD(1000, 5e-05) vs FD(4000,1e-5): L2(trapezoid)=2.4091e-05  Linf=2.1558e-04
+FD(2000, 2.5e-05) vs FD(4000,1e-5): L2(trapezoid)=8.2722e-06  Linf=7.3153e-05
+FD(500,dt=1e-5) vs FD(500,dt=1e-4) [pure time-step effect at fixed dx]: L2=7.5887e-06 Linf=1.1711e-05
+FD(2000,dt=1e-4) vs FD(500,dt=1e-4) [pure spatial effect at fixed dt]: L2=4.5778e-05 Linf=4.1153e-04
+Chebyshev N=80 dt=0.0005 vs FD(4000,1e-5): PINN-protocol L2=4.2705e-05 (Linf200=7.1110e-05) | CC-nodes L2=4.1957e-05 | trap L2=4.2005e-05 | (0.2s)
+Chebyshev N=80 dt=0.0001 vs FD(4000,1e-5): PINN-protocol L2=1.3832e-05 (Linf200=7.3748e-05) | CC-nodes L2=1.1165e-05 | trap L2=1.1233e-05 | (0.4s)
+Chebyshev N=80 dt=2.5e-05 vs FD(4000,1e-5): PINN-protocol L2=1.1766e-05 (Linf200=7.4242e-05) | CC-nodes L2=8.4344e-06 | trap L2=8.4979e-06 | (1.7s)
+Chebyshev N=120 dt=1.25e-05 vs FD(4000,1e-5): PINN-protocol L2=1.1723e-05 (Linf200=7.4330e-05) | CC-nodes L2=8.3768e-06 | trap L2=8.4261e-06 | (3.6s)
+Manuscript reference FD(500,1e-4) vs FD(4000,1e-5) on 200-pt grid: L2(PINN protocol)=7.7409e-05 Linf=4.8516e-04
+spectral_pinn.json t=1: L2 vs manuscript reference 1.4505e-03 (stored 1.4505e-03), vs FD(4000,1e-5) 1.4569e-03 ; Linf 3.7843e-03 vs 3.8002e-03
+    trapezoid-weight L2 on the same 200 pts: 1.4503e-03 (Riemann sum used by code: 1.4505e-03)
+vanilla_pinn.json t=1: L2 vs manuscript reference 6.7613e-02 (stored 6.7613e-02), vs FD(4000,1e-5) 6.7631e-02 ; Linf 8.5809e-02 vs 8.5833e-02
+    trapezoid-weight L2 on the same 200 pts: 6.7609e-02 (Riemann sum used by code: 6.7613e-02)
+
+=== PART 3: Table 4 Chebyshev column (N=400, eps-scaled FD reference) ===
+eps=0.01 nx_ref=668 N=400 dt=0.0001 (stored: l2=1.1739e-04 linf=4.2599e-04) [2s]
+   A_code=1.1739e-04  B_cc=4.6869e-05  C_pinnprotocol=6.6780e-05  D_trap_refgrid=4.7791e-05  Linf_nodes=4.2599e-04  Linf_200=4.2599e-04  Linf_refgrid=4.2599e-04  weight_sum_code=1.2006e+00
+   code/PINN-protocol = 1.758 ; code/CC = 2.505
+eps=0.005 nx_ref=1334 N=400 dt=5e-05 (stored: l2=3.3853e-05 linf=2.0372e-04) [3s]
+   A_code=3.3853e-05  B_cc=1.6348e-05  C_pinnprotocol=2.9564e-05  D_trap_refgrid=1.6787e-05  Linf_nodes=2.0372e-04  Linf_200=2.0372e-04  Linf_refgrid=2.0372e-04  weight_sum_code=6.0120e-01
+   code/PINN-protocol = 1.145 ; code/CC = 2.071
+eps=0.002 nx_ref=3334 N=400 dt=2e-05 (stored: l2=7.0534e-06 linf=7.9298e-05) [7s]
+   A_code=7.0546e-06  B_cc=7.8205e-06  C_pinnprotocol=1.3152e-05  D_trap_refgrid=7.8798e-06  Linf_nodes=7.9296e-05  Linf_200=7.9296e-05  Linf_refgrid=7.9296e-05  weight_sum_code=2.4055e-01
+   code/PINN-protocol = 0.536 ; code/CC = 0.902
+eps=0.001 nx_ref=6668 N=400 dt=1e-05 (stored: l2=2.6586e-06 linf=3.9283e-05) [21s]
+   A_code=2.6507e-06  B_cc=7.7368e-06  C_pinnprotocol=9.4408e-06  D_trap_refgrid=7.7444e-06  Linf_nodes=3.9285e-05  Linf_200=3.9285e-05  Linf_refgrid=3.9285e-05  weight_sum_code=1.2028e-01
+   code/PINN-protocol = 0.281 ; code/CC = 0.343
+total 80s

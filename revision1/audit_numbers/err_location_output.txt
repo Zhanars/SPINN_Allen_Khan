@@ -1,0 +1,4 @@
+N=40: max|e| = 5.500e-04 at x=1.0000 ; share of CC-weighted e^2 within |x|>0.9: 0.135 ; within |x|>0.5: 0.780 ; share of node count with |x|>0.9: 0.293
+   FD(500) minus FD(4000): max|d| = 4.852e-04 at x=-1.000
+N=80: max|e| = 5.563e-04 at x=1.0000 ; share of CC-weighted e^2 within |x|>0.9: 0.737 ; within |x|>0.5: 0.962 ; share of node count with |x|>0.9: 0.296
+   FD(500) minus FD(4000): max|d| = 4.852e-04 at x=-1.000

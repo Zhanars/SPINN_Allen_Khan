@@ -34,23 +34,23 @@ def grad(y, x):
 
 def train_vanilla_pinn(eps, seed=42, epochs=8000, nx_col=80, nt_col=80,
                         n_ic=200, n_bc=200, lr=1e-3, lam_ic=10.0, lam_bc=10.0,
-                        arch=(2, 64, 64, 64, 1), verbose=True):
+                        arch=(2, 64, 64, 64, 1), verbose=True, u0=None, T=T_FINAL, lbfgs_iters=0):
     torch.manual_seed(seed)
     net = MLP(list(arch))
     opt = torch.optim.Adam(net.parameters(), lr=lr)
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=epochs)
 
     x_col = torch.linspace(-1, 1, nx_col)
-    t_col = torch.linspace(0, T_FINAL, nt_col)
+    t_col = torch.linspace(0, T, nt_col)
     Xc, Tc = torch.meshgrid(x_col, t_col, indexing="ij")
     Xc = Xc.reshape(-1, 1).requires_grad_(True)
     Tc = Tc.reshape(-1, 1).requires_grad_(True)
 
     x_ic = torch.linspace(-1, 1, n_ic).reshape(-1, 1)
     t_ic = torch.zeros_like(x_ic)
-    u_ic = torch.tensor(u0_fn(x_ic.numpy()))
+    u_ic = torch.tensor((u0_fn if u0 is None else u0)(x_ic.numpy()))
 
-    t_bc = torch.linspace(0, T_FINAL, n_bc).reshape(-1, 1)
+    t_bc = torch.linspace(0, T, n_bc).reshape(-1, 1)
     xl_bc = -torch.ones_like(t_bc).requires_grad_(True)
     xr_bc = torch.ones_like(t_bc).requires_grad_(True)
     t_bc_l = t_bc.clone().requires_grad_(True)
@@ -84,6 +84,22 @@ def train_vanilla_pinn(eps, seed=42, epochs=8000, nx_col=80, nt_col=80,
             print(f"  ep {ep:>5} loss={loss.item():.3e} pde={L_pde.item():.3e} "
                   f"ic={L_ic.item():.3e} bc={L_bc.item():.3e}")
         history.append(loss.item())
+    if lbfgs_iters > 0:
+        optL = torch.optim.LBFGS(net.parameters(), lr=1.0, max_iter=lbfgs_iters, max_eval=int(1.25 * lbfgs_iters),
+                                 history_size=50, line_search_fn="strong_wolfe", tolerance_grad=1e-14, tolerance_change=1e-16)
+
+        def closure():
+            optL.zero_grad()
+            u = net(torch.cat([Xc, Tc], dim=1))
+            u_x = grad(u, Xc); u_xx = grad(u_x, Xc); u_t = grad(u, Tc)
+            L_pde = ((u_t - eps**2 * u_xx + f_ac(u))**2).mean()
+            L_ic = ((net(torch.cat([x_ic, t_ic], dim=1)) - u_ic)**2).mean()
+            u_l = net(torch.cat([xl_bc, t_bc_l], dim=1)); u_r = net(torch.cat([xr_bc, t_bc_r], dim=1))
+            L_bc = (grad(u_l, xl_bc)**2).mean() + (grad(u_r, xr_bc)**2).mean()
+            l = L_pde + lam_ic * L_ic + lam_bc * L_bc
+            l.backward()
+            return l
+        optL.step(closure)
     elapsed = time.time() - t0
     return net, history, elapsed
 

@@ -33,10 +33,10 @@ torch.set_default_dtype(torch.float64)
 
 
 class CoeffNet(nn.Module):
-    """t -> Chebyshev coefficient vector c(t) in R^{K+1}."""
-    def __init__(self, K, hidden=(64, 64)):
+    """t -> Chebyshev coefficient vector c(t) in R^{K+1} (or K-1 free coefficients with the hard Neumann basis)."""
+    def __init__(self, K, hidden=(64, 64), n_out=None):
         super().__init__()
-        dims = [1, *hidden, K + 1]
+        dims = [1, *hidden, K + 1 if n_out is None else n_out]
         layers = []
         for i in range(len(dims) - 1):
             layers.append(nn.Linear(dims[i], dims[i + 1]))
@@ -57,13 +57,32 @@ def grad(y, x):
 
 
 class SpectralPINN:
-    def __init__(self, eps, K=32, hidden=(64, 64), n_grid=300, seed=42):
+    def __init__(self, eps, K=32, hidden=(64, 64), n_grid=300, seed=42, u0=None, grid="uniform", hard_bc=False):
+        """grid='uniform': 300 equispaced points (as submitted); grid='cgl': Chebyshev-Gauss-Lobatto nodes
+        (N = max(n_grid, 4K+8)) with Clenshaw-Curtis weights.  hard_bc=True: the network outputs K-1 free
+        coefficients b and c = M b spans exactly the polynomials with u_x(+-1)=0 (basis T_k - k^2/(k+2)^2 T_{k+2})."""
         torch.manual_seed(seed)
         self.eps = eps
         self.K = K
-        self.net = CoeffNet(K, hidden)
-        self.x_grid = np.linspace(-1, 1, n_grid)
-        self.dx = self.x_grid[1] - self.x_grid[0]
+        self.grid = grid
+        self.hard_bc = hard_bc
+        if hard_bc:
+            M = np.zeros((K + 1, K - 1))
+            for k in range(K - 1):
+                M[k, k] = 1.0
+                M[k + 2, k] = -(k ** 2) / (k + 2) ** 2
+            self.M = torch.tensor(M)
+        self.net = CoeffNet(K, hidden, n_out=(K - 1 if hard_bc else None))
+        if grid == "cgl":
+            N = max(n_grid, 4 * K + 8)
+            self.x_grid = np.cos(np.pi * np.arange(N + 1) / N)[::-1].copy()
+            from chebyshev_spectral import clenshaw_curtis_weights
+            self.w_np = clenshaw_curtis_weights(N)[::-1].copy()
+            self.dx = None
+        else:
+            self.x_grid = np.linspace(-1, 1, n_grid)
+            self.dx = self.x_grid[1] - self.x_grid[0]
+            self.w_np = None
         Dc_np = cheb_coeff_derivative_matrix(K)
         Tm_np = chebyshev_vandermonde(self.x_grid, K)
         vp_np, vm_np = cheb_boundary_deriv_vectors(K)
@@ -77,11 +96,23 @@ class SpectralPINN:
         self.Tm = torch.tensor(Tm_np)             # (n_grid, K+1)
         self.v_plus = torch.tensor(vp_np)
         self.v_minus = torch.tensor(vm_np)
-        c0 = fit_chebyshev_coeffs(u0_fn(self.x_grid), self.x_grid, K)
+        self.u0 = u0_fn if u0 is None else u0
+        if grid == "cgl":
+            sw = np.sqrt(self.w_np)
+            c0, *_ = np.linalg.lstsq(Tm_np * sw[:, None], self.u0(self.x_grid) * sw, rcond=None)
+            self.wq = torch.tensor(self.w_np)
+        else:
+            c0 = fit_chebyshev_coeffs(self.u0(self.x_grid), self.x_grid, K)
         self.c0 = torch.tensor(c0)
 
     def coeffs(self, t):
-        return self.net(t)
+        out = self.net(t)
+        return out @ self.M.T if self.hard_bc else out
+
+    def pde_loss(self, res):
+        if self.grid == "cgl":
+            return ((res ** 2) * self.wq).sum(dim=-1).mean() / 2.0
+        return (res ** 2).mean()
 
     def field(self, c):
         """c: (batch, K+1) -> u: (batch, n_grid)"""
@@ -117,27 +148,29 @@ class SpectralPINN:
         ux_coeff = c @ self.Dc.T
         ux = self.field(ux_coeff)
         integrand = self.eps**2 / 2 * ux**2 + F_ac(u)
+        if self.grid == "cgl":
+            return (integrand * self.wq).sum(dim=-1)
         return torch.trapezoid(integrand, dx=self.dx, dim=-1)
 
 
 def train_spectral_pinn(eps, K=32, epochs=6000, nt_col=100, lr=1e-3,
                          lam_ic=10.0, lam_bc=1.0, energy_constrained=False,
                          lam_energy=50.0, n_checkpoints=10, seed=42,
-                         warmup_epochs=1000, verbose=True):
-    model = SpectralPINN(eps, K=K, seed=seed)
+                         warmup_epochs=1000, verbose=True, u0=None, T=T_FINAL, grid="uniform", hard_bc=False, lbfgs_iters=0):
+    model = SpectralPINN(eps, K=K, seed=seed, u0=u0, grid=grid, hard_bc=hard_bc)
     opt = torch.optim.Adam(model.net.parameters(), lr=lr)
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=epochs)
 
-    t_col = torch.linspace(1e-4, T_FINAL, nt_col).reshape(-1, 1)
+    t_col = torch.linspace(1e-4, T, nt_col).reshape(-1, 1)
     t_ic = torch.zeros(1, 1)
-    t_ckpt = torch.linspace(0, T_FINAL, n_checkpoints + 1).reshape(-1, 1)
+    t_ckpt = torch.linspace(0, T, n_checkpoints + 1).reshape(-1, 1)
 
     # Warm-up: pretrain the network to output the (constant-in-time) IC
     # coefficients everywhere. This gives the PDE-constrained optimization
     # a sane starting point instead of an arbitrary random trajectory,
     # analogous to the per-step warm-up used in discrete SAV-PINN schemes.
     warmup_opt = torch.optim.Adam(model.net.parameters(), lr=1e-3)
-    t_warmup = torch.linspace(0, T_FINAL, nt_col).reshape(-1, 1)
+    t_warmup = torch.linspace(0, T, nt_col).reshape(-1, 1)
     for _ in range(warmup_epochs):
         warmup_opt.zero_grad()
         c_pred = model.coeffs(t_warmup)
@@ -152,7 +185,7 @@ def train_spectral_pinn(eps, K=32, epochs=6000, nt_col=100, lr=1e-3,
     for ep in range(epochs):
         opt.zero_grad()
         res, c_col = model.pde_residual(t_col)
-        L_pde = (res**2).mean()
+        L_pde = model.pde_loss(res)
 
         c_ic = model.coeffs(t_ic)
         L_ic = ((c_ic - model.c0)**2).mean()
@@ -181,6 +214,24 @@ def train_spectral_pinn(eps, K=32, epochs=6000, nt_col=100, lr=1e-3,
         if verbose and (ep % 1000 == 0 or ep == epochs - 1):
             print(f"  ep {ep:>5} loss={loss.item():.3e} pde={L_pde.item():.3e} "
                   f"ic={L_ic.item():.3e} bc={L_bc.item():.3e} energy={float(L_energy):.3e}")
+    if lbfgs_iters > 0:
+        # full-batch L-BFGS refinement of the same loss (the collocation grid is fixed, so the loss is deterministic)
+        optL = torch.optim.LBFGS(model.net.parameters(), lr=1.0, max_iter=lbfgs_iters, max_eval=int(1.25 * lbfgs_iters),
+                                 history_size=50, line_search_fn="strong_wolfe", tolerance_grad=1e-14, tolerance_change=1e-16)
+
+        def closure():
+            optL.zero_grad()
+            res_, c_col_ = model.pde_residual(t_col)
+            l = model.pde_loss(res_) + lam_ic * ((model.coeffs(t_ic) - model.c0)**2).mean()
+            rp_, rm_ = model.bc_residual(c_col_)
+            l = l + lam_bc * ((rp_**2).mean() + (rm_**2).mean())
+            if energy_constrained:
+                E_ = model.energy(model.coeffs(t_ckpt))
+                l = l + lam_energy * (torch.clamp(E_[1:] - E_[:-1], min=0.0)**2).sum()
+            l.backward()
+            return l
+        optL.step(closure)
+        history["lbfgs_final_loss"] = float(closure())
     elapsed = time.time() - t0
     return model, history, elapsed
 

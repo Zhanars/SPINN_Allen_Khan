@@ -1,0 +1,60 @@
+%  LaTeX support: latex@mdpi.com
+%=================================================================
+\documentclass[symmetry,article,submit,moreauthors]{Definitions/mdpi}
+
+%=================================================================
+% MDPI internal commands - do not modify
+\firstpage{1}
+\makeatletter
+\setcounter{page}{\@firstpage}
+\makeatother
+\pubvolume{1}
+\issuenum{1}
+\articlenumber{0}
+\pubyear{2026}
+\copyrightyear{2026}
+\datereceived{ }
+\daterevised{ }
+\dateaccepted{ }
+\datepublished{ }
+
+%=================================================================
+\usepackage{amsmath,amssymb}
+
+%=================================================================
+% Full title of the paper (Capitalized)
+\Title{A Spectral--Physics-Informed Neural Network Hybrid with Energy-Constrained Training for the Allen--Cahn Equation: Forward and Inverse Problems$^\dagger$}
+
+% This paper is an extended version of a conference abstract (MDPI conference-paper policy)
+\conference{Abdiramanov, Z.; Zhumazhanov, E.; Urnek, D. Investigation of Physics-Informed Neural Networks for Solving the Allen-Cahn Equation. In Proceedings of the 4th International Conference: Constructive Mathematical Analysis (ICCMA 2026), 1--2 July 2026}
+
+% Author Orchid ID
+\newcommand{\orcidauthorA}{0009-0004-9631-6284} % Zhuldyz Issa
+\newcommand{\orcidauthorB}{0009-0002-5513-712X} % Adil Nauryzbay
+\newcommand{\orcidauthorC}{0000-0003-3820-7253} % Zhanars Abdiramanov
+\newcommand{\orcidauthorD}{0009-0008-5187-6105} % Yessimkhan Zhumazhanov
+\newcommand{\orcidauthorE}{0009-0009-0099-4408} % Dastan Urnek
+
+% Authors, for the paper (add full first names)
+\Author{Zhuldyz Issa $^{1}$\orcidA{}, Adil Nauryzbay $^{1}$\orcidB{}, Zhanars Abdiramanov $^{1,2,}$*\orcidC{}, Yessimkhan Zhumazhanov $^{1}$\orcidD{} and Dastan Urnek $^{1}$\orcidE{}}
+
+% MDPI internal command: Authors, for metadata in PDF
+\AuthorNames{Zhuldyz Issa, Adil Nauryzbay, Zhanars Abdiramanov, Yessimkhan Zhumazhanov and Dastan Urnek}
+
+% Affiliations / Addresses
+\address{%
+$^{1}$ \quad Department of Mathematics and Mathematical Modeling, Abai Kazakh National Pedagogical University, Almaty 050010, Kazakhstan\\
+$^{2}$ \quad Institute of Information and Computational Technologies, Almaty 050010, Kazakhstan}
+
+% Contact information of the corresponding author
+\corres{Correspondence: zh.abdiramanov@abaiuniversity.edu.kz}
+
+% Abstract (Do not insert blank lines, i.e. \\)
+\abstract{Physics-informed neural networks (PINNs) offer a mesh-free alternative to classical discretizations of the Allen--Cahn equation, but suffer spectral bias near sharp interfaces and give no structural guarantee that the Ginzburg--Landau energy decreases, a property tied to the double-well potential's $u\mapsto-u$ symmetry. We propose a Spectral-PINN hybrid whose network outputs a time-dependent vector of Chebyshev (1D) or Fourier (2D) spectral coefficients rather than the field value directly, so spatial derivatives are exact and, in 2D, reflection symmetry is preserved to machine precision by construction. On a benchmark problem the Spectral-PINN cuts the $L^2$ error by a factor of $\sim$49 relative to a vanilla PINN while training $\sim$5.4$\times$ faster, with zero violations under an added energy-constrained loss. A stress test up to $K=256$ modes, however, shows accuracy \emph{degrading}, not improving, even under proportionally larger training budgets, exposing an optimization bottleneck absent in classical spectral methods. A systematic sweep of the inverse problem (recovering the interface width $\varepsilon$) rejects our own initial hypothesis that its $\sim$38\% recovery bias is a truncation artifact, since the bias stays flat across a $6\times$ range of $K$. In two dimensions, the Fourier-Spectral-PINN's symmetry violation remains at machine precision across all tested scales, whereas a vanilla PINN's violation grows measurably with time; at longer horizons ($T=10$), the energy-constrained loss keeps enforcing zero energy violations even once solution accuracy has fully collapsed, dissociating this structural guarantee from correctness. Finally, we formalize in Lean~4 with Mathlib both the discrete algebraic lemmas and the continuous energy-dissipation theorem itself, as a general Hilbert-space gradient-flow result resting only on Lean's standard axioms.}
+
+% Keywords
+\keyword{physics-informed neural networks; Allen--Cahn equation; spectral methods; Chebyshev polynomials; Fourier methods; energy stability; inverse problems; symmetry; gradient flow}
+
+\MSC{65M99; 35K57; 68T07}
+
+%=================================================================

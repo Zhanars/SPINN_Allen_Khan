@@ -1,0 +1,124 @@
+\appendixtitles{yes}
+\appendixstart
+\appendix
+\section{Lean 4 Formalization of the Energy-Stability Lemmas}\label{app:lean}
+
+This appendix first states each result as an ordinary mathematical lemma or theorem, with a conventional proof that can be checked without reading Lean, and then gives the corresponding Lean~4 source that was mechanically verified to prove the same statement.
+
+\begin{Lemma}[Polarization identity]\label{lem:polar}
+For all $a,b\in\mathbb{R}$, $2a(a-b) = a^2-b^2+(a-b)^2$.
+\end{Lemma}
+\begin{proof}
+Expand the right-hand side: $a^2-b^2+(a-b)^2 = a^2-b^2+a^2-2ab+b^2 = 2a^2-2ab = 2a(a-b)$.
+\end{proof}
+
+\begin{Lemma}[Discrete Gr\"onwall step]\label{lem:gronwall}
+Let $a,b,L,\tau\in\mathbb{R}$ with $L\ge0$, $\tau>0$, and $\tau(L+1)<1$. If
+\begin{equation}\label{eq:gronwall-hyp}
+a^2 \le b^2+\tau(L+1)(a^2+b^2),
+\end{equation}
+then
+\begin{equation}\label{eq:gronwall-concl}
+a^2 \le \frac{1+\tau(L+1)}{1-\tau(L+1)}\,b^2.
+\end{equation}
+\end{Lemma}
+\begin{proof}
+Set $c:=\tau(L+1)$. Since $\tau>0$ and $L+1>0$ (as $L\ge0$), $c\ge0$; the hypothesis $\tau(L+1)<1$ gives $c<1$, so $1-c>0$. Expanding \eqref{eq:gronwall-hyp}, $a^2\le b^2+ca^2+cb^2$, i.e., $(1-c)a^2\le(1+c)b^2$. Dividing both sides by $1-c>0$ yields \eqref{eq:gronwall-concl}.
+\end{proof}
+
+\begin{Proposition}[Existence of an admissible step size]\label{prop:stepsize}
+For every $L\ge0$ there exists $\tau>0$ with $\tau(L+1)<1$.
+\end{Proposition}
+\begin{proof}
+Take $\tau=\frac{1}{2(L+1)}$ (well defined since $L+1>0$); then $\tau(L+1)=\tfrac12<1$.
+\end{proof}
+
+Lemmas~\ref{lem:polar} and~\ref{lem:gronwall} and Proposition~\ref{prop:stepsize} were additionally machine-verified in Lean~4 with Mathlib (project file \texttt{AllenCahnVerification/Basic.lean}), compiled with \texttt{lake build} against Lean~4.33.1 and the corresponding Mathlib release, with zero errors, zero warnings other than cosmetic style-linter notices, and zero uses of \texttt{sorry}:
+
+\begin{quote}\small\ttfamily\raggedright
+import Mathlib\\[4pt]
+\textbf{theorem} polarization\_identity (a b~:~$\mathbb{R}$) :\\
+\phantom{xx}2~*~a~*~(a~-~b)~=~a~\^{}~2~-~b~\^{}~2~+~(a~-~b)~\^{}~2~:=~\textbf{by} ring\\[6pt]
+\textbf{theorem} discrete\_gronwall\_step (a b L $\tau$~:~$\mathbb{R}$) (hL~:~0~$\le$~L) (h$\tau$~:~0~$<$~$\tau$)\\
+\phantom{xx}(h$\tau$L~:~$\tau$~*~(L~+~1)~$<$~1)\\
+\phantom{xx}(h~:~a~\^{}~2~$\le$~b~\^{}~2~+~$\tau$~*~(L~+~1)~*~(a~\^{}~2~+~b~\^{}~2)) :\\
+\phantom{xx}a~\^{}~2~$\le$~(1~+~$\tau$~*~(L~+~1))~/~(1~-~$\tau$~*~(L~+~1))~*~b~\^{}~2~:=~\textbf{by}\\
+\phantom{xx}\textbf{set} c~:=~$\tau$~*~(L~+~1) \textbf{with} hc\_def\\
+\phantom{xx}\textbf{have} hc\_nonneg~:~0~$\le$~c~:=~\textbf{by}\\
+\phantom{xxxx}\textbf{have} hL1~:~(0~:~$\mathbb{R}$)~$\le$~L~+~1~:=~\textbf{by} linarith\\
+\phantom{xxxx}\textbf{exact} mul\_nonneg h$\tau$.le hL1\\
+\phantom{xx}\textbf{have} hc\_lt\_one~:~c~$<$~1~:=~h$\tau$L\\
+\phantom{xx}\textbf{have} hpos~:~(0~:~$\mathbb{R}$)~$<$~1~-~c~:=~\textbf{by} linarith\\
+\phantom{xx}\textbf{have} key~:~(1~-~c)~*~a~\^{}~2~$\le$~(1~+~c)~*~b~\^{}~2~:=~\textbf{by} nlinarith~[h]\\
+\phantom{xx}rw~[div\_mul\_eq\_mul\_div, le\_div\_iff\textsubscript{0} hpos]\\
+\phantom{xx}nlinarith~[key]\\[6pt]
+\textbf{theorem} stability\_step\_size\_exists (L~:~$\mathbb{R}$) (hL~:~0~$\le$~L) :\\
+\phantom{xx}$\exists$~$\tau$~:~$\mathbb{R}$,~0~$<$~$\tau$~$\land$~$\tau$~*~(L~+~1)~$<$~1~:=~\textbf{by}\\
+\phantom{xx}\textbf{have} hL1~:~(0~:~$\mathbb{R}$)~$<$~L~+~1~:=~\textbf{by} linarith\\
+\phantom{xx}\textbf{have} hden~:~(0~:~$\mathbb{R}$)~$<$~2~*~(L~+~1)~:=~\textbf{by} linarith\\
+\phantom{xx}\textbf{refine}~$\langle$1~/~(2~*~(L~+~1)),~div\_pos one\_pos hden,~?\_$\rangle$\\
+\phantom{xx}rw~[div\_mul\_eq\_mul\_div, div\_lt\_one hden]\\
+\phantom{xx}linarith
+\end{quote}
+
+\begin{Theorem}[Gradient-flow energy dissipation, abstract Hilbert-space form]\label{thm:app-gradflow}
+Let $F$ be a real Hilbert space and $E:F\to\mathbb{R}$ Fr\'echet differentiable at $c(t_0)\in F$, with gradient $\nabla E(c(t_0))\in F$ defined by $DE(c(t_0))[v]=\langle\nabla E(c(t_0)),v\rangle$ for all $v\in F$. Let $c:\mathbb{R}\to F$ be differentiable at $t_0$ and satisfy the gradient-flow relation
+\begin{equation}\label{eq:app-gradflow}
+c'(t_0) = -\nabla E(c(t_0)).
+\end{equation}
+Then $t\mapsto E(c(t))$ is differentiable at $t_0$ with
+\begin{equation}\label{eq:app-diss}
+\frac{d}{dt}\bigg|_{t_0} E(c(t)) = -\|c'(t_0)\|^2 \le 0,
+\end{equation}
+with equality if and only if $c'(t_0)=0$.
+\end{Theorem}
+\begin{proof}
+By the chain rule for the composition of a Fr\'echet-differentiable map with a differentiable curve,
+\[
+\frac{d}{dt}\bigg|_{t_0} E(c(t)) = DE(c(t_0))[c'(t_0)] = \langle \nabla E(c(t_0)),\,c'(t_0)\rangle.
+\]
+Substituting the gradient-flow relation \eqref{eq:app-gradflow} for $\nabla E(c(t_0))=-c'(t_0)$,
+\[
+\langle \nabla E(c(t_0)),\,c'(t_0)\rangle = \langle -c'(t_0),\,c'(t_0)\rangle = -\|c'(t_0)\|^2,
+\]
+using $\langle v,v\rangle=\|v\|^2$ for the real inner product. This proves \eqref{eq:app-diss}; equality holds iff $\|c'(t_0)\|=0$, i.e., $c'(t_0)=0$.
+\end{proof}
+
+\begin{Corollary}[Recovery of Theorem~\ref{thm:energy}]
+Instantiate $F=L^2(\Omega)$ and let $E$ be the Ginzburg--Landau functional of Section~\ref{sec:problem}. The manuscript's proof of Theorem~\ref{thm:energy} (integration by parts under the homogeneous Neumann condition) shows precisely that the $L^2$ gradient of $E$ is $\nabla E(u)=-\varepsilon^2u_{xx}+f(u)$, so that the Allen--Cahn equation $u_t=\varepsilon^2u_{xx}-f(u)$ is exactly the gradient-flow relation \eqref{eq:app-gradflow}. Theorem~\ref{thm:app-gradflow} then gives $dE/dt=-\|u_t\|^2_{L^2}\le0$, which is Theorem~\ref{thm:energy}.
+\end{Corollary}
+
+Theorem~\ref{thm:app-gradflow} was additionally machine-verified in Lean~4 with Mathlib (project file \texttt{AllenCahnVerification/GradientFlow.lean}); \texttt{gradient} below denotes Mathlib's \texttt{HasGradientAt}-derived Riesz-dual gradient. The Lean file compiles with zero errors and zero uses of \texttt{sorry}.
+
+\begin{quote}\small\ttfamily\raggedright
+\textbf{variable} \{F~:~Type*\} [NormedAddCommGroup F] [InnerProductSpace $\mathbb{R}$ F] [CompleteSpace F]\\[6pt]
+\textbf{theorem} gradientFlow\_hasDerivAt\_energy\\
+\phantom{xx}(E~:~F~$\to$~$\mathbb{R}$) (c~:~$\mathbb{R}$~$\to$~F) (t~:~$\mathbb{R}$)\\
+\phantom{xx}(hE~:~HasGradientAt E (gradient E (c t)) (c t))\\
+\phantom{xx}(hflow~:~HasDerivAt c (-(gradient E (c t))) t) :\\
+\phantom{xx}HasDerivAt (\textbf{fun} s~$\Rightarrow$~E (c s)) (-\textbar\textbar deriv c t\textbar\textbar~\^{}~2) t~:=~\textbf{by}\\
+\phantom{xx}\textbf{have} hderiv\_c~:~deriv c t~=~-gradient E (c t)~:=~hflow.deriv\\
+\phantom{xx}\textbf{have} hFD~:~HasFDerivAt E (toDual $\mathbb{R}$ F (gradient E (c t))) (c t)~:=~hE.hasFDerivAt\\
+\phantom{xx}\textbf{have} hcomp~:~HasDerivAt (E~$\circ$~c)\\
+\phantom{xxxx}(toDual $\mathbb{R}$ F (gradient E (c t)) (-(gradient E (c t)))) t~:=\\
+\phantom{xxxx}HasFDerivAt.comp\_hasDerivAt\_of\_eq t hFD hflow rfl\\
+\phantom{xx}\textbf{have} hval~:~toDual $\mathbb{R}$ F (gradient E (c t)) (-(gradient E (c t)))~=~-\textbar\textbar deriv c t\textbar\textbar~\^{}~2~:=~\textbf{by}\\
+\phantom{xxxx}rw~[toDual\_apply\_apply, inner\_neg\_right, real\_inner\_self\_eq\_norm\_sq, hderiv\_c, norm\_neg]\\
+\phantom{xx}rw~[hval] \textbf{at} hcomp;~\textbf{exact} hcomp\\[6pt]
+\textbf{theorem} gradientFlow\_deriv\_energy\_nonpos\\
+\phantom{xx}(E~:~F~$\to$~$\mathbb{R}$) (c~:~$\mathbb{R}$~$\to$~F) (t~:~$\mathbb{R}$)\\
+\phantom{xx}(hE~:~HasGradientAt E (gradient E (c t)) (c t))\\
+\phantom{xx}(hflow~:~HasDerivAt c (-(gradient E (c t))) t) :\\
+\phantom{xx}deriv (\textbf{fun} s~$\Rightarrow$~E (c s)) t~$\le$~0~:=~\textbf{by}\\
+\phantom{xx}rw~[(gradientFlow\_hasDerivAt\_energy E c t hE hflow).deriv]\\
+\phantom{xx}\textbf{exact} neg\_nonpos.mpr (sq\_nonneg \_)
+\end{quote}
+
+A third theorem in the same file, \texttt{gradientFlow\_deriv\_energy\_eq\_zero\_iff}, additionally proves the equality case: $dE/dt=0$ at $t$ if and only if $c'(t)=0$, matching the manuscript's remark that the continuous energy is strictly decreasing except at critical points of the flow.
+
+\section{Symmetry-Preservation Diagnostic}
+
+For the two-dimensional experiment of Section~\ref{sec:2d}, the reflection-symmetry violation $S(t)$ was evaluated on an endpoint-inclusive grid $x_i=-\pi+ih$, $h=2\pi/(n-1)$, $i=0,\dots,n-1$ ($n=49$), so that $x_{n-1-i}=-x_i$ exactly; this avoids an artificial, purely discretization-induced violation that would otherwise arise from comparing a periodic (endpoint-excluded) training grid against its naive array reversal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{adjustwidth}{-\extralength}{0cm}

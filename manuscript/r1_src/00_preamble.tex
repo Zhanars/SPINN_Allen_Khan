@@ -1,0 +1,66 @@
+%  LaTeX support: latex@mdpi.com
+%=================================================================
+\documentclass[symmetry,article,submit,moreauthors]{Definitions/mdpi}
+
+%=================================================================
+% MDPI internal commands - do not modify
+\firstpage{1}
+\makeatletter
+\setcounter{page}{\@firstpage}
+\makeatother
+\pubvolume{1}
+\issuenum{1}
+\articlenumber{0}
+\pubyear{2026}
+\copyrightyear{2026}
+\datereceived{ }
+\daterevised{ }
+\dateaccepted{ }
+\datepublished{ }
+
+%=================================================================
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+% highlighted-changes switch: \hltrue = changes shown in blue (version for the editor), \hlfalse = clean version
+\newif\ifhl
+\HLSWITCH
+\newcommand{\rev}[1]{\ifhl{\color{blue}#1}\else#1\fi}
+\input{numbers_r1.tex}
+
+%=================================================================
+% Full title of the paper (Capitalized)
+\Title{A Chebyshev-Coefficient Physics-Informed Neural Network for the Allen--Cahn Equation: Exact Neumann Basis, A-Posteriori Energy Balance and Inverse Identification$^\dagger$}
+
+% This paper is an extended version of a conference abstract (MDPI conference-paper policy)
+\conference{Abdiramanov, Z.; Zhumazhanov, E.; Urnek, D. Investigation of Physics-Informed Neural Networks for Solving the Allen-Cahn Equation. In Proceedings of the 4th International Conference: Constructive Mathematical Analysis (ICCMA 2026), 1--2 July 2026}
+
+% Author Orchid ID
+\newcommand{\orcidauthorA}{0009-0004-9631-6284} % Zhuldyz Issa
+\newcommand{\orcidauthorB}{0009-0002-5513-712X} % Adil Nauryzbay
+\newcommand{\orcidauthorC}{0000-0003-3820-7253} % Zhanars Abdiramanov
+\newcommand{\orcidauthorD}{0009-0008-5187-6105} % Yessimkhan Zhumazhanov
+\newcommand{\orcidauthorE}{0009-0009-0099-4408} % Dastan Urnek
+
+% Authors, for the paper (add full first names)
+\Author{Zhuldyz Issa $^{1}$\orcidA{}, Adil Nauryzbay $^{1}$\orcidB{}, Zhanars Abdiramanov $^{1,2,}$*\orcidC{}, Yessimkhan Zhumazhanov $^{1}$\orcidD{} and Dastan Urnek $^{1}$\orcidE{}}
+
+% MDPI internal command: Authors, for metadata in PDF
+\AuthorNames{Zhuldyz Issa, Adil Nauryzbay, Zhanars Abdiramanov, Yessimkhan Zhumazhanov and Dastan Urnek}
+
+% Affiliations / Addresses
+\address{%
+$^{1}$ \quad Department of Mathematics and Mathematical Modeling, Abai Kazakh National Pedagogical University, Almaty 050010, Kazakhstan\\
+$^{2}$ \quad Institute of Information and Computational Technologies, Almaty 050010, Kazakhstan}
+
+% Contact information of the corresponding author
+\corres{Correspondence: zh.abdiramanov@abaiuniversity.edu.kz}
+
+% Abstract (Do not insert blank lines, i.e. \\)
+\abstract{\input{abstract_r1.tex}}
+
+% Keywords
+\keyword{physics-informed neural networks; Allen--Cahn equation; Chebyshev polynomials; Neumann boundary conditions; energy balance; maximum bound principle; inverse problems; symmetry; Lean 4}
+
+\MSC{65M99; 35K57; 68T07}
+
+%=================================================================

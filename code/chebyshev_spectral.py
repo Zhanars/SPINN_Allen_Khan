@@ -12,10 +12,10 @@ import numpy as np
 from common import cheb_diff_matrix, u0_fn, f_ac, F_ac, T_FINAL
 
 
-def solve_chebyshev(eps, N=80, dt=1e-3, T=T_FINAL, save_times=None):
+def solve_chebyshev(eps, N=80, dt=1e-3, T=T_FINAL, save_times=None, u0=None):
     D, x = cheb_diff_matrix(N)          # x[0]=1 ... x[N]=-1
     D2 = D @ D
-    u = u0_fn(x).copy()
+    u = (u0_fn if u0 is None else u0)(x).copy()
     Nt = int(round(T / dt))
 
     A = np.eye(N + 1) - dt * eps**2 * D2
