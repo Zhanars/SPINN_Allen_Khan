@@ -13,7 +13,7 @@ coefficient space. Revision 1:
   solver, with an exactly Neumann-compatible basis;
 - tests the optional one-sided energy penalty (every 1D forward-problem Spectral-PINN has monotone energy without it, so the penalty
   is unnecessary; the maximum bound is checked separately);
-- adds an a-posteriori energy balance that bounds the energy growth of any trained trajectory by its measured residual (abstract form
+- adds an a-posteriori energy balance that bounds the energy growth of any trained trajectory by its measured residual and boundary defect (abstract form
   machine-checked in Lean 4);
 - revisits the inverse problem for ε (joint Adam, variable projection, classical least squares, identifiability).
 
@@ -38,7 +38,7 @@ code/                              PyTorch, double precision
   r1_profiles.py, r1_check_quad.py B3 profiles, quadrature check
   check_identity.py                finite-difference sanity check of the energy identity (Appendix B)
   r1_tables.py                     aggregation -> data_r1/summary.json
-  make_tex_r1.py                   every number and table of the manuscript -> manuscript/r1_src/numbers_r1.tex, tab_*.tex, data_r1/numbers.json
+  make_tex_r1.py                   the revision-1 results of the training runs and classical baselines, and the data tables of the manuscript -> manuscript/r1_src/numbers_r1.tex, tab_*.tex, data_r1/numbers.json
   make_figures_r1.py               figures -> manuscript/figures_r1/*.png
   finalize_r1.sh                   server post-processing chain (timing runs, profiles, quadrature check)
   experiment_2d_symmetry.py        2D Fourier network and symmetry diagnostic (first version)
@@ -81,8 +81,9 @@ python package_r1.py                     # upload packages in submission/
 
 Do not run `run_experiments.py 2d`, `server_sweep_2d.py` or `stress_2d_sweep.py`: they overwrite `data/experiment_2d.json`,
 `data/symmetry_2d_multiseed.json` and `data/stress_2d_sweep.json`, which `make_tex_r1.py` reads for Tables 8 and 9 (the other
-first-version scripts overwrite other files in `data/`). Do not run the job group `variants` either: its K=128 jobs other than
-`var_K128_uniform_soft` are not used in the article, and `make_tex_r1.py` would pick them up.
+first-version scripts overwrite other files in `data/`). Run only the job groups `all` and `timing`: the other groups in
+`r1_jobs.py` (e.g. `variants`, `forward`, `ablation_lamE`, `penalty_regimes`, `stress_K`, `stress_T`) also contain jobs that
+are not used in the article, and `make_tex_r1.py` would pick up their records.
 
 ## Checking the Lean proofs
 

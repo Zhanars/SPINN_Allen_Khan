@@ -27,7 +27,7 @@ def runs(pat):
 
 
 def fig_energy():
-    """Fig. 1: energy trajectories with and without the penalty, and their difference; penalty activity."""
+    """Fig. 3: energy trajectories with and without the penalty, their difference, and the L2 error at t=1 versus lambda_E."""
     a, b = run("fh_K32_s42"), run("fh_K32_E50_s42")
     t = np.linspace(0, 1, len(a["E_traj_dt0.02"]))
     Ea, Eb = np.array(a["E_traj_dt0.02"]), np.array(b["E_traj_dt0.02"])
@@ -39,7 +39,7 @@ def fig_energy():
     step = np.abs(np.diff(Ea)).min()
     ax[1].axhline(step, color="gray", ls=":", label="smallest decrement\nper step")
     ax[1].set_xlabel("t"); ax[1].legend(loc="center right"); ax[1].set_title("(b) difference of the curves")
-    # (c) penalty activity vs lambda_E over seeds: number of epochs with nonzero L_E and max lam*L_E
+    # (c) L2 error at t=1 vs lambda_E over five seeds: individual seeds and mean +- SD
     lams = [0.0, 1.0, 10.0, 50.0, 500.0, 5000.0]
     pats = {0.0: "fh_K32_s*", 1.0: "ah_lamE1_s*", 10.0: "ah_lamE10_s*", 50.0: "fh_K32_E50_s*", 500.0: "ah_lamE500_s*", 5000.0: "ah_lamE5000_s*"}
     xs, ys, sds = [], [], []
@@ -62,7 +62,7 @@ def fig_K():
     series = {"soft BC, equispaced grid (as submitted)": ("#e74c3c", "o", {32: "fwd_compat_K32_s*", 64: "fwd_compat_K64_s*", 128: "var_K128_uniform_soft"}),
               r"soft BC rescaled, $\lambda_{\rm BC}=K^4$": ("#8e44ad", "^", {32: "vs_K32_bcfix_s*", 64: "vs_K64_bcfix_s*", 128: "vs_K128_bcfix_s*"}),
               "hard Neumann basis, Gauss–Lobatto grid (revised)": ("#27ae60", "s", {32: "fh_K32_s*", 64: "fh_K64_s*", 128: "fh_K128_s*", 256: "kh_K256_x1"}),
-              "revised, 2x training budget": ("#16a085", "D", {64: "kh_K64_x2", 128: "kh_K128_x2"})}
+              "revised, 2× training budget": ("#16a085", "D", {64: "kh_K64_x2", 128: "kh_K128_x2"})}
     for lab, (c, m, d) in series.items():
         xs, mean = [], []
         for K, pat in sorted(d.items()):
@@ -82,7 +82,7 @@ def fig_K():
 
 
 def fig_balance():
-    """Fig. 3: energy balance of the trained trajectory: E(0)-E(t) versus the a-posteriori bound."""
+    """Fig. 4: (a) the two sides of the energy identity (dE/dt and -||u_t||^2+<r,u_t>+beta, with -||u_t||^2) along a trained trajectory; (b) L2 norm of the PDE residual of three trained networks."""
     r = run("fh_K32_E50_s42")
     s = r["balance"]["t_series"]
     t = np.array(s["t"]); n_r = np.array(s["n_r"]); n_ut2 = np.array(s["n_ut2"]); dEdt = np.array(s["dEdt"]); rhs = np.array(s["rhs"])
@@ -103,8 +103,8 @@ def fig_balance():
 
 
 def fig_inverse():
-    """Fig. 4: (a) joint Adam: eps_hat/eps_init is nearly constant; (b) variable projection: error vs data weight (noise-free);
-    (c) noisy data: variable projection versus classical least squares on the same noise realisations."""
+    """Fig. 5: (a) joint Adam: eps_hat/eps_init is nearly constant; (b) variable projection: error vs data weight (noise-free);
+    (c) noisy data: variable projection versus classical least squares on the same noise realizations."""
     fig, ax = plt.subplots(1, 3, figsize=(7.2, 3.0))
     allr = []
     for var, c, m in (("soft", "#e74c3c", "o"), ("hard", "#27ae60", "s")):
@@ -155,7 +155,7 @@ def fig_inverse():
 
 
 def fig_b3():
-    """Fig. 5: B3 (eps=0.05, T=5) profiles of the reference and of the trained networks at t = 1, 3, 5 (data_r1/profiles_b3.json)."""
+    """Fig. 1: B3 (eps=0.05, T=5) profiles of the reference and of the trained networks at t = 1, 3, 5 (data_r1/profiles_b3.json)."""
     d = json.load(open(os.path.join(HERE, "..", "data_r1", "profiles_b3.json")))
     x = np.array(d["x"])
     fig, ax = plt.subplots(1, 3, figsize=(7.2, 2.7), sharey=True)

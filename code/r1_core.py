@@ -62,7 +62,7 @@ class Quad:
         j = np.arange(self.N + 1)
         self.x = np.cos(np.pi * j / self.N)
         self.w = torch.tensor(refsol.clenshaw_curtis_weights(self.N))
-        self.T = torch.tensor(chebyshev_vandermonde(self.x, K))                  # (Nq, K+1)
+        self.T = torch.tensor(chebyshev_vandermonde(self.x, K))                  # (Nq+1, K+1)
         Dc = cheb_coeff_derivative_matrix(K)
         self.Dc = torch.tensor(Dc)
         self.Dc2 = torch.tensor(Dc @ Dc)

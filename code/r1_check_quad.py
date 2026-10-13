@@ -1,8 +1,8 @@
 """Quadrature check of the a-posteriori diagnostics (r1_core.balance_diagnostics).
 
 The energy integrand and every term of the energy identity are polynomials of degree <= 4K in x and are integrated exactly by the
-Clenshaw-Curtis rule on 4K+8 nodes used in r1_core.Quad.  ||r||^2 is a polynomial of degree 6K (r contains u^3), so that rule is not
-exact for it.  This script recomputes int_0^T ||r||^2/2 dt for trained networks with the CC rule on 6K+8 nodes (exact) and reports the
+Clenshaw-Curtis rule of order 4K+8 (4K+9 nodes) used in r1_core.Quad.  ||r||^2 is a polynomial of degree 6K (r contains u^3), so that rule is not
+exact for it.  This script recomputes int_0^T ||r||^2/2 dt for trained networks with the CC rule of order 6K+8 (6K+9 nodes, exact) and reports the
 relative difference.   usage: python r1_check_quad.py  -> data_r1/check_quad.json"""
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"

@@ -39,10 +39,10 @@ rigorous a-posteriori bound).  Max-norm differences, all numbers from audit_code
       - half-interval vs full-interval solver (N=128) . <= 1.8e-13
       - independent 2nd-order ghost-node finite-difference method of lines (Radau),
         Nx=4000/8000 Richardson-extrapolated, compared at the FD nodes .... <= 5.4e-9
-        (worst case ic=orig, eps=0.01, t=0.1; the other 17 cases <= 1e-10)
+        (worst case ic=orig, eps=0.01, t=0.1; the other 17 cases <= 2.2e-10)
     => reference error <= 1e-8 (spectral convergence itself is ~1e-11) in every tested case.
   * eps=0.01, T=10 (interfaces of width ~sqrt2*eps form; N=1024 default): N=1024 vs N=1536
-    (rtol 1e-12) <= 1.3e-11, BDF vs Radau <= 2e-9.  N=256 is NOT enough there (1e-2 error at t>=5).
+    (rtol 1e-12) <= 1.3e-11, BDF vs Radau <= 2e-9.  N=256 is NOT enough there (1e-3 error at t=5, 1e-2 at t=10).
   * eps in {0.005,0.002,0.001}, T=1, ic=orig (N=512 default): N=512 vs N=1536 <= 4e-12.
   The default N is chosen by `_default_N`; for (eps, T) outside the tested set use
   `reference_certified`, which also returns the N vs 1.5N difference as an error estimate.

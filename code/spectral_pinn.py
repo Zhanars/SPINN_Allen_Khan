@@ -9,8 +9,8 @@ and the field is reconstructed as
     u(x,t) = sum_{k=0}^{K} c_k(t) T_k(x).
 
 Spatial derivatives are obtained *exactly* by a fixed linear operator in
-coefficient space (Dcoef, see common.py) rather than by automatic
-differentiation, which removes the spectral bias / sharp-interface
+coefficient space (cheb_coeff_derivative_matrix in common.py) rather than by automatic
+differentiation. This does not by itself remove the sharp-interface
 difficulty that plagues vanilla space-time PINNs at small eps. Automatic
 differentiation is only used in the time direction (dc/dt).
 
@@ -143,7 +143,7 @@ class SpectralPINN:
         return r_plus, r_minus
 
     def energy(self, c):
-        """Physical Ginzburg-Landau energy via trapezoid rule on x_grid."""
+        """Physical Ginzburg-Landau energy on x_grid: trapezoidal rule (grid='uniform') or Clenshaw-Curtis weights (grid='cgl')."""
         u = self.field(c)
         ux_coeff = c @ self.Dc.T
         ux = self.field(ux_coeff)

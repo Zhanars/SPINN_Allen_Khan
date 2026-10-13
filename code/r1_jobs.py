@@ -133,7 +133,7 @@ def regimes_hard():
 
 
 def regimes_soft64():
-    """The as-submitted K=64 network (soft penalty with effective weight K^-4: wall slopes ~4, L2 ~ 6e-2) with the energy penalty;
+    """The as-submitted K=64 network (soft penalty with effective weight K^-4: wall slopes 3.6-6.7, L2(t=1) ~ 1e-1) with the energy penalty;
     the same configuration without the penalty is fwd_compat_K64_s* (group forward)."""
     return [J("spectral", f"reg_K64_E50_s{s}", ic="compat", K=64, seed=s, lam_energy=50.0) for s in (42, 123, 7)]
 

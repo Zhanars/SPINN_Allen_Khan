@@ -7,7 +7,7 @@ usage:  python r1_classical2.py b3        -> Chebyshev IMEX solver and reaction-
 Each mode writes data_r1/classical2_<mode>.json.
 
 Inverse: the data are generated exactly as in r1_inverse.py (certified reference at the 40 x 5 observation points, Gaussian noise
-np.random.default_rng(noise_seed).normal(0, sigma, (5, 40))), so noise seeds 1..5 are the same realisations as the neural runs
+np.random.default_rng(noise_seed).normal(0, sigma, (5, 40))), so noise seeds 1..5 are the same realizations as the neural runs
 (paired comparison); seeds 101..120 are extra replicates for the statistics.  Forward model: the Chebyshev/Radau solver of refsol.py
 at a lower resolution (N=96, rtol 1e-10).  Estimator: nonlinear least squares in log(eps) started from 2 eps_true (the start of the
 first version)."""

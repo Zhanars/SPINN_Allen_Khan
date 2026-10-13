@@ -705,10 +705,10 @@ def tab_forward():
     R.append(pinn_row(r"\quad + energy penalty ($\lambda_E=50$)", b3K32E, "5.0"))
     R.append(pinn_row(r"Spectral-PINN revised, $K=64$", b3K64, "5.0"))
     R.append(pinn_row(r"\quad + energy penalty ($\lambda_E=50$)", b3K64E, "5.0"))
-    cap = (r"Forward problem: errors against the certified reference on the 200-point grid, mean $\pm$ SD over $n$ seeds. "
+    cap = (r"Forward problem: errors against the certified reference on the 200-point grid, mean~$\pm$~SD over $n$ seeds. "
            r"``As submitted'': soft Neumann penalty and 300 equispaced collocation points; ``revised'': exact Neumann basis~\eqref{eq:neumann-basis} and Gauss--Lobatto collocation. "
            r"$\max|u|$: largest value over all runs of a row on a $1001\times(100T+1)$ space--time grid. "
-           r"E incr.: total number of energy increases on the grid of spacing $0.02$ (in parentheses: number of runs with at least one). "
+           r"E incr.: total number of energy increases on the grid of spacing $0.02$ (in parentheses: number of runs with at least one increase out of $n$). "
            r"Time: training time of one run (Adam phase, one CPU thread, separate timing runs on the same machine for the classical solver and the PINNs; ``---'': not measured separately).")
     return wide(cap, "tab:forward", "p{5.2cm}cCCccc", H, R)
 
@@ -747,7 +747,7 @@ def tab_K():
 
 def tab_energy():
     H = row(BS + "textbf{Configuration}", m(BS + "boldsymbol{n}"), m(BS + "boldsymbol{" + BS + "|e" + BS + "|_{L^2}}"),
-            BS + "textbf{E incr. } " + m(BS + "boldsymbol{0.02/0.002/0.0002}"), BS + "textbf{Epochs with } " + m(BS + "boldsymbol{" + BS + "mathcal L_E>0}"),
+            BS + "textbf{E incr.}~" + m(BS + "boldsymbol{0.02/0.002/0.0002}"), BS + "textbf{Epochs with} " + m(BS + "boldsymbol{" + BS + "mathcal L_E>0}"),
             m(BS + "boldsymbol{" + BS + "max" + BS + "lambda_E" + BS + "mathcal L_E}"))[:-2]
     R = [group_row(r"B1, revised $K=32$: penalty weight", 6)]
     pats = [(0.0, "fh_K32_s*"), (1.0, "ah_lamE1_s*"), (10.0, "ah_lamE10_s*"), (50.0, "fh_K32_E50_s*"), (500.0, "ah_lamE500_s*"), (5000.0, "ah_lamE5000_s*")]
@@ -766,15 +766,15 @@ def tab_energy():
         R.append(erow(f"$" + BS + f"lambda_E={lam:g}$", runs(p)))
     R.append(BS + "midrule")
     R.append(group_row(r"Regimes with a poor trajectory ($K=32$ revised unless stated; 3 seeds)", 6))
-    for lab, base in ((r"300 epochs (100 warm-up)", "rh_short"), (r"no warm-up", "rh_nowarm"), (r"1500 epochs, lr $10^{-4}$", "rh_pde0")):
+    for lab, base in ((r"300 epochs (100 warm-up)", "rh_short"), (r"no warm-up", "rh_nowarm"), (r"1500 epochs, learning rate $10^{-4}$", "rh_pde0")):
         for lam in (0, 50):
             R.append(erow(lab + f", $" + BS + f"lambda_E={lam}$", runs(f"{base}_E{lam}_s*")))
     R.append(erow(r"$K=64$ as submitted, $\lambda_E=0$", [r for r in so64 if seed(r) in {seed(q) for q in runs("reg_K64_E50_s*")}]))
     R.append(erow(r"$K=64$ as submitted, $\lambda_E=50$", runs("reg_K64_E50_s*")))
     cap = (r"Energy penalty: accuracy at $t=1$ (B1), number of energy increases of the trained trajectory on grids of spacing $0.02$, $0.002$ and $2\times10^{-4}$ "
-           r"(total over the seeds; in parentheses the number of runs with at least one increase), number of training epochs in which the penalty was nonzero (summed over the seeds), "
+           r"(total over the seeds), number of training epochs in which the penalty was nonzero (summed over the seeds), "
            r"and the largest value of the weighted penalty $\lambda_E\mathcal L_E$ during training (``---'': $\lambda_E=0$, for which $\mathcal L_E$ is not evaluated during training).")
-    return wide(cap, "tab:energy", "p{4.6cm}cCCcc", H, R)
+    return wide(cap, "tab:energy", "p{5.3cm}cCCcc", H, R)
 
 
 def tab_balance():
@@ -823,7 +823,7 @@ def tab_inverse():
             cells.append(m(f"{np.mean([r['ratio_to_init'] for r in rr]):.3f}" + BS + f"pm{np.std([r['ratio_to_init'] for r in rr], ddof=1):.3f}") if len(rr) > 1 else DASH)
     R.append(row(r"$\hat\varepsilon/\varepsilon_{\rm init}$", *cells))
     cap = (r"Joint Adam (procedure of the first version): estimate $\hat\varepsilon/\varepsilon_{\rm true}$ for five starting values, noise-free data, seed 42. "
-           r"Last row: $\hat\varepsilon/\varepsilon_{\rm init}$, mean $\pm$ SD over the five starting values.")
+           r"Last row: $\hat\varepsilon/\varepsilon_{\rm init}$, mean~$\pm$~SD over the five starting values.")
     out.append(narrow(cap, "tab:inverse1", "cCCCC", H, R))
     # --- table 2: ablation of joint Adam and variable projection
     H = row(BS + "textbf{Setting}", m(BS + "boldsymbol{" + BS + "varepsilon_{" + BS + "rm true}}"), m(BS + "boldsymbol{" + BS + "hat" + BS + "varepsilon/" + BS + "varepsilon_{" + BS + "rm true}}"),
@@ -850,7 +850,7 @@ def tab_inverse():
         r = run1(tag)
         R.append(row(lab + r" ($\lambda_{\rm data}=2000$)", "0.05", num(r["ratio_to_true"], 3), DASH, f_sci(r["data_rms_misfit"], 1)) if r else row(lab, "0.05", "(not run)", "", ""))
     cap = (r"Inverse problem, noise-free data: sensitivity of the joint-Adam estimate and of the variable-projection estimate to the settings (one run each, seed 42).")
-    out.append(narrow(cap, "tab:inverse2", "p{6.2cm}cccc", H, R))
+    out.append(narrow(cap, "tab:inverse2", "Xcccc", H, R))
     # --- table 3: noise, neural vs classical
     H = row(m(BS + "boldsymbol{" + BS + "varepsilon_{" + BS + "rm true}}"), m(BS + "boldsymbol{" + BS + "sigma}"), BS + "textbf{Var. projection (5 real.)}",
             BS + "textbf{Classical LS (same 5)}", BS + "textbf{Classical LS (25), RMSE}", BS + "textbf{Fisher s.e.}")[:-2]
@@ -882,8 +882,8 @@ def tab_inverse():
             R.append(row(f"{e:g}", f"{nz:g}", neu, cl5, cl25, fis))
         R.append(BS + "midrule") if e != 0.1 else None
     cap = (r"Inverse problem with noisy data: relative error $|\hat\varepsilon-\varepsilon_{\rm true}|/\varepsilon_{\rm true}$ of the variable-projection Spectral-PINN "
-           r"($\lambda_{\rm data}=2000$; mean $\pm$ SD over five noise realizations, one run for $\varepsilon_{\rm true}=0.01$ and for noise-free data) and of the classical least-squares estimator on the same "
-           r"realizations and on 25 realizations (root-mean-square error); Fisher s.e.: Cram\'er--Rao standard error $\sigma/\|\partial u_{\rm obs}/\partial\log\varepsilon\|$ of $\log\hat\varepsilon$.")
+           r"($\lambda_{\rm data}=2000$; mean~$\pm$~SD over five noise realizations, one run for $\varepsilon_{\rm true}=0.01$ and for noise-free data) and of the classical least-squares estimator on the same "
+           r"five realizations (noise seeds 1--5; for $\varepsilon_{\rm true}=0.01$ the network was run only on the first of them with $\sigma=0.01$ and not at all with $\sigma=0.05$) and on 25 realizations (root-mean-square error); Fisher s.e.: Cram\'er--Rao standard error $\sigma/\|\partial u_{\rm obs}/\partial\log\varepsilon\|$ of $\log\hat\varepsilon$.")
     out.append(wide(cap, "tab:inverse3", "ccCCCC", H, R))
     return "\n".join(out)
 
@@ -895,7 +895,7 @@ def tab_2d():
         v = [r["violations"][t] for r in ms2["results"]]
         R.append(row(t, f_sci(ex2["violations"][t]["fourier_spectral"], 1), f_stat(v)))
     cap = (r"Reflection-symmetry violation $S(t)$ (Section~\ref{sec:2d}) of the Fourier-Spectral-PINN (one run; $M=8$, $\varepsilon=0.3$) and of a vanilla PINN with the same "
-           r"periodic input encoding (mean $\pm$ SD over five seeds). Data of the first version, unchanged.")
+           r"periodic input encoding (mean~$\pm$~SD over five seeds). Data of the first version, unchanged.")
     a = narrow(cap, "tab:2d", "cCC", H, R)
     H = row(m(BS + "boldsymbol{M}"), m(BS + "boldsymbol{" + BS + "varepsilon}"), BS + "textbf{Epochs}", m(BS + "boldsymbol{S(1)}"), m(BS + "boldsymbol{" + BS + "sqrt{S(1)}}"))[:-2]
     R = [row(str(r["M"]), f"{r['eps']:g}", num(r["epochs"], 4), f_sci(r["violations"]["1.0"], 2), f_sci(np.sqrt(r["violations"]["1.0"]), 1)) for r in st2["results"]]
@@ -919,7 +919,7 @@ def tab_orig():
         sc = set(seed(r) for r in ro)
         rc = [r for r in rc if seed(r) in sc]
         R.append(row(lab, str(len(ro)), f_stat(l2(ro)) if ro else "(not run)", f_stat(l2(rc)) if rc else DASH))
-    cap = (r"Original (Neumann-incompatible) versus compatible initial condition, B1 ($\varepsilon=0.01$, $T=1$): $L^2$ error at $t=1$, mean $\pm$ SD over the same seeds "
+    cap = (r"Original (Neumann-incompatible) versus compatible initial condition, B1 ($\varepsilon=0.01$, $T=1$): $L^2$ error at $t=1$, mean~$\pm$~SD over the same seeds "
            r"(42, 123, 7), each scored against the certified reference for its own initial condition.")
     return narrow(cap, "tab:orig", "p{5.4cm}cCC", H, R)
 

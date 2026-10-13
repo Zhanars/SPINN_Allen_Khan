@@ -121,7 +121,6 @@ Theorem~\ref{thm:app-gradflow} was additionally machine-verified in Lean~4 with 
 A third theorem in the same file, \texttt{gradientFlow\_deriv\_energy\_eq\_zero\_iff}, additionally proves the equality case: $dE/dt=0$ at $t$ if and only if $c'(t)=0$, which is the equality clause of Theorem~\ref{thm:app-gradflow}: along an exact gradient flow, $dE/dt<0$ at every $t$ with $c'(t)\neq0$.
 
 
-\ifhl\color{blue}\fi
 \section{A-Posteriori Energy Balance for an Arbitrary Trajectory}\label{app:perturbed}
 
 Theorem~\ref{thm:app-gradflow} assumes that the curve $c$ is an \emph{exact} gradient flow, $c'=-\nabla E(c)$.
@@ -291,7 +290,7 @@ D\mathcal{E}(a)[v]=\int_{-1}^{1}\bigl(\varepsilon^2u_a'w'+f(u_a)\,w\bigr)dx .
 The derivative in $s$ is exchanged only with a finite sum of integrals, never with a limit, so no dominated-convergence argument is needed.
 
 \emph{Step 3: integration by parts in $x$.}
-Let $p,q$ be real polynomials. Then $(pq)'=p'q+pq'$, and by the fundamental theorem of calculus $\int_{-1}^{1}(pq)'dx=p(1)q(1)-p(-1)q(-1)$; hence $\int_{-1}^{1}p\,q'\,dx=[pq]_{-1}^{1}-\int_{-1}^{1}p'q\,dx$.
+Let $p,q$ be real polynomials. Then $(pq)'=p'q+pq'$, and by the fundamental theorem of calculus $\int_{-1}^{1}(pq)'\,dx=p(1)q(1)-p(-1)q(-1)$; hence $\int_{-1}^{1}p\,q'\,dx=[pq]_{-1}^{1}-\int_{-1}^{1}p'q\,dx$.
 Apply this with $p=u_a'$ and $q=w$ in \eqref{eq:DE}:
 \begin{equation}\label{eq:DE-split}
 D\mathcal{E}(a)[v]=\underbrace{\int_{-1}^{1}\bigl(-\varepsilon^2u_a''+f(u_a)\bigr)\,w\,dx}_{=\ \langle G_a,\,\iota v\rangle}\;+\;\underbrace{\varepsilon^2\bigl[u_a'\,w\bigr]_{x=-1}^{x=1}}_{=\ \beta_a(v)},
@@ -330,7 +329,7 @@ The maxima exist and the continuity hypotheses of \eqref{eq:integrated-L2} hold 
 \end{proof}
 
 \begin{Remark}[What this does and does not say about the trained network]\label{rem:compute}
-(i) The theorem is conditional: it converts a bound on the PDE residual and on the Neumann defect into a bound on energy growth. It does not prove that training makes $\delta$ or $b$ small, and the resulting bound $\frac{\delta^2}{2}T$ can be far larger than the actual energy variation.
+(i) Corollary~\ref{cor:spinn-bound} is conditional: it converts a bound on the PDE residual and on the Neumann defect into a bound on energy growth. It does not prove that training makes $\delta$ or $b$ small, and the resulting bound $\bigl(\frac{\delta^2}{2}+b\bigr)T$ ($\frac{\delta^2}{2}T$ for the exact Neumann basis) can be far larger than the actual energy variation.
 The values of $\delta$ and $b$, or the time integrals $\frac12\int_0^T\|r\|^2\,dt$ and $\int_0^T|\beta|\,dt$ that bound the energy growth in~\eqref{eq:integrated-L2} (Table~\ref{tab:balance}), must be measured for each trained network before any quantitative conclusion is drawn; $\|r(\cdot,t)\|$ and $\beta(t)$ are computable to rounding error at every $t$, because $r(\cdot,t)$ is a polynomial of degree $\le3K$ in $x$, so $\|r(\cdot,t)\|^2$ is integrated exactly by any quadrature rule that is exact for polynomials of degree $6K$, and $u_x(\pm1,t)$, $u_t(\pm1,t)$ are evaluated directly from the coefficients.
 \rev{In our implementation the energy and the terms of the first line of~\eqref{eq:pde-identity} (polynomials of degree $\le4K$ in $x$) are integrated exactly by Clenshaw--Curtis quadrature on $4K+9$ nodes; $\|r\|^2$ is integrated by the same rule, and its relative deviation from the exact value (Clenshaw--Curtis on $6K+9$ nodes) is at most of the order of \N{quad.max_rel} for the seed-42 network of each configuration of Table~\ref{tab:balance}.}
 (ii) The training objective contains the mean-square residual at collocation points and, \rev{in the soft variant,} a boundary penalty on $u_x(\pm1,t)$.
@@ -372,7 +371,6 @@ Proposition~\ref{prop:pde-identity}, Step~3 and \eqref{eq:DE-split} & \texttt{ib
 
 Not machine-checked are: Step~1 of Proposition~\ref{prop:pde-identity} (that $\mathcal{E}$ is a polynomial in the coefficients), the identification of the abstract objects $E,G,\beta,r$ with the Allen--Cahn quantities in Corollary~\ref{cor:spinn-bound} (this identification is the content of Steps~2--4 and uses only the verified integration by parts), the fundamental-theorem-of-calculus step in the remark following Corollary~\ref{cor:discrete}, and, of course, the empirical values of $\delta$ and $b$ for the trained networks.
 
-\ifhl\color{black}\fi
 \section{Symmetry-Preservation Diagnostic}\label{app:sym}
 
 For the two-dimensional experiment of Section~\ref{sec:2d}, the reflection-symmetry violation $S(t)$ was evaluated on an endpoint-inclusive grid $x_i=-\pi+ih$, $h=2\pi/(n-1)$, $i=0,\dots,n-1$ ($n=49$), so that $x_{n-1-i}=-x_i$ \rev{up to floating-point round-off (for the computed nodes $|x_{n-1-i}+x_i|\le9\times10^{-16}$)}; this avoids an artificial, purely discretization-induced violation that would otherwise arise from comparing a periodic (endpoint-excluded) training grid against its naive array reversal. \rev{The remaining round-off of the nodes, not the network, produces the nonzero values of order $10^{-31}$ of $S$ for the Fourier-Spectral-PINN in Tables~\ref{tab:2d} and~\ref{tab:stress-2d}: on an exactly mirrored grid the cosine basis gives $S=0$, whereas on the computed grid the field $0.4\cos(2x)\cos(2y)$ by itself already gives $S=8.7\times10^{-32}$.}

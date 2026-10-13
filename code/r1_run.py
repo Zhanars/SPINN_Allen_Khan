@@ -1,6 +1,6 @@
 """Round-1 experiment runner.
 usage:  python r1_run.py <group> [nproc]     groups are defined in r1_jobs.py
-Every job writes data_r1/runs/<tag>.json (+ data_r1/models/<tag>.pt for Spectral-PINNs); finished jobs are skipped."""
+Every job writes data_r1/runs/<tag>.json (+ data_r1/models/<tag>.pt for the forward-problem networks, Spectral-PINN and vanilla PINN); finished jobs are skipped."""
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 import sys
