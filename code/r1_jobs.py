@@ -264,7 +264,7 @@ def all_jobs():
     """Everything that is still needed for the revision, without duplicates, longest jobs first.
     (The orig-IC jobs of the group 'forward' are trimmed to 3 seeds / no vanilla: they only serve Appendix D.)"""
     seen, jobs = set(), []
-    for g in (forward_trimmed, forward_hard, b2, abl_hard, regimes_hard, stress_K_hard, variants2, lbfgs, b3, inverse, var128, inverse_abl, regimes_soft64):
+    for g in (forward_trimmed, forward_hard, b2, abl_hard, regimes_hard, stress_K_hard, variants2, lbfgs, b3, inverse, var3264, var128, inverse_abl, regimes_soft64):
         for jb in g():
             if jb["tag"] not in seen:
                 seen.add(jb["tag"]); jobs.append(jb)
@@ -273,6 +273,11 @@ def all_jobs():
 
 def forward_trimmed():
     return [jb for jb in forward() if not (jb["tag"].startswith("fwd_orig_vanilla") or jb["tag"].endswith(("_s2024", "_s99")) and "fwd_orig" in jb["tag"] or ("fwd_orig" in jb["tag"] and "_E50_" in jb["tag"]))]
+
+
+def var3264():
+    """The K=32/64 implementation variants of Table 2 (the K=128 cells other than uniform-soft are not used)."""
+    return [jb for jb in variants() if not jb["tag"].startswith("var_K128_")]
 
 
 def var128():
@@ -287,5 +292,5 @@ def timing():
             J("spectral", "timing_hard_K64_s42", ic="compat", K=64, seed=42, **HARD)]
 
 
-JOBS = {"all": all_jobs, "timing": timing, "inverse_abl": inverse_abl, "regimes_soft64": regimes_soft64, "lbfgs": lbfgs, "queue2": queue2, "variants2": variants2, "b3": b3, "inverse": inverse, "forward_hard": forward_hard, "b2": b2, "abl_hard": abl_hard, "regimes_hard": regimes_hard, "stress_K_hard": stress_K_hard, "queue1": queue1, "variants": variants, "smoke": smoke, "forward": forward, "ablation_lamE": ablation_lamE, "penalty_regimes": penalty_regimes,
+JOBS = {"all": all_jobs, "timing": timing, "inverse_abl": inverse_abl, "regimes_soft64": regimes_soft64, "lbfgs": lbfgs, "queue2": queue2, "variants2": variants2, "b3": b3, "inverse": inverse, "forward_hard": forward_hard, "b2": b2, "abl_hard": abl_hard, "regimes_hard": regimes_hard, "stress_K_hard": stress_K_hard, "queue1": queue1, "variants": variants, "var3264": var3264, "smoke": smoke, "forward": forward, "ablation_lamE": ablation_lamE, "penalty_regimes": penalty_regimes,
         "stress_K": stress_K, "stress_T": stress_T}

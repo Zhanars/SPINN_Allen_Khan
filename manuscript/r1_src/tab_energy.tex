@@ -2,14 +2,14 @@
 \begin{table}[H]
 \begin{adjustwidth}{-\extralength}{0cm}
 \tablesize{\footnotesize}
-\caption{Energy penalty: accuracy at $t=1$ (B1), number of energy increases of the trained trajectory on grids of spacing $0.02$, $0.002$ and $2\times10^{-4}$ (total over the seeds; in parentheses the number of runs with at least one increase), number of training epochs in which the penalty was nonzero (summed over the seeds), and the largest value of the weighted penalty during training.\label{tab:energy}}
+\caption{Energy penalty: accuracy at $t=1$ (B1), number of energy increases of the trained trajectory on grids of spacing $0.02$, $0.002$ and $2\times10^{-4}$ (total over the seeds; in parentheses the number of runs with at least one increase), number of training epochs in which the penalty was nonzero (summed over the seeds), and the largest value of the weighted penalty $\lambda_E\mathcal L_E$ during training (``---'': $\lambda_E=0$, for which $\mathcal L_E$ is not evaluated during training).\label{tab:energy}}
 \newcolumntype{C}{>{\centering\arraybackslash}X}
 \begin{tabularx}{\fulllength}{p{4.6cm}cCCcc}
 \toprule
 \textbf{Configuration} & \ensuremath{\boldsymbol{n}} & \ensuremath{\boldsymbol{\|e\|_{L^2}}} & \textbf{E incr. } \ensuremath{\boldsymbol{0.02/0.002/0.0002}} & \textbf{Epochs with } \ensuremath{\boldsymbol{\mathcal L_E>0}} & \ensuremath{\boldsymbol{\max\lambda_E\mathcal L_E}}\\
 \midrule
 \multicolumn{6}{l}{\emph{B1, revised $K=32$: penalty weight}}\\
-$\lambda_E=0$ & 5 & \ensuremath{(8.29\pm1.43)\times10^{-4}} & 0/0/0 & 0 & 0\\
+$\lambda_E=0$ & 5 & \ensuremath{(8.29\pm1.43)\times10^{-4}} & 0/0/0 & --- & ---\\
 $\lambda_E=1$ & 5 & \ensuremath{(8.29\pm1.43)\times10^{-4}} & 0/0/0 & 5 & \ensuremath{4.7\times10^{-7}}\\
 $\lambda_E=10$ & 5 & \ensuremath{(8.30\pm1.43)\times10^{-4}} & 0/0/0 & 5 & \ensuremath{4.7\times10^{-6}}\\
 $\lambda_E=50$ & 5 & \ensuremath{(8.29\pm1.45)\times10^{-4}} & 0/0/0 & 5 & \ensuremath{2.3\times10^{-5}}\\
@@ -17,13 +17,13 @@ $\lambda_E=500$ & 5 & \ensuremath{(8.23\pm1.41)\times10^{-4}} & 0/0/0 & 5 & \ens
 $\lambda_E=5000$ & 5 & \ensuremath{(8.30\pm1.29)\times10^{-4}} & 0/0/0 & 5 & \ensuremath{2.3\times10^{-3}}\\
 \midrule
 \multicolumn{6}{l}{\emph{Regimes with a poor trajectory ($K=32$ revised unless stated; 3 seeds)}}\\
-300 epochs (100 warm-up), $\lambda_E=0$ & 3 & \ensuremath{(7.60\pm1.54)\times10^{-2}} & 0/0/0 & 0 & 0\\
+300 epochs (100 warm-up), $\lambda_E=0$ & 3 & \ensuremath{(7.60\pm1.54)\times10^{-2}} & 0/0/0 & --- & ---\\
 300 epochs (100 warm-up), $\lambda_E=50$ & 3 & \ensuremath{(7.60\pm1.55)\times10^{-2}} & 0/0/0 & 2 & \ensuremath{5.2\times10^{-5}}\\
-no warm-up, $\lambda_E=0$ & 3 & \ensuremath{(6.46\pm6.88)\times10^{-3}} & 0/0/0 & 0 & 0\\
+no warm-up, $\lambda_E=0$ & 3 & \ensuremath{(6.46\pm6.88)\times10^{-3}} & 0/0/0 & --- & ---\\
 no warm-up, $\lambda_E=50$ & 3 & \ensuremath{(4.09\pm3.32)\times10^{-2}} & 0/0/0 & 46 & \ensuremath{3.3\times10^{1}}\\
-1500 epochs, lr $10^{-4}$, $\lambda_E=0$ & 3 & \ensuremath{(6.92\pm1.40)\times10^{-2}} & 0/0/0 & 0 & 0\\
+1500 epochs, lr $10^{-4}$, $\lambda_E=0$ & 3 & \ensuremath{(6.92\pm1.40)\times10^{-2}} & 0/0/0 & --- & ---\\
 1500 epochs, lr $10^{-4}$, $\lambda_E=50$ & 3 & \ensuremath{(6.93\pm1.41)\times10^{-2}} & 0/0/0 & 4 & \ensuremath{2.3\times10^{-5}}\\
-$K=64$ as submitted, $\lambda_E=0$ & 3 & \ensuremath{(9.94\pm1.90)\times10^{-2}} & 0/0/0 & 0 & 0\\
+$K=64$ as submitted, $\lambda_E=0$ & 3 & \ensuremath{(9.94\pm1.90)\times10^{-2}} & 0/0/0 & --- & ---\\
 $K=64$ as submitted, $\lambda_E=50$ & 3 & \ensuremath{(9.49\pm2.15)\times10^{-2}} & 0/0/0 & 59 & \ensuremath{6.8\times10^{-2}}\\
 \bottomrule
 \end{tabularx}

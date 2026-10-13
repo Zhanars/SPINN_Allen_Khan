@@ -160,6 +160,7 @@
  "reg.pde0.E50": "\\ensuremath{(6.93\\pm1.41)\\times10^{-2}}",
  "reg.pde0.E50.maxnz": "2",
  "reg.pde0.E50.maxpen": "\\ensuremath{2.3\\times10^{-5}}",
+ "reg.nowarm.factors": "1.6, 4.2 and 18",
  "reg.soft64.E50": "\\ensuremath{(9.49\\pm2.15)\\times10^{-2}}",
  "reg.soft64.E0": "\\ensuremath{(9.94\\pm1.90)\\times10^{-2}}",
  "reg.soft64.nz": "13--28",

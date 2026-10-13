@@ -1,83 +1,88 @@
-# Spectral-PINN for the Allen–Cahn Equation
+# Chebyshev-coefficient PINN for the Allen–Cahn equation (Symmetry, symmetry-4596052)
 
-Research code, experimental data, manuscript, and formal proofs for:
+Research code, raw results, manuscript and Lean 4 proofs for:
 
-> **A Spectral–Physics-Informed Neural Network Hybrid with Energy-Constrained
-> Training for the Allen–Cahn Equation: Forward and Inverse Problems**
-> Zhuldyz Issa, Adil Nauryzbay, Zhanars Abdiramanov (corresponding), Esimkhan
-> Zhumazhanov, Dastan Urnek
-> Submitted to *Symmetry* (MDPI), Special Issue "Selected Papers from the 4th
-> International Conference: Constructive Mathematical Analysis" (ICCMA 2026).
+> **A Chebyshev-Coefficient Physics-Informed Neural Network for the Allen–Cahn Equation: Exact Neumann Basis, A-Posteriori Energy Balance and Inverse Identification**
+> Zhuldyz Issa, Adil Nauryzbay, Zhanars Abdiramanov (corresponding), Yessimkhan Zhumazhanov, Dastan Urnek.
+> *Symmetry* (MDPI), manuscript symmetry-4596052, revision 1 (resubmission). Extended version of an ICCMA 2026 conference abstract.
 
-The paper introduces a **Spectral-PINN**: instead of a network that outputs
-the field value directly, the network outputs time-dependent Chebyshev (1D)
-or Fourier (2D) spectral coefficients, and spatial derivatives are computed
-exactly via fixed linear operators in coefficient space, avoiding spatial
-automatic differentiation. Training adds a one-sided **energy-constrained**
-penalty that enforces discrete Ginzburg–Landau energy dissipation. The method
-is evaluated on the forward problem, an inverse problem (recovering the
-interface parameter ε), a 2D Fourier variant with architecturally exact
-reflection symmetry, and stress-tested at scale (large mode counts, small ε,
-long time horizons, larger 2D grids). The continuous energy-dissipation
-theorem underlying the method is additionally verified formally in
-**Lean 4 / Mathlib**.
+The network outputs time-dependent Chebyshev (1D) or Fourier (2D) coefficients, so spatial derivatives are exact linear maps in
+coefficient space. Revision 1:
+
+- evaluates the network on three 1D benchmarks against a certified reference solution, a space–time PINN and a classical Chebyshev
+  solver, with an exactly Neumann-compatible basis;
+- tests the optional one-sided energy penalty (every 1D forward-problem Spectral-PINN has monotone energy without it, so the penalty
+  is unnecessary; the maximum bound is checked separately);
+- adds an a-posteriori energy balance that bounds the energy growth of any trained trajectory by its measured residual (abstract form
+  machine-checked in Lean 4);
+- revisits the inverse problem for ε (joint Adam, variable projection, classical least squares, identifiability).
+
+The 2D reflection-symmetric Fourier results are those of the first version (`run_experiments.py 2d`, `server_sweep_2d.py`,
+`stress_2d_sweep.py`; Tables 8 and 9). The 1D stress tests and sweeps of the first version (`stress_k_sweep.py`,
+`stress_eps_sweep.py`, `stress_time_sweep.py`, `server_sweep_forward.py`, `server_sweep_inverse.py`) are superseded and not used
+in revision 1. `HANDOFF.md` records the state of the revision; where its counts differ, the manuscript and
+`data_r1/numbers.json` are authoritative.
 
 ## Repository layout
 
 ```
-code/          Experiment implementation (PyTorch)
-  common.py                  shared utilities (grids, IC, PDE residual, energy)
-  chebyshev_spectral.py      classical Chebyshev spectral-collocation baseline
-  vanilla_pinn.py            standard PINN baseline
-  spectral_pinn.py           Spectral-PINN (Chebyshev-coefficient network)
-  inverse_problem.py         inverse recovery of epsilon
-  experiment_2d_symmetry.py  2D Fourier-Spectral-PINN, symmetry diagnostics
-  stress_*.py                large-scale stress tests (K, epsilon, T, 2D)
-  server_sweep_*.py          multiprocessing sweep drivers for server runs
-  run_experiments.py         entry point tying the above together
-  make_figures.py            regenerates the paper's figures from data/
-
-data/          Raw JSON results for every experiment reported in the paper
-figures/       Generated figures (PNG)
-
-manuscript/    LaTeX source (MDPI Symmetry template)
-  manuscript.tex             the manuscript
-  manuscript.pdf             compiled PDF
-  Definitions/               MDPI class/style files (mdpi.cls, logos, etc.)
-
-lean/AllenCahnVerification/  Lean 4 + Mathlib formal verification
-  AllenCahnVerification/Basic.lean         polarization identity, discrete
-                                            Gronwall step, step-size existence
-  AllenCahnVerification/GradientFlow.lean  abstract Hilbert-space gradient-flow
-                                            energy-dissipation theorem
-
-submission/    Cover-letter / submission-checklist materials for MDPI
+code/                              PyTorch, double precision
+  common.py, chebyshev_spectral.py, vanilla_pinn.py, spectral_pinn.py
+                                   shared utilities, classical solver, space-time PINN, Spectral-PINN
+  refsol.py                        certified reference solutions (Chebyshev collocation + Radau, N-refinement)
+  r1_core.py                       evaluation protocol of revision 1 (200-point grid, max-bound check, energy, a-posteriori balance)
+  r1_inverse.py                    inverse problem (joint Adam, variable projection, data-fitting phase)
+  r1_jobs.py, r1_run.py            job groups;  python r1_run.py <group> [nproc] -> data_r1/runs/<tag>.json, data_r1/models/<tag>.pt
+  r1_classical.py                  classical baselines -> data_r1/classical.json
+  r1_classical2.py                 python r1_classical2.py {b3|inverse|floor|timing} -> data_r1/classical2_<mode>.json
+  r1_profiles.py, r1_check_quad.py B3 profiles, quadrature check
+  check_identity.py                finite-difference sanity check of the energy identity (Appendix B)
+  r1_tables.py                     aggregation -> data_r1/summary.json
+  make_tex_r1.py                   every number and table of the manuscript -> manuscript/r1_src/numbers_r1.tex, tab_*.tex, data_r1/numbers.json
+  make_figures_r1.py               figures -> manuscript/figures_r1/*.png
+  finalize_r1.sh                   server post-processing chain (timing runs, profiles, quadrature check)
+  experiment_2d_symmetry.py        2D Fourier network and symmetry diagnostic (first version)
+  run_experiments.py, inverse_problem.py, make_figures.py, stress_*.py, server_sweep_*.py
+                                   first-version pipeline, kept for reference (the scripts write to data/,
+                                   make_figures.py to figures/)
+data_r1/       raw results of revision 1: runs/ (one JSON per training run), models/ (weights of the 1D forward networks),
+               ref/ (certified reference solutions), classical*.json, check_quad.json, profiles_b3.json,
+               runs_workstation.txt, numbers.json
+data/          raw results of the first version; experiment_2d.json, symmetry_2d_multiseed.json and stress_2d_sweep.json
+               feed the 2D tables of revision 1
+manuscript/    r1_src/ (LaTeX sources), build_r1.py, package_r1.py, manuscript_r1_{clean,highlighted}.{tex,pdf},
+               response_r1.{tex,pdf}, v1_submitted/ (first version), Definitions/ (MDPI class files)
+lean/AllenCahnVerification/AllenCahnVerification/
+  Basic.lean          polarization identity, discrete Gronwall step, step-size existence (Appendix A)
+  GradientFlow.lean   abstract gradient-flow energy-dissipation theorem (Appendix A)
+  PerturbedFlow.lean  a-posteriori energy balance for an arbitrary trajectory (Appendix B)
+submission/    upload packages and submission notes
 ```
 
-## Reproducing the experiments
+## Reproducing revision 1
 
 ```bash
 cd code
 pip install torch numpy scipy matplotlib
-python run_experiments.py        # forward, inverse, 2D experiments -> data/
-python make_figures.py           # data/*.json -> figures/*.png
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+python r1_run.py all 36                  # every training run used in revision 1 except the timings; finished jobs are skipped
+python r1_run.py timing 1                # clean timings, one job at a time
+python r1_classical.py
+python r1_classical2.py b3               # likewise: inverse, floor, timing
+python r1_profiles.py
+python r1_check_quad.py
+python make_tex_r1.py                    # numbers and tables of the manuscript
+python make_figures_r1.py                # figures of the manuscript
+cd ../manuscript
+python build_r1.py both                  # manuscript_r1_highlighted and manuscript_r1_clean (.tex and .pdf)
+pdflatex response_r1.tex && pdflatex response_r1.tex
+python package_r1.py                     # upload packages in submission/
 ```
 
-The `stress_*.py` and `server_sweep_*.py` scripts run the large-scale sweeps
-(up to K=256 Chebyshev modes) and are intended for a multi-core machine; they
-set `OPENBLAS_NUM_THREADS`/`MKL_NUM_THREADS`/`OMP_NUM_THREADS` explicitly to
-avoid BLAS thread oversubscription under `multiprocessing`.
-
-## Rebuilding the manuscript
-
-```bash
-cd manuscript
-pdflatex -interaction=nonstopmode manuscript.tex
-pdflatex -interaction=nonstopmode manuscript.tex   # twice, for cross-references
-```
-
-Requires a TeX distribution with the MDPI `symmetry` document class (provided
-in `Definitions/`, or install via `mdpi.cls` on CTAN).
+Do not run `run_experiments.py 2d`, `server_sweep_2d.py` or `stress_2d_sweep.py`: they overwrite `data/experiment_2d.json`,
+`data/symmetry_2d_multiseed.json` and `data/stress_2d_sweep.json`, which `make_tex_r1.py` reads for Tables 8 and 9 (the other
+first-version scripts overwrite other files in `data/`). Do not run the job group `variants` either: its K=128 jobs other than
+`var_K128_uniform_soft` are not used in the article, and `make_tex_r1.py` would pick them up.
 
 ## Checking the Lean proofs
 
@@ -86,16 +91,7 @@ cd lean/AllenCahnVerification
 lake build
 ```
 
-Requires [`elan`](https://github.com/leanprover/elan) (Lean 4 toolchain
-manager); the exact toolchain version is pinned in `lean-toolchain`. The
-`.lake/` build cache (Mathlib source and compiled `.olean` files, several GB)
-is not tracked in this repository and is fetched/built automatically by
-`lake build`. Verify no `sorry` was used with:
-
-```bash
-lake env lean --run <(echo '#print axioms AllenCahnVerification.gradientFlow_deriv_energy_nonpos')
-```
-
-or open the relevant theorem in an editor with the Lean 4 extension and check
-via `#print axioms <theorem_name>` — it should depend only on `propext`,
-`Classical.choice`, and `Quot.sound`.
+Requires [`elan`](https://github.com/leanprover/elan); the toolchain version is pinned in `lean-toolchain`. The `.lake/` build cache
+(Mathlib source and compiled `.olean` files, several GB) is not tracked and is fetched/built by `lake build`. `PerturbedFlow.lean` ends
+with `#print axioms` for each of its 39 theorems; the output must list only `propext`, `Classical.choice` and `Quot.sound`. For the
+other files, use `#print axioms <theorem_name>` in an editor with the Lean 4 extension.

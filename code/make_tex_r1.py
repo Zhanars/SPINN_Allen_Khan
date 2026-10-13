@@ -18,6 +18,7 @@ import r1_tables as T
 BS = chr(92)
 ROOT = os.path.join(HERE, "..")
 OUT_DIR = os.path.join(ROOT, "manuscript", "r1_src")
+os.makedirs(OUT_DIR, exist_ok=True)
 RUNS = T.RUNS
 NUM = {}
 REPORT = []
@@ -406,6 +407,10 @@ for base in ("short", "nowarm", "pde0"):
             put(f"reg.{base}.E{lam}", f_stat(l2(rr)))
             put(f"reg.{base}.E{lam}.maxnz", str(max(r["penalty"]["n_epochs_nonzero"] for r in rr)))
             put(f"reg.{base}.E{lam}.maxpen", f_sci(max(r["penalty"]["max_lamE_LE"] for r in rr), 1) if max(r["penalty"]["max_lamE_LE"] for r in rr) > 0 else "0")
+_nw0, _nw50 = by_seed(runs("rh_nowarm_E0_s*")), by_seed(runs("rh_nowarm_E50_s*"))
+if _nw0 and _nw50:
+    _fac = sorted(_nw50[s]["errors"]["1.0"]["l2"] / _nw0[s]["errors"]["1.0"]["l2"] for s in _nw0 if s in _nw50)
+    put("reg.nowarm.factors", ", ".join(num(x) for x in _fac[:-1]) + " and " + num(_fac[-1]))
 _r64 = runs("reg_K64_E50_s*")
 if _r64 and so64:
     sd_ = set(seed(r) for r in _r64)
@@ -753,6 +758,8 @@ def tab_energy():
         inc = "/".join(incr_cell(rr, k) for k in ("dt0.02", "dt0.002", "dt0.0002") if k in rr[0]["energy"])
         nz = sum(r["penalty"]["n_epochs_nonzero"] for r in rr)
         mx = max(r["penalty"]["max_lamE_LE"] for r in rr)
+        if all(r["penalty"]["lam_E"] == 0 for r in rr):
+            return row(label, str(len(rr)), f_stat(l2(rr)), inc, DASH, DASH)
         return row(label, str(len(rr)), f_stat(l2(rr)), inc, str(nz), f_sci(mx, 1) if mx > 0 else "0")
 
     for lam, p in pats:
@@ -766,7 +773,7 @@ def tab_energy():
     R.append(erow(r"$K=64$ as submitted, $\lambda_E=50$", runs("reg_K64_E50_s*")))
     cap = (r"Energy penalty: accuracy at $t=1$ (B1), number of energy increases of the trained trajectory on grids of spacing $0.02$, $0.002$ and $2\times10^{-4}$ "
            r"(total over the seeds; in parentheses the number of runs with at least one increase), number of training epochs in which the penalty was nonzero (summed over the seeds), "
-           r"and the largest value of the weighted penalty during training.")
+           r"and the largest value of the weighted penalty $\lambda_E\mathcal L_E$ during training (``---'': $\lambda_E=0$, for which $\mathcal L_E$ is not evaluated during training).")
     return wide(cap, "tab:energy", "p{4.6cm}cCCcc", H, R)
 
 

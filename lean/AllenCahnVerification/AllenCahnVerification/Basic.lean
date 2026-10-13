@@ -7,8 +7,9 @@ set_option linter.style.header false
 
 Formal verification of the two real-arithmetic identities/inequalities
 underlying the energy-stability arguments used in the manuscript
-"A Spectral-PINN Hybrid with Energy-Constrained Training for the
-Allen-Cahn Equation" (Section: energy dissipation / discrete stability).
+"A Chebyshev-Coefficient Physics-Informed Neural Network for the
+Allen-Cahn Equation: Exact Neumann Basis, A-Posteriori Energy Balance and
+Inverse Identification" (Section 2.9 and Appendix A).
 
 This file is deliberately *not* an attempt to formalize the full PDE
 theory (weak derivatives, Sobolev spaces, ...) in Mathlib. Instead it

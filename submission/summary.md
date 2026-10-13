@@ -2,7 +2,7 @@
 
 *Symmetry (MDPI) — Research Article*
 
-# Revision 1 — resubmission package (state of 2026-10-12)
+# Revision 1 — resubmission package (state of 2026-10-13)
 
 **Decision of round 1:** rejected to allow revision; resubmit with the same ID (symmetry-4596052), highlighted changes and a point-by-point response.
 
@@ -18,7 +18,7 @@
 | `submission/symmetry-4596052_R1_manuscript.zip` | LaTeX source (both versions), MDPI class files, figures, PDFs, response |
 | `submission/symmetry-4596052_R1_supporting_data.zip` | Supporting Information: raw results of every run, trained weights, reference solutions, scripts |
 
-**How it was produced.** All 1D experiments were re-run with the harness in `code/` (`r1_run.py all`, 191 jobs incl. ablations; 42 earlier runs on the workstation, everything else on the ai.atu server, one CPU thread per run), plus clean timing runs (`r1_run.py timing 1`). Every number, table and figure of the revised manuscript is generated from `data_r1/` by `code/make_tex_r1.py` and `code/make_figures_r1.py`; `manuscript/build_r1.py both` assembles and compiles both versions.
+**How it was produced.** All 1D experiments were re-run with the harness in `code/` (`r1_run.py all`, 200 jobs incl. ablations; 42 earlier runs on the workstation, everything else on the ai.atu server, one CPU thread per run), plus clean timing runs (`r1_run.py timing 1`). Every number, table and figure of the revised manuscript is generated from `data_r1/` by `code/make_tex_r1.py` and `code/make_figures_r1.py`; `manuscript/build_r1.py both` assembles and compiles both versions.
 
 **Key results of the revision** (B1: ε=0.01, T=1; B2: ε=0.1, T=1; B3: ε=0.05, T=5; L² error at t=1, t=5 for B3; mean ± SD over seeds):
 
@@ -34,8 +34,8 @@
 
 - Revised vs vanilla PINN on B1: ratio of seed means 81 (95 % bootstrap interval 66–99); this replaces the inconsistent 49/47 of the first version. With L-BFGS refinement of both: 14 on B1, and on B2 the vanilla PINN is slightly better. Classical solver is 15× (B1) and 84× (B2) more accurate than the revised network. On B3 all PINNs fail.
 - Mode number (B1): as submitted K=64 (9.71±1.43)e-2 vs revised (1.46±0.42)e-3; soft penalty rescaled to unit weight (λ_BC=K⁴) is worse, (3.98±0.49)e-1. Revised K=128 (6.68±1.29)e-3; 2× budget: K=64 2.24e-4, K=128 1.46e-3; K=256 default budget 3.48e-2 (first version: 1.5).
-- Energy penalty: λ_E ∈ {0,…,5000} gives mean errors 8.23e-4…8.30e-4; every trained Spectral-PINN (118 runs, penalized or not, accurate or not) has monotone energy (only the vanilla PINN on B3 has increases); the penalty matters only without warm-up, where it makes the result worse ((4.09±3.32)e-2 vs (6.46±6.88)e-3).
-- Maximum bound: revised networks reach max|u| ≤ 1.0031, vanilla PINNs exceed 1 by up to 8.4e-3, inaccurate networks up to 2.05.
+- Energy penalty: λ_E ∈ {0,…,5000} gives mean errors 8.23e-4…8.30e-4; every trained Spectral-PINN (120 runs, penalized or not, accurate or not) has monotone energy (only the vanilla PINN on B3 has increases); the penalty matters only without warm-up, where it makes the result worse ((4.09±3.32)e-2 vs (6.46±6.88)e-3).
+- Maximum bound: revised networks reach max|u| ≤ 1.0015 on B1 (≤ 1.0082 including the penalty regimes), vanilla PINNs exceed 1 by up to 8.4e-3, inaccurate networks up to 2.05.
 - A-posteriori energy balance holds to 2e-14 for every trained network; for revised K=32 the residual term is 1.3e-5 against an energy decrease of 7.1e-2. Lean 4 file `PerturbedFlow.lean` (39 theorems, standard axioms only).
 - Inverse problem: joint Adam gives ε̂ ≈ 0.70 ε_init (0.61–0.73 over 20 runs) — the "38 % bias" was the start value. Variable projection: 0.62 % / 0.33 % error without noise, but 11 % / 3.0 % with σ=0.01 (classical least squares on the same noise: 1.8 % / 0.60 %). ε=0.01 is not identifiable at σ=0.01 (Cramér–Rao 45 %).
 - 2D: S(1) between 1.26e-31 and 3.74e-31 in all configurations (range corrected).

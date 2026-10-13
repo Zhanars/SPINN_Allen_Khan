@@ -7,13 +7,15 @@ set_option linter.style.header false
 
 `GradientFlow.lean` proves that an *exact* gradient flow `c'(t) = -grad E(c(t))`
 in a real Hilbert space dissipates the energy at the rate `-‖c'‖^2`.  A trained
-Spectral-PINN does **not** satisfy the PDE exactly: its coefficient trajectory
-`c(t)` satisfies
+Spectral-PINN does **not** satisfy the PDE exactly: for its coefficient trajectory
+`c(t)` the state `ι c(t) = u(., t)` satisfies, in `H = L^2`,
 ```
-  c'(t) = -grad E(c(t)) + r(t)
+  ι c'(t) = -G(c(t)) + r(t),   G = -eps^2 u_xx + f(u),
 ```
 where `r(t)` is the PDE residual (the quantity that the training loss
-minimises).  This file proves, for an *arbitrary* differentiable trajectory,
+minimises); the form `c' = -grad E(c) + r` of Section 2 is the special case
+`V = H`, `ι = id`, `β = 0` of Section 3.  This file proves, for an *arbitrary* differentiable
+trajectory,
 the resulting a-posteriori energy balance, so that the conclusion no longer
 depends on the trajectory being an exact gradient flow:
 
@@ -22,8 +24,8 @@ depends on the trajectory being an exact gradient flow:
 3.  `defectFlow_*`: the version in which the differential of `E` is only
     `DE(c)[v] = <G, v> + beta(v)` with a defect functional `beta`
     (e.g. `eps^2 [u_x v]_{-1}^{1}` when the Neumann condition is not exact), and
-    the PDE holds as `c' = -G + r` in a Hilbert space `H` into which the space
-    `V` carrying `E` is embedded (`V = ` coefficient space / `H^1`, `H = L^2`);
+    the PDE holds as `ι c' = -G + r` in a Hilbert space `H` into which the space
+    `V` carrying `E` is embedded by `ι` (`V = ` coefficient space / `H^1`, `H = L^2`);
 4.  `*_energy_growth_bound`: if `‖r(t)‖ <= delta` on `[0,T]` then
     `E(c(t)) <= E(c(0)) + (delta^2/2) t`, and with `|beta(c'(t))| <= b`,
     `E(c(t)) <= E(c(0)) + (delta^2/2 + b) t`;
@@ -506,7 +508,10 @@ theorem perturbedFlow_energy_growth_bound
   simpa using this
 
 /-- **(4) from time zero**: `E(c(t)) <= E(c(0)) + (δ^2/2) t` for `t ∈ [0,T]`
-(the statement requested for the Spectral-PINN trajectory). -/
+(the defect-free Hilbert-space case `V = H = F`, `ι = id`, `β = 0`; the bound for the
+Spectral-PINN trajectory, Corollary A4 of the accompanying article, is obtained from
+`defectFlow_energy_growth_bound` and `defectFlow_energy_integral_bound`
+with `V = ℝ^{K+1}`, `H = L^2`). -/
 theorem perturbedFlow_energy_bound
     (E : F → ℝ) (c : ℝ → F) (r : ℝ → F) (T δ : ℝ)
     (hEd : ∀ t ∈ Set.Icc 0 T, DifferentiableAt ℝ E (c t))
@@ -588,7 +593,7 @@ theorem discrete_energy_bound (E : ℕ → ℝ) (r d : ℕ → H)
     Finset.sum_nonneg (fun n _ => sq_nonneg _)
   linarith
 
-/-- Uniform residual bound: if `‖r_n‖ <= δ` for `n < N` then `E_N <= E_0 + N δ^2 / 2`. -/
+/-- Uniform residual bound: if `‖r_n‖ <= δ` for all `n` then `E_N <= E_0 + N δ^2 / 2`. -/
 theorem discrete_energy_bound_uniform (E : ℕ → ℝ) (r d : ℕ → H) (δ : ℝ)
     (h : ∀ n, E (n + 1) - E n ≤ (1 / 2) * ‖r n‖ ^ 2 - (1 / 2) * ‖d n‖ ^ 2)
     (hr : ∀ n, ‖r n‖ ≤ δ) (N : ℕ) :

@@ -1,13 +1,11 @@
 # AllenCahnVerification
 
-## GitHub configuration
+Lean 4 / Mathlib proofs for the article "A Chebyshev-Coefficient Physics-Informed Neural Network for the Allen–Cahn Equation"
+(Symmetry, symmetry-4596052):
 
-To set up your new GitHub repository, follow these steps:
+- `AllenCahnVerification/Basic.lean`: polarization identity, discrete Gronwall step, existence of an admissible step size (Appendix A).
+- `AllenCahnVerification/GradientFlow.lean`: energy dissipation along an exact gradient flow in a real Hilbert space (Appendix A).
+- `AllenCahnVerification/PerturbedFlow.lean`: a-posteriori energy balance for an arbitrary differentiable trajectory with residual and
+  boundary defect, integrated and discrete-time bounds, integration by parts for polynomials (Appendix B; 39 theorems).
 
-* Under your repository name, click **Settings**.
-* In the **Actions** section of the sidebar, click "General".
-* Check the box **Allow GitHub Actions to create and approve pull requests**.
-* Click the **Pages** section of the settings sidebar.
-* In the **Source** dropdown menu, select "GitHub Actions".
-
-After following the steps above, you can remove this section from the README file.
+Build with `lake build` (toolchain pinned in `lean-toolchain`).

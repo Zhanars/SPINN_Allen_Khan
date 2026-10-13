@@ -12,15 +12,17 @@ Ginzburg-Landau free energy. The paper's proof (integration by parts) shows
 that the right-hand side of the PDE is exactly the negative *L^2 gradient* of
 `E`, i.e. the Allen-Cahn equation is the `L^2`-gradient flow `u_t = -grad E(u)`
 of `E`. This file formalizes, completely and for a general real Hilbert space
-`F` (which specializes to `F = L^2(Omega)` for the PDE), the theorem that
+`F` (the instantiation `F = L^2(Omega)` for the PDE is only formal, because the Ginzburg-Landau
+energy is not Fréchet differentiable on `L^2`; see Remark A1(iii) and Theorem A3 of the
+article), the theorem that
 *any* gradient flow dissipates its energy at exactly the rate `-‖u_t‖^2`:
 this is the actual ODE/calculus content of Theorem 1, proved here via
 Mathlib's `HasGradientAt` / `HasFDerivAt` / chain-rule machinery, rather than
 only the finite-dimensional real-arithmetic lemmas of `Basic.lean`.
 
 Unlike `Basic.lean`, this file is not about a numerical-scheme inequality: it
-is a genuine derivative computation `d/dt E(c(t)) = ...`, i.e. exactly the
-"ODE / derivatives via Mathlib" content requested for Theorem 1. The one part
+is a genuine derivative computation `d/dt E(c(t)) = ...`, i.e. the calculus
+content of Theorem 1. The one part
 of Theorem 1 *not* re-derived here is the identification, for the specific
 Ginzburg-Landau functional `E[u] = int (eps^2/2 |u_x|^2 + F(u)) dx`, of its
 `L^2` gradient with `-eps^2 u_xx + f(u)` (a classical calculus-of-variations
@@ -57,7 +59,7 @@ theorem gradientFlow_hasDerivAt_energy
 This is Theorem 1's conclusion `dE/dt <= 0`, in the abstract gradient-flow
 setting: with `F = L^2(Omega)`, `E` the Ginzburg-Landau functional, and the
 gradient-flow hypothesis instantiated via the manuscript's calculation
-`grad E(u) = -eps^2 u_xx + f(u)`, this is exactly Theorem 1. -/
+`grad E(u) = -eps^2 u_xx + f(u)`, this formally recovers Theorem 1 (Corollary A1 of the article). -/
 theorem gradientFlow_deriv_energy_nonpos
     (E : F → ℝ) (c : ℝ → F) (t : ℝ)
     (hE : HasGradientAt E (gradient E (c t)) (c t))
