@@ -6,7 +6,8 @@ set_option linter.style.header false
 # Energy-stability lemmas for the Allen-Cahn Spectral-PINN manuscript
 
 Formal verification of the two real-arithmetic identities/inequalities
-underlying the energy-stability arguments used in the manuscript
+of the kind used in discrete energy-stability proofs for gradient-flow schemes, as discussed in
+the manuscript
 "A Chebyshev-Coefficient Physics-Informed Neural Network for the
 Allen-Cahn Equation: Exact Neumann Basis, A-Posteriori Energy Balance and
 Inverse Identification" (Section 2.9 and Appendix A).

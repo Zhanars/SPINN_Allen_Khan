@@ -5,7 +5,7 @@ modes
   varpro  : eps^2 is, at every epoch, the least-squares minimiser of the PDE residual for the current network
             (the PDE is linear in eps^2: eps^2 = <u_t + f(u), u_xx>_w / <u_xx, u_xx>_w with the quadrature weights w of the PDE loss), relaxed by 0.9/0.1
   phaseA  : N epochs of IC/BC/data fitting with the PDE switched off before the joint phase
-Data: certified spectral reference (r1_core.reference), observed at n_obs_x equispaced points and the given times,
+Data: certified spectral reference (refsol.reference), observed at n_obs_x equispaced points and the given times,
 optionally corrupted by Gaussian noise (absolute sigma)."""
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"

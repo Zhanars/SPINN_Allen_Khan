@@ -9,7 +9,7 @@ from numpy.polynomial import legendre as L
 rng = np.random.default_rng(0)
 K = 7
 eps = 0.3
-xg, wg = L.leggauss(40)  # exact for degree <= 79; integrands have degree <= 4K = 28
+xg, wg = L.leggauss(40)  # exact for degree <= 79; integrands have degree <= 6K = 42 (||r||^2, ||G||^2; energy and <r,u_t>: 4K = 28)
 
 
 def integ(vals):

@@ -6,7 +6,7 @@
 * energy monotonicity counted at several time resolutions, energy by Clenshaw-Curtis (exact for the polynomial integrand),
 * a-posteriori energy balance diagnostics for the trained trajectory:
       dE/dt = -||u_t||^2 + <r, u_t> + eps^2 [u_x u_t]_{x=-1}^{x=1},   r = u_t - eps^2 u_xx + f(u)
-  (identity checked against the autograd derivative of E(c(t)) and quantified through the integrated residual).
+  (identity checked against dE/dt = int (eps^2 u_x u_xt + f(u) u_t) dx, evaluated by the chain rule with dc/dt from autograd, and quantified through the integrated residual).
 """
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"

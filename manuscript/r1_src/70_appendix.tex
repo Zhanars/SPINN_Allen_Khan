@@ -4,7 +4,7 @@
 \def\theHequation{\thesection.\arabic{equation}}\def\theHtheorem{\thesection.\arabic{theorem}}
 \section{Lean 4 Formalization of the Energy-Stability Lemmas}\label{app:lean}
 
-This appendix first states each result as an ordinary mathematical lemma or theorem, with a conventional proof that can be checked without reading Lean, and then gives the corresponding Lean~4 source that was mechanically verified to prove the same statement.
+This appendix first states each result as an ordinary mathematical lemma or theorem, with a conventional proof that can be checked without reading Lean, and then gives the corresponding Lean~4 source that was mechanically verified to prove the same statement; the corollary following Theorem~\ref{thm:app-gradflow}, which instantiates the abstract theorem for the Ginzburg--Landau functional, is formal (Remark~\ref{rem:sharp}(iii)) and is not machine-checked.
 
 \begin{Lemma}[Polarization identity]\label{lem:polar}
 For all $a,b\in\mathbb{R}$, $2a(a-b) = a^2-b^2+(a-b)^2$.
@@ -357,6 +357,7 @@ Lemma~\ref{lem:balance} & \texttt{inner\_balance}, \texttt{inner\_balance\_exact
 Theorem~\ref{thm:perturbed}, \eqref{eq:pert-id} & \texttt{perturbedFlow\_hasDerivAt\_energy}, \texttt{perturbedFlow\_hasDerivAt\_energy\_gradient}\\
 Theorem~\ref{thm:perturbed}, \eqref{eq:pert-exact} & \texttt{perturbedFlow\_hasDerivAt\_energy\_exact}\\
 Theorem~\ref{thm:perturbed}, \eqref{eq:pert-ineq} & \texttt{perturbedFlow\_deriv\_energy\_le}, \texttt{perturbedFlow\_deriv\_energy\_le\_deriv}\\
+Theorem~\ref{thm:perturbed}, bound $\tfrac14\|r\|^2$ & \texttt{hasDerivAt\_energy\_inner} with \texttt{inner\_balance\_le\_quarter}; special case $\beta=0$ of \texttt{defectFlow\_deriv\_energy\_le\_quarter}\\
 Theorem~\ref{thm:perturbed}, $\|r\|\le\theta\|c'\|$ & \texttt{perturbedFlow\_deriv\_energy\_le\_of\_relative}, \texttt{perturbedFlow\_deriv\_energy\_nonpos\_of\_residual\_le}\\
 Remark~\ref{rem:sharp}(i) ($r=0$) & \texttt{perturbedFlow\_exact\_case}\\
 Theorem~\ref{thm:defect}, identity & \texttt{defectFlow\_hasDerivAt\_energy}, \texttt{defectFlow\_hasDerivAt\_energy\_functional}, \texttt{defectFlow\_hasDerivAt\_energy\_exact}\\
@@ -369,7 +370,7 @@ Proposition~\ref{prop:pde-identity}, Step~3 and \eqref{eq:DE-split} & \texttt{ib
 \end{tabularx}
 \end{table}
 
-Not machine-checked are: Step~1 of Proposition~\ref{prop:pde-identity} (that $\mathcal{E}$ is a polynomial in the coefficients), the identification of the abstract objects $E,G,\beta,r$ with the Allen--Cahn quantities in Corollary~\ref{cor:spinn-bound} (this identification is the content of Steps~2--4 and uses only the verified integration by parts), the fundamental-theorem-of-calculus step in the remark following Corollary~\ref{cor:discrete}, and, of course, the empirical values of $\delta$ and $b$ for the trained networks.
+Not machine-checked are: Step~1 of Proposition~\ref{prop:pde-identity} (that $\mathcal{E}$ is a polynomial in the coefficients), the identification of the abstract objects $E,G,\beta,r$ with the Allen--Cahn quantities in Corollary~\ref{cor:spinn-bound} (this identification is the content of Steps~2--4; of their ingredients only the integration by parts of Step~3 and Lemma~\ref{lem:balance}, which Step~4 applies, are machine-checked), the fundamental-theorem-of-calculus step in the remark following Corollary~\ref{cor:discrete}, the time shift $\tau\mapsto c(s+\tau)$ that gives~\eqref{eq:balance-int} for $s>0$ from~\eqref{eq:integrated-L2}, and, of course, the empirical values of $\delta$ and $b$ for the trained networks.
 
 \section{Symmetry-Preservation Diagnostic}\label{app:sym}
 

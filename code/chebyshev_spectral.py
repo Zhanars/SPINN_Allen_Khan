@@ -2,7 +2,7 @@
 Chebyshev collocation spectral solver for the 1D Allen-Cahn equation
 (semi-implicit / IMEX time-stepping), used as a classical high-accuracy
 baseline that plays the role of the spectral method of Shiyapov et al.
-(ref. [3] in the manuscript) for the *local* Allen-Cahn equation.
+(AppliedMath 2026, cited in the manuscript) for the *local* Allen-Cahn equation.
 
 Neumann BC u_x(+-1,t)=0 are imposed by "boundary bordering": the first and
 last rows of the implicit system are replaced with the Neumann condition

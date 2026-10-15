@@ -285,7 +285,7 @@ def var128():
 
 
 def timing():
-    """Clean timing on an idle machine, one job at a time (run with nproc=1, after everything else has finished)."""
+    """Timing runs, one job at a time (run with nproc=1, after everything else has finished); the server was shared with unrelated jobs, so the times are indicative only (Section 2.8)."""
     return [J("vanilla", "timing_vanilla_s42", ic="compat", seed=42),
             J("spectral", "timing_soft_K32_s42", ic="compat", K=32, seed=42),
             J("spectral", "timing_hard_K32_s42", ic="compat", K=32, seed=42, **HARD),

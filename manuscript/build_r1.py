@@ -78,6 +78,7 @@ SIMPLE_HEADING = re.compile(re.escape(BS) + r"((?:sub)*section)\{([^{}]*)\}")
 
 def _norm(t):
     t = re.sub(r"(?<!" + re.escape(BS) + r")%.*", "", t)
+    t = t.replace(BS + "allowbreak", "")  # a line-break hint changes the layout, not the text
     t = t.replace(BS + " ", " ")          # a control space ('Y.Zh.\ and') changes the spacing, not the text
     return " ".join(t.split())
 
@@ -189,7 +190,8 @@ def highlight_bib(refs2):
     n, first = 0, []
 
     def rep(m):
-        # the colour is switched before \bibitem (at the end of the previous entry's paragraph), so that the
+        # the colour is switched before \bibitem (after the previous entry's paragraph has ended, so that its
+        # line numbers keep its colour), so that the
         # reference number has the colour of its own entry; the first entry's colour is set before the list
         nonlocal n
         key, text = m.group(1), m.group(2)
@@ -199,7 +201,7 @@ def highlight_bib(refs2):
         if not first:
             first.append(col)
             return BS + "bibitem{" + key + "}" + text
-        return BS + "ifhmode" + BS + "unskip" + BS + "fi" + BS + "color{" + col + "}" + BS + "bibitem{" + key + "}" + text
+        return BS + "ifhmode" + BS + "unskip" + BS + "par" + BS + "fi" + BS + "color{" + col + "}" + BS + "bibitem{" + key + "}" + text
     out = re.sub(r"(?ms)^" + re.escape(BS) + r"bibitem\{([^}]+)\}(.*?)(?=^" + re.escape(BS) + r"bibitem\{|^" + re.escape(BS) + r"end\{thebibliography\})", rep, refs2)
     if first:     # the heading 'References' (unchanged) and the first entry
         out = out.replace(BS + "reftitle{", BS + "color{" + first[0] + "}" + BS + "reftitle{", 1)

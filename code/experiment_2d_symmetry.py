@@ -165,7 +165,8 @@ def train_fourier_spectral_pinn(eps=EPS2D, M=M_MODES, epochs=3000, nt_col=40,
 
 def symmetry_violation_fourier(model, t_val, n=49):
     # NOTE: use an endpoint-INCLUSIVE grid so that grid[n-1-i] == -grid[i]
-    # exactly; the model's *training* grid is periodic (endpoint=False),
+    # up to floating-point round-off (the source of the S ~ 1e-31 of Appendix C);
+    # the model's *training* grid is periodic (endpoint=False),
     # but for this diagnostic we just need a grid where reflection is a
     # simple index reversal.
     grid = np.linspace(-np.pi, np.pi, n, endpoint=True)

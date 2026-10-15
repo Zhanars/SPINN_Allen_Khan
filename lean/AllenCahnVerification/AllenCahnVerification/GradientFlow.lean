@@ -69,7 +69,7 @@ theorem gradientFlow_deriv_energy_nonpos
   exact neg_nonpos.mpr (sq_nonneg _)
 
 /-- **Strict form**: the energy strictly decreases unless the flow has already
-reached a critical point (`c'(t) = 0`), matching the manuscript's remark that
+reached a critical point (`c'(t) = 0`), matching the equality clause of Theorem A1 of the article:
 equality `dE/dt = 0` holds only where `u_t = 0`. -/
 theorem gradientFlow_deriv_energy_eq_zero_iff
     (E : F → ℝ) (c : ℝ → F) (t : ℝ)

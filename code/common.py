@@ -54,7 +54,7 @@ def cheb_coeff_derivative_matrix(K):
     (b_K = 0). Backward recurrence, see Trefethen / Boyd."""
     # Build the linear map column by column using unit vectors, applying
     # the standard backward recurrence:
-    #   b[K] = 0;  b[k-1] = b[k+1] + 2*k*a[k]  for k = K,...,1;  b[0] /= 2.
+    #   b[K+1] = b[K] = 0;  b[k-1] = b[k+1] + 2*k*a[k]  for k = K,...,1;  b[0] /= 2.
     Dc = np.zeros((K + 1, K + 1))
     for col in range(K + 1):
         a = np.zeros(K + 1)

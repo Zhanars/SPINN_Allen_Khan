@@ -3,7 +3,7 @@
 usage:  python r1_classical2.py b3        -> Chebyshev IMEX solver and reaction-only ODE on B3 (eps=0.05, T=5)
         python r1_classical2.py inverse   -> classical least-squares estimator of eps + identifiability (Fisher) numbers
         python r1_classical2.py floor     -> polynomial representation floor of the reference (degree K, unconstrained / Neumann basis)
-        python r1_classical2.py timing    -> wall time of the Chebyshev IMEX solver on B1/B2 on this machine (run on an idle machine)
+        python r1_classical2.py timing    -> wall time of the Chebyshev IMEX solver on B1/B2 on this machine (run after all training jobs; the archived timing used the shared server, Section 2.8)
 Each mode writes data_r1/classical2_<mode>.json.
 
 Inverse: the data are generated exactly as in r1_inverse.py (certified reference at the 40 x 5 observation points, Gaussian noise

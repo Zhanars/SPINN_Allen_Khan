@@ -1,5 +1,5 @@
 #!/bin/sh
-# waits for the "all" group, then: clean timings (one job at a time), classical timing, B3 profiles, quadrature check
+# waits for the "all" group, then: B3 profiles, clean timings (one job at a time), classical timing, quadrature check
 cd ~/SPINN_Allen_Khan/code
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
 PY=~/spectral_pinn_test/venv/bin/python

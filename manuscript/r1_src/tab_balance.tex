@@ -2,7 +2,7 @@
 \begin{table}[H]
 \begin{adjustwidth}{-\extralength}{0cm}
 \tablesize{\footnotesize}
-\caption{A-posteriori energy balance~\eqref{eq:balance-int} of the trained networks (means over the seeds): time-RMS of the residual norm, the integrated residual term, the integrated boundary term $\beta=\varepsilon^2[u_xu_t]_{-1}^{1}$, the actual energy decrease, the largest wall slope, and the largest relative deviation between $dE/dt$, evaluated as $\int(\varepsilon^2u_xu_{xt}+f(u)u_t)\,dx$ with $\dot{\mathbf c}$ from automatic differentiation, and the right-hand side of~\eqref{eq:balance-main} over 201 times.\label{tab:balance}}
+\caption{A-posteriori energy balance~\eqref{eq:balance-int} of the trained networks (means over the seeds): time-RMS of the residual norm, the integrated residual term, the time integral of the absolute value of the boundary term $\beta=\varepsilon^2[u_xu_t]_{-1}^{1}$, the actual energy decrease, the largest wall slope, and the largest relative deviation between $dE/dt$, evaluated as $\int(\varepsilon^2u_xu_{xt}+f(u)u_t)\,dx$ with $\dot{\mathbf c}$ from automatic differentiation, and the right-hand side of~\eqref{eq:balance-main} over 201 times.\label{tab:balance}}
 \newcolumntype{C}{>{\centering\arraybackslash}X}
 \begin{tabularx}{\fulllength}{p{4.4cm}cCCCCCc}
 \toprule

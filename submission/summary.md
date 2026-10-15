@@ -2,7 +2,7 @@
 
 *Symmetry (MDPI) — Research Article*
 
-# Revision 1 — resubmission package (state of 2026-10-14)
+# Revision 1 — resubmission package (state of 2026-10-15)
 
 **Decision of round 1:** rejected to allow revision; resubmit with the same ID (symmetry-4596052), highlighted changes and a point-by-point response.
 
@@ -40,7 +40,7 @@
 - Inverse problem: joint Adam gives ε̂ ≈ 0.70 ε_init (0.61–0.73 over 20 runs) — the "38 % bias" was the start value. Variable projection: 0.62 % / 0.33 % error without noise, but 11 % / 3.0 % with σ=0.01 (classical least squares on the same noise: 1.8 % / 0.60 %). ε=0.01 is not identifiable at σ=0.01 (Cramér–Rao 45 %).
 - 2D: S(1) between 1.26e-31 and 3.74e-31 in all configurations (range corrected).
 
-**Retracted conclusions of the first version:** degradation with K (boundary-penalty artefact), the 38 % inverse bias (start-value artefact), zero energy violations as an effect of the penalty (the unpenalized network has none either). 22 of 77 numerical statements of v1 were wrong, 7 unverifiable (`revision1/audit_numbers/audit_numbers.md`).
+**Retracted conclusions of the first version:** the large degradation with K, up to errors of order one (boundary-penalty artefact; a milder growth of the error with K remains at a fixed training budget), the 38 % inverse bias (start-value artefact), zero energy violations as an effect of the penalty (the unpenalized network has none either). 22 of 77 numerical statements of v1 were wrong, 7 unverifiable (`revision1/audit_numbers/audit_numbers.md`).
 
 **Author actions before resubmission**
 

@@ -20,7 +20,6 @@ def run_one(T):
     import torch
     torch.set_num_threads(4)
     import spectral_pinn
-    spectral_pinn.T_FINAL = T          # late-binding monkeypatch, see module docstring
     from spectral_pinn import train_spectral_pinn, eval_on_grid
     from chebyshev_spectral import clenshaw_curtis_weights
     from common import reference_solution_fd, l2_error, linf_error
@@ -36,7 +35,7 @@ def run_one(T):
     t0 = time.time()
     model, hist, elapsed = train_spectral_pinn(
         EPS, K=32, epochs=epochs, nt_col=nt_col, warmup_epochs=1000,
-        energy_constrained=True, n_checkpoints=n_ckpt, seed=42, verbose=False)
+        energy_constrained=True, n_checkpoints=n_ckpt, seed=42, verbose=False, T=T)
 
     errs = {}
     for tv in save_times:

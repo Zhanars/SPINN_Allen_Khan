@@ -709,7 +709,7 @@ def tab_forward():
            r"``As submitted'': soft Neumann penalty and 300 equispaced collocation points; ``revised'': exact Neumann basis~\eqref{eq:neumann-basis} and Gauss--Lobatto collocation. "
            r"$\max|u|$: largest value over all runs of a row on a $1001\times(100T+1)$ space--time grid. "
            r"E incr.: total number of energy increases on the grid of spacing $0.02$ (in parentheses: number of runs with at least one increase out of $n$). "
-           r"Time: training time of one run (Adam phase, one CPU thread, separate timing runs on the same machine for the classical solver and the PINNs; ``---'': not measured separately).")
+           r"Time: wall-clock time of one run (for the PINNs the Adam training phase; one CPU thread, separate timing runs on the same machine for the classical solver and the PINNs; ``---'': not measured separately).")
     return wide(cap, "tab:forward", "p{5.2cm}cCCccc", H, R)
 
 
@@ -795,7 +795,7 @@ def tab_balance():
         R.append(row(lab, str(len(rr)), f_sci(np.mean(g("rms_residual_L2")), 1), f_sci(np.mean(g("int_half_r2")), 1), f_sci(np.mean(g("int_abs_bterm")), 1),
                      f_sci(np.mean(dE), 2), f_sci(max(g("max_abs_ux_wall")), 1), f_sci(max(g("identity_rel_err")), 0)))
     cap = (r"A-posteriori energy balance~\eqref{eq:balance-int} of the trained networks (means over the seeds): time-RMS of the residual norm, the integrated residual term, "
-           r"the integrated boundary term $\beta=\varepsilon^2[u_xu_t]_{-1}^{1}$, the actual energy decrease, the largest wall slope, and the largest relative deviation "
+           r"the time integral of the absolute value of the boundary term $\beta=\varepsilon^2[u_xu_t]_{-1}^{1}$, the actual energy decrease, the largest wall slope, and the largest relative deviation "
            r"between $dE/dt$, evaluated as $\int(\varepsilon^2u_xu_{xt}+f(u)u_t)\,dx$ with $\dot{\mathbf c}$ from automatic differentiation, and the right-hand side of~\eqref{eq:balance-main} over 201 times.")
     return wide(cap, "tab:balance", "p{4.4cm}cCCCCCc", H, R)
 

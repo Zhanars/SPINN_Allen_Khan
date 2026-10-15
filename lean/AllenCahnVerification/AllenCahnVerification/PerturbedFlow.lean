@@ -22,7 +22,7 @@ depends on the trajectory being an exact gradient flow:
 1.  `perturbedFlow_hasDerivAt_energy`:  `d/dt E(c(t)) = -‖c'‖^2 + <r, c'>` (exact identity);
 2.  `perturbedFlow_deriv_energy_le`:  `d/dt E(c(t)) <= (1/2)‖r‖^2 - (1/2)‖c'‖^2`;
 3.  `defectFlow_*`: the version in which the differential of `E` is only
-    `DE(c)[v] = <G, v> + beta(v)` with a defect functional `beta`
+    `DE(c)[v] = <G, ι v> + beta(v)` with a defect functional `beta`
     (e.g. `eps^2 [u_x v]_{-1}^{1}` when the Neumann condition is not exact), and
     the PDE holds as `ι c' = -G + r` in a Hilbert space `H` into which the space
     `V` carrying `E` is embedded by `ι` (`V = ` coefficient space / `H^1`, `H = L^2`);
@@ -544,7 +544,7 @@ theorem perturbedFlow_energy_bound_quarter
   intro t ht
   simpa using this t ht
 
-/-- Exact gradient flow (`δ = 0`): the integrated energy is non-increasing on `[0,T]`
+/-- Exact gradient flow (`δ = 0`): the energy never exceeds its initial value on `[0,T]`
 (this recovers the integrated form of `GradientFlow.lean`). -/
 theorem gradientFlow_energy_le_initial
     (E : F → ℝ) (c : ℝ → F) (T : ℝ)
