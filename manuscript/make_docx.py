@@ -8,6 +8,10 @@ import subprocess
 import sys
 
 BS = chr(92)
+# switches used by make_docx_mdpi.py (MDPI Word template)
+EQ_SENTINEL = False   # equation number as @@n@@ marker inside the math (moved into the template's number cell later)
+LANDSCAPE = True      # wide tables in landscape sections
+ABBR_TABLE = False    # keep the abbreviation list as a table
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "r1_src")
 sys.path.insert(0, HERE)
@@ -231,7 +235,8 @@ def convert_envs(s, lab):
         body = m.group(3)
         lm = re.search(re.escape(BS) + r"label\{([^}]+)\}", body)
         num = lab.get(lm.group(1), "") if lm else ""
-        body = re.sub(re.escape(BS) + r"label\{[^}]+\}", "", body)
+        if lm:
+            body = body.replace(lm.group(0), "", 1)   # only the theorem's own label; equation labels inside stay for eqn()
         head = BS + "textbf{Theorem " + num + "}" + (" (" + title + ")." if title else ".")
         return "\n\n" + head + " " + body.strip() + "\n\n"
     s = re.sub(re.escape(BS) + r"begin\{Theorem\}(\[(.*?)\])?(.*?)" + re.escape(BS) + r"end\{Theorem\}", thm, s, flags=re.S)
@@ -281,7 +286,7 @@ def convert_envs(s, lab):
         rest = rest.replace(BS + "noindent{", "{")
         block = "\n\n" + BS + "textbf{Table " + num + ".} " + cap.strip() + "\n\n" + rest.strip() + "\n\n"
         km = re.search(re.escape(BS) + r"begin\{tabular\}\{([^}]*)\}", rest)
-        if km and len(km.group(1)) >= 6:
+        if km and len(km.group(1)) >= 6 and LANDSCAPE:
             block = "\n\nLANDSCAPESTART\n\n" + block + "LANDSCAPEEND\n\n"
         return block
     s = re.sub(re.escape(BS) + r"begin\{table\}(?:\[[^\]]*\])?(.*?)" + re.escape(BS) + r"end\{table\}", tab, s, flags=re.S)
@@ -293,7 +298,10 @@ def convert_envs(s, lab):
         body = re.sub(re.escape(BS) + r"label\{[^}]+\}", "", body)
         body = body.replace(BS + "notag", "")
         if lm and lm.group(1) in lab:
-            tag = BS + "qquad (" + lab[lm.group(1)] + ")"
+            if EQ_SENTINEL:
+                tag = BS + "qquad " + BS + "mathrm{@@" + lab[lm.group(1)] + "@@}"
+            else:
+                tag = BS + "qquad (" + lab[lm.group(1)] + ")"
             if env == "align" and (BS + BS) in body:
                 k = body.index(BS + BS)
                 body = body[:k] + tag + body[k:]
@@ -409,13 +417,16 @@ def backmatter(s):
         a, j = grab(s, k + len(BS + "abbreviations"))
         b, j2 = grab(s, j)
         kb = b.find(BS + "begin{tabular}")
-        if kb >= 0:
+        if kb >= 0 and not ABBR_TABLE:
             _, jb = grab(b, kb + len(BS + "begin{tabular}"))
             ke = b.index(BS + "end{tabular}", jb)
             rows = [r for r in b[jb:ke].split(BS + BS) if "&" in r]
             lines = [BS + "textbf{" + r.split("&")[0].strip() + "} \u2014 " + r.split("&")[1].strip() for r in rows]
             b = b[:kb] + "\n\n".join(lines) + b[ke + len(BS + "end{tabular}"):]
-        b = b.replace(BS + BS, "\n\n")
+        if ABBR_TABLE and kb >= 0:
+            b = b[:kb].replace(BS + BS, "\n\n") + b[kb:].replace(BS + "begin{tabular}{@{}ll}", BS + "begin{tabular}{ll}")
+        else:
+            b = b.replace(BS + BS, "\n\n")
         s = s[:k] + "\n\n" + BS + "section*{" + a + "}\n\n" + b + "\n\n" + s[j2:]
     return s
 

@@ -99,3 +99,9 @@ Machine notes: everything is float64 with tiny networks, CPU only. ai.atu has 32
 * The undo request of the previous turn was cancelled by the user: the short-sentence texts (commit 50b572d) are the current ones.
 * Results 3.3 (energy penalty) and 3.5 (inverse problem) are split into subsubsections (3.3.1-3.3.4, 3.5.1-3.5.4); section headings shortened (e.g. "Mode Number and Boundary Penalty"). The text about a reviewer was removed from the Discussion; the Data Availability Statement now says "access can be granted on request".
 * Word version: `python manuscript/make_docx.py` writes `manuscript/manuscript_r1_clean.docx` (pandoc + python-docx; equations are native Word equations, wide tables sit on landscape pages, numbers of sections/tables/figures/equations/citations are resolved from the LaTeX .aux file, so run `build_r1.py` first). It is a plain Word layout, not the MDPI Word template.
+
+## 9. Update 2026-10-19 (night): Word version in the MDPI template
+
+* `python manuscript/make_docx_mdpi.py [template]` writes `manuscript/manuscript_r1_mdpi.docx` from `manuscript/symmetry-template.dot` (MDPI Symmetry Word template; the file is an OOXML package with a .dot extension; `symmetry-template (1).dot` differs only in guidance wording and footers). Front matter is filled in; body text, headings, equations (Word equations with the MDPI number column), tables, figures, back matter and numbered references use the MDPI_* styles of the template. Needs `build_r1.py` first (numbers from the .aux), pandoc and python-docx; checked by rendering through Microsoft Word (26 pages, line numbers and side column as in the template).
+* Plain (non-template) Word file: `python manuscript/make_docx.py` -> `manuscript_r1_clean.docx`. Bug fixed in both: equation labels inside theorems were dropped, so equations (9) and (10) had no number.
+* The Word files are the clean version; the highlighted-changes version exists only as PDF/LaTeX.

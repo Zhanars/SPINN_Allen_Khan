@@ -23,7 +23,7 @@ def manuscript_zip():
     n = 0
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
         for f in ("manuscript_r1_clean.tex", "manuscript_r1_clean.pdf", "manuscript_r1_highlighted.tex", "manuscript_r1_highlighted.pdf",
-                  "manuscript_r1_clean.docx", "response_r1.pdf", "response_r1.tex"):
+                  "manuscript_r1_clean.docx", "manuscript_r1_mdpi.docx", "response_r1.pdf", "response_r1.tex"):
             n += add(z, os.path.join(HERE, f), f)
         for f in glob.glob(os.path.join(HERE, "Definitions", "*")):
             n += add(z, f, "Definitions/" + os.path.basename(f))
