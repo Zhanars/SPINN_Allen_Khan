@@ -36,7 +36,7 @@
 - Mode number (B1): as submitted K=64 (9.71±1.43)e-2 vs revised (1.46±0.42)e-3; soft penalty rescaled to unit weight (λ_BC=K⁴) is worse, (3.98±0.49)e-1. Revised K=128 (6.68±1.29)e-3; 2× budget: K=64 2.24e-4, K=128 1.46e-3; K=256 default budget 3.48e-2 (first version: 1.5).
 - Energy penalty: λ_E ∈ {0,…,5000} gives mean errors 8.23e-4…8.30e-4; every Spectral-PINN trained for the forward problem (120 runs, penalized or not, accurate or not) has monotone energy (only the vanilla PINN on B3 has increases); the penalty matters only without warm-up, where it makes the result worse ((4.09±3.32)e-2 vs (6.46±6.88)e-3).
 - Maximum bound: revised networks reach max|u| ≤ 1.0015 on B1 (≤ 1.0082 including the penalty regimes), vanilla PINNs exceed 1 by up to 8.4e-3, inaccurate networks up to 2.05.
-- A-posteriori energy balance holds to 2e-14 for every Spectral-PINN trained for the forward problem; for revised K=32 the residual term is 1.3e-5 against an energy decrease of 7.1e-2. Lean 4 file `PerturbedFlow.lean` (39 theorems, standard axioms only).
+- A-posteriori energy balance (Theorem 2, proved in Section 2.5 by pure mathematics; the Lean 4 appendices were removed on 2026-10-19) holds to 2e-14 for every Spectral-PINN trained for the forward problem; for revised K=32 the residual term is 1.3e-5 against an energy decrease of 7.1e-2.
 - Inverse problem: joint Adam gives ε̂ ≈ 0.70 ε_init (0.61–0.73 over 20 runs) — the "38 % bias" was the start value. Variable projection: 0.62 % / 0.33 % error without noise, but 11 % / 3.0 % with σ=0.01 (classical least squares on the same noise: 1.8 % / 0.60 %). ε=0.01 is not identifiable at σ=0.01 (Cramér–Rao 45 %).
 - 2D: S(1) between 1.26e-31 and 3.74e-31 in all configurations (range corrected).
 
@@ -46,7 +46,7 @@
 
 1. Read the highlighted PDF and the response letter; all co-authors approve.
 2. Check the GenAI statement in the Acknowledgments (it now describes the actual extent of AI assistance in the revision).
-3. Lean: `lake build` of the pinned project (Lean 4.33.1, now including `PerturbedFlow.lean`) was reported OK on the writing PC (commit ae7911f); the proofs were also re-checked against Lean 4.35.0-rc2 + Mathlib `b0df0c4`.
+3. The revised manuscript no longer contains Lean (user decision, 2026-10-19: pure mathematics instead). The Lean project stays in the repository (`lean/`) but nothing in the paper relies on it. The manuscript was condensed from 37 to 27 pages; the related work now includes Yu et al., Spectral informed neural networks, J. Comput. Appl. Math. 477 (2026) 117178.
 4. Confirm two details that were corrected on 2026-10-13 from external records: the ICCMA 2026 abstract cited in the title footnote and in the references has five authors in the Abstract Book (Nauryzbay, Abdiramanov, Zhumazhanov, Urnek, Ertai), and the GenAI statement names only the Claude models used for the revision (add the version used for the first version if required).
 5. Upload via https://susy.mdpi.com/user/manuscripts/upload?pre_hash_key=760fc201bdbd8cda5fc7fe42d548ad3d&resubmit=1 (keep the manuscript ID).
 
