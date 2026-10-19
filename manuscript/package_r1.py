@@ -68,6 +68,57 @@ def data_zip():
     print(out, n, "files", os.path.getsize(out) // 1024, "KB")
 
 
+README = """ПОВТОРНАЯ ПОДАЧА: Symmetry, рукопись symmetry-4596052 (reject and resubmit)
+=========================================================================
+
+Ссылка для повторной подачи (с тем же номером рукописи):
+https://susy.mdpi.com/user/manuscripts/upload?pre_hash_key=760fc201bdbd8cda5fc7fe42d548ad3d&resubmit=1
+
+Название: A Chebyshev-Coefficient Physics-Informed Neural Network for the Allen-Cahn Equation
+Авторы: Zhuldyz Issa, Adil Nauryzbay, Zhanars Abdiramanov (corresponding), Yessimkhan Zhumazhanov, Dastan Urnek
+
+ФАЙЛЫ В ЭТОЙ ПАПКЕ
+1_Manuscript_symmetry-4596052_R1.docx      статья в шаблоне MDPI Symmetry (Word), единственный вариант
+2_Response_to_Reviewers_symmetry-4596052.pdf   ответ рецензентам (по пунктам)
+3_Supplementary_Data_S1.zip                 Supporting Information (Data S1): результаты всех запусков, веса сетей,
+                                            референсные решения, скрипты
+
+КАК ЗАГРУЖАТЬ
+- Рукопись: файл 1 (Word).
+- Ответ рецензентам: файл 2 (если форма просит текст, вставить текст из PDF).
+- Supplementary: файл 3.
+
+ПЕРЕД ОТПРАВКОЙ ПРОВЕРЬТЕ (подачу выполняет автор сам)
+1. Все соавторы прочитали статью и ответ и согласны.
+2. Формулировка об использовании ИИ (раздел Acknowledgments) верна.
+3. Поля Academic Editor, Received/Revised/Accepted/Published оставлены как в шаблоне: их заполняет редакция.
+4. Репозиторий https://github.com/Zhanars/SPINN_Allen_Khan приватный; в Data Availability Statement сказано, что доступ
+   выдаётся по запросу (имя пользователя GitHub).
+5. Версия с выделенными изменениями не готовится (нужен один вариант статьи). Если редакция её потребует, её можно
+   собрать заново: см. HANDOFF.md, раздел 10.
+
+Эта папка создаётся командой: python manuscript/package_r1.py (из корня проекта).
+"""
+
+
+def resubmission_folder():
+    """everything needed for the resubmission in one folder (copies; the folder is git-ignored)"""
+    import shutil
+    out = os.path.join(ROOT, "resubmission")
+    os.makedirs(out, exist_ok=True)
+    files = [
+        (os.path.join(HERE, "manuscript_r1_mdpi.docx"), "1_Manuscript_symmetry-4596052_R1.docx"),
+        (os.path.join(HERE, "response_r1.pdf"), "2_Response_to_Reviewers_symmetry-4596052.pdf"),
+        (os.path.join(SUB, "symmetry-4596052_R1_supporting_data.zip"), "3_Supplementary_Data_S1.zip"),
+    ]
+    for src, name in files:
+        shutil.copyfile(src, os.path.join(out, name))
+    with open(os.path.join(out, "README.txt"), "w", encoding="utf-8") as f:
+        f.write(README)
+    print(out, [n for _, n in files] + ["README.txt"])
+
+
 if __name__ == "__main__":
     manuscript_zip()
     data_zip()
+    resubmission_folder()
