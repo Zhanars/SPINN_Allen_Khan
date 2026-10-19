@@ -1,6 +1,6 @@
 """Package the resubmission (revision 1) of symmetry-4596052.
 usage: python package_r1.py
-  -> submission/symmetry-4596052_R1_manuscript.zip   (clean + highlighted LaTeX source and PDF, MDPI class files, figures, response letter)
+  -> submission/symmetry-4596052_R1_manuscript.zip   (the article in the MDPI Word template + the response letter)
   -> submission/symmetry-4596052_R1_supporting_data.zip (raw results of revision 1, trained weights, reference solutions, scripts)"""
 import os
 import glob
@@ -19,18 +19,12 @@ def add(z, path, arc):
 
 
 def manuscript_zip():
+    """one article only (manuscript_r1_mdpi.docx, MDPI Symmetry Word template) + the response letter"""
     out = os.path.join(SUB, "symmetry-4596052_R1_manuscript.zip")
     n = 0
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
-        for f in ("manuscript_r1_clean.tex", "manuscript_r1_clean.pdf", "manuscript_r1_highlighted.tex", "manuscript_r1_highlighted.pdf",
-                  "manuscript_r1_clean.docx", "manuscript_r1_mdpi.docx", "response_r1.pdf", "response_r1.tex"):
+        for f in ("manuscript_r1_mdpi.docx", "response_r1.pdf"):
             n += add(z, os.path.join(HERE, f), f)
-        for f in glob.glob(os.path.join(HERE, "Definitions", "*")):
-            n += add(z, f, "Definitions/" + os.path.basename(f))
-        for f in glob.glob(os.path.join(HERE, "figures_r1", "*.png")):
-            n += add(z, f, "figures_r1/" + os.path.basename(f))
-        n += add(z, os.path.join(HERE, "r1_src", "numbers_r1.tex"), "r1_src/numbers_r1.tex")   # \N{...} values used by response_r1.tex
-        n += add(z, os.path.join(HERE, "manuscript_r1_clean.aux"), "manuscript_r1_clean.aux")    # cross-references used by response_r1.tex
     print(out, n, "files", os.path.getsize(out) // 1024, "KB")
 
 

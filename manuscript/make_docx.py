@@ -94,7 +94,7 @@ def remove_macro(s, name, nargs=1, keep_arg=None):
 
 # ------------------------------------------------------------------ data from the build
 def read_aux():
-    aux = open(os.path.join(HERE, "manuscript_r1_clean.aux"), encoding="utf-8").read()
+    aux = open(os.path.join(HERE, "build", "manuscript_r1_clean.aux"), encoding="utf-8").read()
     lab = {}
     for m in re.finditer(r"\\newlabel\{([^}]+)\}\{\{([^}]*)\}", aux):
         lab[m.group(1)] = m.group(2)
@@ -112,7 +112,7 @@ def read_numbers():
 
 
 def read_bib():
-    clean = open(os.path.join(HERE, "manuscript_r1_clean.tex"), encoding="utf-8").read()
+    clean = open(os.path.join(HERE, "build", "manuscript_r1_clean.tex"), encoding="utf-8").read()
     k = clean.index(BS + "begin{thebibliography}")
     body = clean[k:]
     items = re.split(r"(?m)^" + re.escape(BS) + r"bibitem\{", body)[1:]
@@ -691,4 +691,4 @@ def postprocess(path):
 
 
 if __name__ == "__main__":
-    main()
+    print("make_docx.py is a helper library; the article is built by make_docx_mdpi.py (MDPI template).")

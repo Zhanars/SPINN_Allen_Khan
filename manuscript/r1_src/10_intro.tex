@@ -22,7 +22,7 @@ For Allen--Cahn, vanilla PINNs have known problems. For small $\varepsilon$ the 
 
 Symmetry has also been built into PINNs. Examples are invariant-surface conditions~\cite{Zhang_SPINN2023}, symmetry-generated data~\cite{Zhang_SymGroup2023,Brandstetter2022}, moving frames~\cite{Arora2024} and symmetry-based domain decomposition~\cite{Liu_SymDD2024}. The closest work uses group-equivariant networks for lattices~\cite{Zhu_SPINN2022}. Our Fourier-Spectral-PINN (Section~\ref{sec:2d}) is different. It imposes reflection symmetry through the basis functions. No loss term is responsible for it. This is a special case of hard-constraint design. We claim only its demonstration for two-dimensional Allen--Cahn.
 
-\textbf{Scope and contributions.} \rev{Coefficient networks, exact boundary bases and energy penalties are not new. This article is a careful, reproducible evaluation of a Chebyshev-coefficient PINN (Spectral-PINN) against strong baselines. Its contributions are as follows.}
+\rev{Coefficient networks, exact boundary bases and energy penalties are not new. This article is a careful, reproducible evaluation of a Chebyshev-coefficient PINN (Spectral-PINN) against strong baselines. Its contributions are as follows.}
 
 \rev{(i)~We use the classical Neumann basis of Chebyshev--Galerkin methods~\cite{Shen1995} as the output basis. A soft Neumann penalty fails at large mode number $K$ in both natural scalings (Section~\ref{sec:results-k}). Scaled with $K$, it vanishes. This caused a spurious loss of accuracy in the first version. Unscaled, it makes the loss ill-conditioned.}
 

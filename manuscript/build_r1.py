@@ -5,7 +5,8 @@ usage: python build_r1.py [hl|clean|both]
    blue; paragraphs, headings, title-page data and references carried over verbatim are black,
  * re-orders the bibliography by order of first citation (MDPI requirement),
  * checks for undefined labels/citations and unresolved numbers (??),
- * writes manuscript/manuscript_r1_highlighted.tex / manuscript_r1_clean.tex and compiles them (pdflatex x2)."""
+ * writes manuscript/build/manuscript_r1_clean.tex (mode hl: ..._highlighted.tex, needs v1_submitted/manuscript.tex = git show a2cbf41:manuscript/manuscript.tex)
+   and compiles it (pdflatex x2). Default mode: clean."""
 import os
 import re
 import sys
@@ -14,6 +15,8 @@ import subprocess
 BS = chr(92)
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "r1_src")
+BUILD = os.path.join(HERE, "build")      # LaTeX intermediates (git-ignored); the only article file is manuscript_r1_mdpi.docx
+os.makedirs(BUILD, exist_ok=True)
 
 
 def read(name):
@@ -225,17 +228,18 @@ def build(mode):
         print(f"[hl] unchanged blocks/headings shown in black: {n_black}; unchanged references shown in black: {n_bib}; changed title-page items: {front}")
     doc = pre + "\n" + BS + "begin{document}\n\n" + full_body + "\n" + refs2
     name = "manuscript_r1_highlighted" if mode == "hl" else "manuscript_r1_clean"
-    open(os.path.join(HERE, name + ".tex"), "w", encoding="utf-8").write(doc)
+    open(os.path.join(BUILD, name + ".tex"), "w", encoding="utf-8").write(doc)
     log = ""
     for _ in range(2):
-        r = subprocess.run(["pdflatex", "-interaction=nonstopmode", name + ".tex"], cwd=HERE, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        r = subprocess.run(["pdflatex", "-interaction=nonstopmode", "-output-directory=build", "build/" + name + ".tex"], cwd=HERE, capture_output=True, text=True, encoding="utf-8", errors="replace")
         log = r.stdout
     errs = re.findall(r"(?m)^! .*", log)
     undef = re.findall(r"(?m)^.*(?:undefined|Undefined).*$", log)
     used = set(re.findall(re.escape(BS) + r"N\{([^}]+)\}", doc))
     defined = set(re.findall(re.escape(BS) + r"csname num@(.+?)" + re.escape(BS) + "endcsname", doc))
     qq = len(used - defined)                # \N{key} without a generated value would print ??[key]
-    pages = re.findall(r"Output written on .*\((\d+) pages", log)
+    logfile = open(os.path.join(BUILD, name + ".log"), encoding="utf-8", errors="replace").read().replace("\n", "")
+    pages = re.findall(r"Output written on .*?\((\d+) pages", logfile)
     print(f"[{mode}] pages={pages} errors={len(errs)} undefined-warnings={len(undef)} unresolved-numbers={qq} missing-bib={missing} unused-bib={len(unused)}")
     for e in errs[:8]:
         print("   ", e)
@@ -247,6 +251,6 @@ def build(mode):
 
 
 if __name__ == "__main__":
-    which = sys.argv[1] if len(sys.argv) > 1 else "both"
+    which = sys.argv[1] if len(sys.argv) > 1 else "clean"
     for m in (["hl", "clean"] if which == "both" else [which]):
         build(m)

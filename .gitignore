@@ -20,3 +20,6 @@ __pycache__/
 # OS
 Thumbs.db
 .DS_Store
+
+# LaTeX build folder of the article (the only article file is manuscript/manuscript_r1_mdpi.docx)
+manuscript/build/

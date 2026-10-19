@@ -12,10 +12,9 @@
 
 | File | Content |
 |---|---|
-| `manuscript/manuscript_r1_highlighted.pdf` (+ `.tex`) | revised manuscript, all changes in blue (for the editor and reviewers) |
-| `manuscript/manuscript_r1_clean.pdf` (+ `.tex`) | clean revised manuscript |
+| `manuscript/manuscript_r1_mdpi.docx` | the revised manuscript (the only version), in the MDPI Symmetry Word template |
 | `manuscript/response_r1.pdf` (+ `.tex`) | point-by-point response to both reviewers |
-| `submission/symmetry-4596052_R1_manuscript.zip` | LaTeX source (both versions), MDPI class files, figures, PDFs, response |
+| `submission/symmetry-4596052_R1_manuscript.zip` | the manuscript (Word) and the response letter (PDF) |
 | `submission/symmetry-4596052_R1_supporting_data.zip` | Supporting Information: raw results of every run, trained weights, reference solutions, scripts |
 
 **How it was produced.** All 1D experiments were re-run with the harness in `code/` (`r1_run.py all`, 200 jobs incl. ablations; 42 earlier runs on the workstation, everything else on the ai.atu server, one CPU thread per run), plus clean timing runs (`r1_run.py timing 1`). Every result of these runs and of the classical baselines, every data table and every figure of the revised manuscript is generated from the raw results (`data_r1/`; 2D tables: `data/`) by `code/make_tex_r1.py` and `code/make_figures_r1.py`; `manuscript/build_r1.py both` assembles and compiles both versions.
@@ -44,7 +43,7 @@
 
 **Author actions before resubmission**
 
-1. Read the highlighted PDF and the response letter; all co-authors approve.
+1. Read the Word manuscript and the response letter; all co-authors approve.
 2. Check the GenAI statement in the Acknowledgments (it now describes the actual extent of AI assistance in the revision).
 3. The revised manuscript no longer contains Lean (user decision, 2026-10-19: pure mathematics instead). The Lean project stays in the repository (`lean/`) but nothing in the paper relies on it. The manuscript was condensed from 37 to 27 pages; the related work now includes Yu et al., Spectral informed neural networks, J. Comput. Appl. Math. 477 (2026) 117178.
 4. Confirm two details that were corrected on 2026-10-13 from external records: the ICCMA 2026 abstract cited in the title footnote and in the references has five authors in the Abstract Book (Nauryzbay, Abdiramanov, Zhumazhanov, Urnek, Ertai), and the GenAI statement names only the Claude models used for the revision (add the version used for the first version if required).

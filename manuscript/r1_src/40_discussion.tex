@@ -23,11 +23,11 @@
 
 \rev{Three conclusions of the first version did not survive a systematic check. Each rests on an easy mistake.}
 
-\rev{(i)~\emph{Large loss of accuracy with growing $K$.} The cause was a boundary penalty whose effective weight decayed like $K^{-4}$. Rescaling the penalty did not cure it, because the loss becomes ill-conditioned. The exact Neumann basis did. A milder growth of the error with $K$ remains at a fixed budget. It is an optimization effect. Twice the epochs lower the error of seed~42 from \N{kk.hard_cgl64_s42} to \N{kk.kh_K64_x2.l2} at $K=64$. At $K=128$ they lower it only from \N{kk.hard128_s42} to \N{kk.kh_K128_x2.l2}. The wall slope of the trained network would have exposed the penalty failure.}
+\rev{(i)~The large loss of accuracy with growing $K$ had one cause: a boundary penalty whose effective weight decayed like $K^{-4}$. Rescaling the penalty did not cure it, because the loss becomes ill-conditioned. The exact Neumann basis did. A milder growth of the error with $K$ remains at a fixed budget. It is an optimization effect. Twice the epochs lower the error of seed~42 from \N{kk.hard_cgl64_s42} to \N{kk.kh_K64_x2.l2} at $K=64$. At $K=128$ they lower it only from \N{kk.hard128_s42} to \N{kk.kh_K128_x2.l2}. The wall slope of the trained network would have exposed the penalty failure.}
 
-\rev{(ii)~\emph{A systematic $38\%$ bias of the inverse estimate.} It reflects the start and the step size of the optimization, not the data. If a result scales with an arbitrary starting value, the optimizer is being measured, not the estimator.}
+\rev{(ii)~The systematic $38\%$ bias of the inverse estimate reflects the start and the step size of the optimization, not the data. If a result scales with an arbitrary starting value, the optimizer is being measured, not the estimator.}
 
-\rev{(iii)~\emph{Zero energy violations as an effect of the energy penalty.} The unpenalized network has none either. The first version reported the count only for the penalized network. The missing control was the comparison of the two counts.}
+\rev{(iii)~The zero energy violations were not an effect of the energy penalty. The unpenalized network has none either. The first version reported the count only for the penalized network. The missing control was the comparison of the two counts.}
 
 \rev{Two further flaws were found. B1 is reaction-dominated and almost independent of $\varepsilon$ for $\varepsilon\le0.01$. So the small-$\varepsilon$ experiments tested essentially one function. The initial condition also violated the boundary condition.}
 

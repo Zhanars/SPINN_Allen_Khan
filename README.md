@@ -50,8 +50,8 @@ data_r1/       raw results of revision 1: runs/ (one JSON per training run), mod
                runs_workstation.txt, numbers.json
 data/          raw results of the first version; experiment_2d.json, symmetry_2d_multiseed.json and stress_2d_sweep.json
                feed the 2D tables of revision 1
-manuscript/    r1_src/ (LaTeX sources), build_r1.py, package_r1.py, manuscript_r1_{clean,highlighted}.{tex,pdf},
-               response_r1.{tex,pdf}, v1_submitted/ (first version), Definitions/ (MDPI class files)
+manuscript/    r1_src/ (LaTeX sources), build_r1.py, make_docx_mdpi.py, package_r1.py, manuscript_r1_mdpi.docx (the article, MDPI Word
+               template), response_r1.{tex,pdf}, Definitions/ (MDPI class files); build/ = LaTeX intermediates (git-ignored)
 lean/AllenCahnVerification/AllenCahnVerification/
   Basic.lean          polarization identity, discrete Gronwall step, step-size existence (Appendix A)
   GradientFlow.lean   abstract gradient-flow energy-dissipation theorem (Appendix A)
@@ -74,7 +74,8 @@ python r1_check_quad.py
 python make_tex_r1.py                    # numbers and tables of the manuscript
 python make_figures_r1.py                # figures of the manuscript
 cd ../manuscript
-python build_r1.py both                  # manuscript_r1_highlighted and manuscript_r1_clean (.tex and .pdf)
+python build_r1.py                       # LaTeX intermediates in manuscript/build/ (aux file with the numbers)
+python make_docx_mdpi.py                 # manuscript_r1_mdpi.docx (the single version of the article)
 pdflatex response_r1.tex && pdflatex response_r1.tex
 python package_r1.py                     # upload packages in submission/
 ```
