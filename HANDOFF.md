@@ -112,3 +112,10 @@ Machine notes: everything is float64 with tiny networks, CPU only. ai.atu has 32
 * The MDPI resubmission usually asks for a highlighted-changes version; it can be regenerated: restore v1 (see above), run `python build_r1.py hl`.
 * Run-in paragraph headings (italic or bold lead-ins such as "Maximum bound.", "Quadrature.", "Joint Adam") were removed from the whole text; the first sentences were adapted so that the paragraphs read on their own. Theorem/Proof labels stay.
 
+## 11. Update 2026-10-19 (final): response in Word, upload folder
+
+* Authors approved the manuscript and the response. The acknowledgment (GenAI statement) now names text generation (drafting and editing the manuscript and the response) and translation explicitly. Academic Editor / date fields of the template stay untouched. The repository stays private (access on request, see the Data Availability Statement).
+* The response to the reviewers is a Word file: `python manuscript/make_docx_response.py` -> `manuscript/response_r1.docx` (source: `response_r1.tex`; numbers and section/table references are filled from the build, so run `build_r1.py` first).
+* `python manuscript/package_r1.py` fills `resubmission/` (git-ignored) with `1_Manuscript_symmetry-4596052_R1.docx`, `2_Response_to_Reviewers_symmetry-4596052.docx`, `3_Supplementary_Data_S1.zip`, `README.txt` (what to upload where, checklist) and the two zips in `submission/`.
+* Full rebuild order: `python code/make_tex_r1.py` (only if data changed), `python manuscript/build_r1.py`, `python manuscript/make_docx_mdpi.py`, `python manuscript/make_docx_response.py`, `python manuscript/package_r1.py`.
+

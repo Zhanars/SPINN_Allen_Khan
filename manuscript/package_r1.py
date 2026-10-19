@@ -1,6 +1,6 @@
 """Package the resubmission (revision 1) of symmetry-4596052.
 usage: python package_r1.py
-  -> submission/symmetry-4596052_R1_manuscript.zip   (the article in the MDPI Word template + the response letter)
+  -> submission/symmetry-4596052_R1_manuscript.zip   (the article in the MDPI Word template + the response to the reviewers, Word)
   -> submission/symmetry-4596052_R1_supporting_data.zip (raw results of revision 1, trained weights, reference solutions, scripts)"""
 import os
 import glob
@@ -19,11 +19,11 @@ def add(z, path, arc):
 
 
 def manuscript_zip():
-    """one article only (manuscript_r1_mdpi.docx, MDPI Symmetry Word template) + the response letter"""
+    """one article only (manuscript_r1_mdpi.docx, MDPI Symmetry Word template) + the response to the reviewers (Word)"""
     out = os.path.join(SUB, "symmetry-4596052_R1_manuscript.zip")
     n = 0
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
-        for f in ("manuscript_r1_mdpi.docx", "response_r1.pdf"):
+        for f in ("manuscript_r1_mdpi.docx", "response_r1.docx"):
             n += add(z, os.path.join(HERE, f), f)
     print(out, n, "files", os.path.getsize(out) // 1024, "KB")
 
@@ -79,21 +79,21 @@ https://susy.mdpi.com/user/manuscripts/upload?pre_hash_key=760fc201bdbd8cda5fc7f
 
 ФАЙЛЫ В ЭТОЙ ПАПКЕ
 1_Manuscript_symmetry-4596052_R1.docx      статья в шаблоне MDPI Symmetry (Word), единственный вариант
-2_Response_to_Reviewers_symmetry-4596052.pdf   ответ рецензентам (по пунктам)
+2_Response_to_Reviewers_symmetry-4596052.docx  ответ рецензентам по пунктам (Word)
 3_Supplementary_Data_S1.zip                 Supporting Information (Data S1): результаты всех запусков, веса сетей,
                                             референсные решения, скрипты
 
 КАК ЗАГРУЖАТЬ
 - Рукопись: файл 1 (Word).
-- Ответ рецензентам: файл 2 (если форма просит текст, вставить текст из PDF).
+- Ответ рецензентам: файл 2 (если форма просит текст, вставить текст из Word).
 - Supplementary: файл 3.
 
 ПЕРЕД ОТПРАВКОЙ ПРОВЕРЬТЕ (подачу выполняет автор сам)
-1. Все соавторы прочитали статью и ответ и согласны.
-2. Формулировка об использовании ИИ (раздел Acknowledgments) верна.
-3. Поля Academic Editor, Received/Revised/Accepted/Published оставлены как в шаблоне: их заполняет редакция.
-4. Репозиторий https://github.com/Zhanars/SPINN_Allen_Khan приватный; в Data Availability Statement сказано, что доступ
-   выдаётся по запросу (имя пользователя GitHub).
+1. Авторы согласовали статью и ответ (подтверждено).
+2. Использование ИИ указано в Acknowledgments (программирование, анализ результатов, проверка чисел, генерация и правка текста, перевод).
+3. Поля Academic Editor, Received/Revised/Accepted/Published оставлены как в шаблоне (не менять).
+4. Репозиторий https://github.com/Zhanars/SPINN_Allen_Khan остаётся приватным; в Data Availability Statement сказано, что доступ
+   выдаётся по запросу (имя пользователя GitHub). Содержимое репозитория обновлено.
 5. Версия с выделенными изменениями не готовится (нужен один вариант статьи). Если редакция её потребует, её можно
    собрать заново: см. HANDOFF.md, раздел 10.
 
@@ -108,7 +108,7 @@ def resubmission_folder():
     os.makedirs(out, exist_ok=True)
     files = [
         (os.path.join(HERE, "manuscript_r1_mdpi.docx"), "1_Manuscript_symmetry-4596052_R1.docx"),
-        (os.path.join(HERE, "response_r1.pdf"), "2_Response_to_Reviewers_symmetry-4596052.pdf"),
+        (os.path.join(HERE, "response_r1.docx"), "2_Response_to_Reviewers_symmetry-4596052.docx"),
         (os.path.join(SUB, "symmetry-4596052_R1_supporting_data.zip"), "3_Supplementary_Data_S1.zip"),
     ]
     for src, name in files:
