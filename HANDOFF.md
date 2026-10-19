@@ -88,3 +88,8 @@ Machine notes: everything is float64 with tiny networks, CPU only. ai.atu has 32
 * Introduction, Methods, Results, Discussion were condensed without changing any number or conclusion (all `\N{...}` keys are unchanged). New related work: Yu, Qi, Oseledets, Chen, Spectral informed neural networks, J. Comput. Appl. Math. 477 (2026) 117178 (bib key `ref_Yu2026SINN`). `references/3138_Spectral_Informed_Neural__Originally Submitted PDF.pdf` is an anonymous, unpublished ICML submission (Modified SINNs, high-dimensional PDEs): deliberately NOT cited. The OpenReview page is behind a browser check that must not be bypassed.
 * `manuscript/response_r1.tex` updated (Lean statements replaced, label `app:balance`, SINN mentioned); `\rev` is defined in the letter because the manuscript .aux carries captions with `\rev`.
 * Rebuild: `python manuscript/build_r1.py both`, then `pdflatex response_r1.tex` twice in `manuscript/`, then `python manuscript/package_r1.py`.
+
+## 7. Update 2026-10-19 (later): short sentences
+
+* User request: the text was hard to read. Introduction, Methods, Results, Discussion, Conclusions, abstract, appendices, all table captions (generator `code/make_tex_r1.py`) and the response letter were rewritten with short sentences (mean sentence length of the body 49 -> 20 words, 62% -> 12% of sentences over 30 words). No number, claim or `\N{...}` key changed. Manuscript: 26 pages. The forward table floats (`place="t"`) to avoid a blank half page.
+* Style rule for further edits: one idea per sentence, no nested parentheses, details into tables or appendices.

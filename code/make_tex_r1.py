@@ -612,8 +612,8 @@ put("s2d.rms_max", f_sci(np.sqrt(max(s1)), 0))
 
 
 # ================================================================================================ tables
-def wide(caption, label, colspec, header, rows, note=None):
-    out = [BS + "begin{table}[H]", BS + "begin{adjustwidth}{-" + BS + "extralength}{0cm}", BS + "tablesize{" + BS + "footnotesize}",
+def wide(caption, label, colspec, header, rows, note=None, place="H"):
+    out = [BS + "begin{table}[" + place + "]", BS + "begin{adjustwidth}{-" + BS + "extralength}{0cm}", BS + "tablesize{" + BS + "footnotesize}",
            BS + "caption{" + caption + BS + "label{" + label + "}}", BS + "newcolumntype{C}{>{" + BS + "centering" + BS + "arraybackslash}X}",
            BS + "begin{tabularx}{" + BS + "fulllength}{" + colspec + "}", BS + "toprule", header + BS + BS, BS + "midrule"]
     out += rows
@@ -705,12 +705,8 @@ def tab_forward():
     R.append(pinn_row(r"\quad + energy penalty ($\lambda_E=50$)", b3K32E, "5.0"))
     R.append(pinn_row(r"Spectral-PINN revised, $K=64$", b3K64, "5.0"))
     R.append(pinn_row(r"\quad + energy penalty ($\lambda_E=50$)", b3K64E, "5.0"))
-    cap = (r"Forward problem: errors against the certified reference on the 200-point grid, mean~$\pm$~SD over $n$ seeds. "
-           r"``As submitted'': soft Neumann penalty and 300 equispaced collocation points; ``revised'': exact Neumann basis~\eqref{eq:neumann-basis} and Gauss--Lobatto collocation. "
-           r"$\max|u|$: largest value over all runs of a row on a $1001\times(100T+1)$ space--time grid. "
-           r"E incr.: total number of energy increases on the grid of spacing $0.02$ (in parentheses: number of runs with at least one increase out of $n$). "
-           r"Time: wall-clock time of one run (for the PINNs the Adam training phase; one CPU thread, separate timing runs on the same machine for the classical solver and the PINNs; ``---'': not measured separately).")
-    return wide(cap, "tab:forward", "p{5.2cm}cCCccc", H, R)
+    cap = (r"Forward problem on three benchmarks. Errors are measured against the certified reference on the 200-point grid. Mean~$\pm$~SD over $n$ seeds. ``As submitted'': soft Neumann penalty, 300 equispaced collocation points. ``Revised'': exact Neumann basis~\eqref{eq:neumann-basis}, Gauss--Lobatto collocation. $\max|u|$: largest value over all runs of a row. E incr.: total number of energy increases on the grid of spacing $0.02$. In parentheses: runs with at least one increase out of $n$. Time: wall-clock time of one run; for PINNs the Adam phase. One CPU thread; separate timing runs. ``---'': not measured separately.")
+    return wide(cap, "tab:forward", "p{5.2cm}cCCccc", H, R, place="t")
 
 
 def tab_K():
@@ -738,10 +734,7 @@ def tab_K():
         base = by_seed(runs(f"fh_K{K}_s*")).get(42)
         R.append(row(str(K), r"\multicolumn{4}{l}{$" + str(fac) + r"\times$ epochs (12\,000 + 2000 warm-up)}",
                      (f_sci(r["errors"]["1.0"]["l2"]) if r else "(not run)") + (f" (default: {f_sci(base['errors']['1.0']['l2'])})" if base else ""), DASH))
-    cap = (r"$L^2$ error at $t=1$ on B1 versus the mode number $K$ for the four combinations of boundary treatment (soft penalty / exact Neumann basis) and collocation grid "
-           r"(equispaced / Gauss--Lobatto, CGL); mean over the number of seeds in parentheses. ``As submitted'' = soft penalty with effective weight $K^{-4}$, equispaced grid; "
-           r"``$\lambda_{\rm BC}=K^4$'' = the same with the penalty rescaled to unit effective weight; ``Revised'' = exact Neumann basis, CGL grid. "
-           r"The last column is the largest wall slope of the as-submitted networks (zero for the exact basis by construction).")
+    cap = (r"$L^2$ error at $t=1$ on B1 versus the mode number $K$. Four combinations of boundary treatment (soft penalty or exact Neumann basis) and grid (equispaced or Gauss--Lobatto, CGL). The number of seeds is in parentheses. ``As submitted'': soft penalty with effective weight $K^{-4}$, equispaced grid. ``$\lambda_{\rm BC}=K^4$'': the same penalty rescaled to unit weight. ``Revised'': exact Neumann basis, CGL grid. Last column: largest wall slope of the as-submitted networks. It is zero for the exact basis.")
     return wide(cap, "tab:K", "cCCCCCc", H, R)
 
 
@@ -771,9 +764,7 @@ def tab_energy():
             R.append(erow(lab + f", $" + BS + f"lambda_E={lam}$", runs(f"{base}_E{lam}_s*")))
     R.append(erow(r"$K=64$ as submitted, $\lambda_E=0$", [r for r in so64 if seed(r) in {seed(q) for q in runs("reg_K64_E50_s*")}]))
     R.append(erow(r"$K=64$ as submitted, $\lambda_E=50$", runs("reg_K64_E50_s*")))
-    cap = (r"Energy penalty: accuracy at $t=1$ (B1), number of energy increases of the trained trajectory on grids of spacing $0.02$, $0.002$ and $2\times10^{-4}$ "
-           r"(total over the seeds), number of training epochs in which the penalty was nonzero (summed over the seeds), "
-           r"and the largest value of the weighted penalty $\lambda_E\mathcal L_E$ during training (``---'': $\lambda_E=0$, for which $\mathcal L_E$ is not evaluated during training).")
+    cap = (r"Energy penalty. Accuracy at $t=1$ (B1). Number of energy increases on grids of spacing $0.02$, $0.002$ and $2\times10^{-4}$ (total over seeds). Number of epochs with a nonzero penalty (summed over seeds). Largest weighted penalty $\lambda_E\mathcal L_E$ during training. ``---'': $\lambda_E=0$, so $\mathcal L_E$ is not evaluated.")
     return wide(cap, "tab:energy", "p{5.3cm}cCCcc", H, R)
 
 
@@ -794,9 +785,7 @@ def tab_balance():
         dE = [r["balance"]["E_first"] - r["balance"]["E_last"] for r in rr]
         R.append(row(lab, str(len(rr)), f_sci(np.mean(g("rms_residual_L2")), 1), f_sci(np.mean(g("int_half_r2")), 1), f_sci(np.mean(g("int_abs_bterm")), 1),
                      f_sci(np.mean(dE), 2), f_sci(max(g("max_abs_ux_wall")), 1), f_sci(max(g("identity_rel_err")), 0)))
-    cap = (r"A-posteriori energy balance~\eqref{eq:balance-int} of the trained networks (means over the seeds): time-RMS of the residual norm, the integrated residual term, "
-           r"the time integral of the absolute value of the boundary term $\beta=\varepsilon^2[u_xu_t]_{-1}^{1}$, the actual energy decrease, the largest wall slope, and the largest relative deviation "
-           r"between $dE/dt$, evaluated as $\int(\varepsilon^2u_xu_{xt}+f(u)u_t)\,dx$ with $\dot{\mathbf c}$ from automatic differentiation, and the right-hand side of~\eqref{eq:balance-main} over 201 times.")
+    cap = (r"A-posteriori energy balance~\eqref{eq:balance-int} of the trained networks (means over seeds). Columns: time-RMS of the residual norm; integrated residual term; time integral of $|\beta|$, $\beta=\varepsilon^2[u_xu_t]_{-1}^{1}$; actual energy decrease; largest wall slope; largest relative deviation of identity~\eqref{eq:balance-main} over 201 times. For the deviation, $dE/dt$ is computed as $\int(\varepsilon^2u_xu_{xt}+f(u)u_t)\,dx$ with $\dot{\mathbf c}$ from automatic differentiation.")
     return wide(cap, "tab:balance", "p{4.4cm}cCCCCCc", H, R)
 
 
@@ -822,8 +811,7 @@ def tab_inverse():
             rr = [r for r in rr if r]
             cells.append(m(f"{np.mean([r['ratio_to_init'] for r in rr]):.3f}" + BS + f"pm{np.std([r['ratio_to_init'] for r in rr], ddof=1):.3f}") if len(rr) > 1 else DASH)
     R.append(row(r"$\hat\varepsilon/\varepsilon_{\rm init}$", *cells))
-    cap = (r"Joint Adam (procedure of the first version): estimate $\hat\varepsilon/\varepsilon_{\rm true}$ for five starting values, noise-free data, seed 42. "
-           r"Last row: $\hat\varepsilon/\varepsilon_{\rm init}$, mean~$\pm$~SD over the five starting values.")
+    cap = (r"Joint Adam (procedure of the first version). Estimate $\hat\varepsilon/\varepsilon_{\rm true}$ for five starting values. Noise-free data, seed 42. Last row: $\hat\varepsilon/\varepsilon_{\rm init}$, mean~$\pm$~SD over the five starting values.")
     out.append(narrow(cap, "tab:inverse1", "cCCCC", H, R))
     # --- table 2: ablation of joint Adam and variable projection
     H = row(BS + "textbf{Setting}", m(BS + "boldsymbol{" + BS + "varepsilon_{" + BS + "rm true}}"), m(BS + "boldsymbol{" + BS + "hat" + BS + "varepsilon/" + BS + "varepsilon_{" + BS + "rm true}}"),
@@ -849,7 +837,7 @@ def tab_inverse():
                      ("no data-fit phase", "inv_vp_e0.05_nophaseA"), (r"$K=64$", "inv_vp_e0.05_K64")):
         r = run1(tag)
         R.append(row(lab + r" ($\lambda_{\rm data}=2000$)", "0.05", num(r["ratio_to_true"], 3), DASH, f_sci(r["data_rms_misfit"], 1)) if r else row(lab, "0.05", "(not run)", "", ""))
-    cap = (r"Inverse problem, noise-free data: sensitivity of the joint-Adam estimate and of the variable-projection estimate to the settings (one run each, seed 42).")
+    cap = (r"Inverse problem, noise-free data. Sensitivity of the joint-Adam and variable-projection estimates to the settings. One run each, seed 42.")
     out.append(narrow(cap, "tab:inverse2", "Xcccc", H, R))
     # --- table 3: noise, neural vs classical
     H = row(m(BS + "boldsymbol{" + BS + "varepsilon_{" + BS + "rm true}}"), m(BS + "boldsymbol{" + BS + "sigma}"), BS + "textbf{Var. projection (5 real.)}",
@@ -881,9 +869,7 @@ def tab_inverse():
                 cl5 = cl25 = fis = DASH
             R.append(row(f"{e:g}", f"{nz:g}", neu, cl5, cl25, fis))
         R.append(BS + "midrule") if e != 0.1 else None
-    cap = (r"Inverse problem with noisy data: relative error $|\hat\varepsilon-\varepsilon_{\rm true}|/\varepsilon_{\rm true}$ of the variable-projection Spectral-PINN "
-           r"($\lambda_{\rm data}=2000$; mean~$\pm$~SD over five noise realizations, one run for $\varepsilon_{\rm true}=0.01$ and for noise-free data) and of the classical least-squares estimator on the same "
-           r"five realizations (noise seeds 1--5; for $\varepsilon_{\rm true}=0.01$ the network was run only on the first of them with $\sigma=0.01$ and not at all with $\sigma=0.05$) and on 25 realizations (root-mean-square error); Fisher s.e.: Cram\'er--Rao standard error $\sigma/\|\partial u_{\rm obs}/\partial\log\varepsilon\|$ of $\log\hat\varepsilon$.")
+    cap = (r"Inverse problem with noisy data. Relative error $|\hat\varepsilon-\varepsilon_{\rm true}|/\varepsilon_{\rm true}$. Variable-projection Spectral-PINN: $\lambda_{\rm data}=2000$, mean~$\pm$~SD over five noise realizations. For $\varepsilon_{\rm true}=0.01$ and for noise-free data: one run. For $\varepsilon_{\rm true}=0.01$ the network ran only on the first realization with $\sigma=0.01$, and not with $\sigma=0.05$. Classical least squares: on the same five realizations (noise seeds 1--5) and on 25 realizations (root-mean-square error). Fisher s.e.: Cram\'er--Rao standard error $\sigma/\|\partial u_{\rm obs}/\partial\log\varepsilon\|$ of $\log\hat\varepsilon$.")
     out.append(wide(cap, "tab:inverse3", "ccCCCC", H, R))
     return "\n".join(out)
 
@@ -894,13 +880,11 @@ def tab_2d():
     for t in ("0.0", "0.2", "0.5", "1.0"):
         v = [r["violations"][t] for r in ms2["results"]]
         R.append(row(t, f_sci(ex2["violations"][t]["fourier_spectral"], 1), f_stat(v)))
-    cap = (r"Reflection-symmetry violation $S(t)$ (Section~\ref{sec:2d}) of the Fourier-Spectral-PINN (one run; $M=8$, $\varepsilon=0.3$) and of a vanilla PINN with the same "
-           r"periodic input encoding (mean~$\pm$~SD over five seeds). Data of the first version, unchanged.")
+    cap = (r"Reflection-symmetry violation $S(t)$ (Section~\ref{sec:2d}). Fourier-Spectral-PINN: one run, $M=8$, $\varepsilon=0.3$. Vanilla PINN with the same periodic input encoding: mean~$\pm$~SD over five seeds. Data of the first version, unchanged.")
     a = narrow(cap, "tab:2d", "cCC", H, R)
     H = row(m(BS + "boldsymbol{M}"), m(BS + "boldsymbol{" + BS + "varepsilon}"), BS + "textbf{Epochs}", m(BS + "boldsymbol{S(1)}"), m(BS + "boldsymbol{" + BS + "sqrt{S(1)}}"))[:-2]
     R = [row(str(r["M"]), f"{r['eps']:g}", num(r["epochs"], 4), f_sci(r["violations"]["1.0"], 2), f_sci(np.sqrt(r["violations"]["1.0"]), 1)) for r in st2["results"]]
-    cap = (r"Fourier-Spectral-PINN: reflection-symmetry violation at $t=1$ for larger mode numbers $M$ and a sharper interface ($\varepsilon=0.1$). "
-           r"$\sqrt{S}$ is the root-mean-square asymmetry, to be compared with the machine epsilon $2.2\times10^{-16}$.")
+    cap = (r"Fourier-Spectral-PINN: symmetry violation at $t=1$ for larger mode numbers $M$ and a sharper interface ($\varepsilon=0.1$). $\sqrt{S}$ is the root-mean-square asymmetry. Compare it with the machine epsilon $2.2\times10^{-16}$.")
     b = narrow(cap, "tab:stress-2d", "cCCCC", H, R)
     return a + "\n" + b
 
@@ -919,8 +903,7 @@ def tab_orig():
         sc = set(seed(r) for r in ro)
         rc = [r for r in rc if seed(r) in sc]
         R.append(row(lab, str(len(ro)), f_stat(l2(ro)) if ro else "(not run)", f_stat(l2(rc)) if rc else DASH))
-    cap = (r"Original (Neumann-incompatible) versus compatible initial condition, B1 ($\varepsilon=0.01$, $T=1$): $L^2$ error at $t=1$, mean~$\pm$~SD over the same seeds "
-           r"(42, 123, 7), each scored against the certified reference for its own initial condition.")
+    cap = (r"Original (Neumann-incompatible) versus compatible initial condition, B1 ($\varepsilon=0.01$, $T=1$). $L^2$ error at $t=1$, mean~$\pm$~SD over the same seeds (42, 123, 7). Each run is scored against the certified reference for its own initial condition.")
     return narrow(cap, "tab:orig", "p{5.4cm}cCC", H, R)
 
 
