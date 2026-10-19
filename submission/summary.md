@@ -6,7 +6,7 @@
 
 **Decision of round 1:** rejected to allow revision; resubmit with the same ID (symmetry-4596052), highlighted changes and a point-by-point response.
 
-**New title:** *A Chebyshev-Coefficient Physics-Informed Neural Network for the Allen–Cahn Equation: Exact Neumann Basis, A-Posteriori Energy Balance and Inverse Identification*
+**New title:** *A Chebyshev-Coefficient Physics-Informed Neural Network for the Allen–Cahn Equation*
 
 **Files to upload** (all in this repository):
 

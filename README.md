@@ -2,7 +2,7 @@
 
 Research code, raw results, manuscript and Lean 4 proofs for:
 
-> **A Chebyshev-Coefficient Physics-Informed Neural Network for the Allen–Cahn Equation: Exact Neumann Basis, A-Posteriori Energy Balance and Inverse Identification**
+> **A Chebyshev-Coefficient Physics-Informed Neural Network for the Allen–Cahn Equation**
 > Zhuldyz Issa, Adil Nauryzbay, Zhanars Abdiramanov (corresponding), Yessimkhan Zhumazhanov, Dastan Urnek.
 > *Symmetry* (MDPI), manuscript symmetry-4596052, revision 1 (resubmission). Extended version of an ICCMA 2026 conference abstract.
 

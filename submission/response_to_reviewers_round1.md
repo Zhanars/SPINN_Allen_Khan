@@ -2,7 +2,7 @@
 
 # Response to the reviewers — manuscript symmetry-4596052 (resubmission)
 
-*Title (revised):* A Chebyshev-Coefficient Physics-Informed Neural Network for the Allen–Cahn Equation: Exact Neumann Basis, A-Posteriori Energy Balance and Inverse Identification
+*Title (revised):* A Chebyshev-Coefficient Physics-Informed Neural Network for the Allen–Cahn Equation
 
 > **DRAFT. Before sending:** (1) resolve every TODO; (2) re-check every section/table/figure number and every number against the final PDF built by `manuscript/build_r1.py` and `data_r1/numbers.json`; (3) delete this note.
 
