@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Materials and Methods}
 
-\subsection{Problem Formulation, Energy Dissipation and Benchmarks}\label{sec:problem}
+\subsection{Problem and Benchmarks}\label{sec:problem}
 
 Let $\Omega=[-1,1]$ and $t\in[0,T]$. We solve
 \begin{equation}\label{eq:AC}
@@ -26,7 +26,7 @@ Differentiate $E$ under the integral sign. Integrate $\int u_x u_{xt}\,dx$ by pa
 
 The energy-constrained loss (Section~\ref{sec:energy-loss}) tries to enforce this law approximately. \rev{Section~\ref{sec:balance} gives the counterpart for a network that does \emph{not} solve the PDE exactly.}
 
-\subsection{Reference Solution and Baseline Methods}\label{sec:cheb-baseline}
+\subsection{Reference and Baselines}\label{sec:cheb-baseline}
 
 \rev{\emph{Reference solution.} All errors are measured against a spectral reference. It uses Chebyshev collocation on Gauss--Lobatto nodes. The two Neumann rows eliminate the wall unknowns. Time stepping uses the stiff Radau integrator (rtol $10^{-11}$). For $T\le1$ we certified it in four ways: $N$-refinement, tighter tolerances, a second integrator and an independent finite-difference solution. For B3 we used $N$-refinement. Agreement is $\le10^{-8}$ in all cases (Appendix~\ref{app:ref}). Predictions and reference are compared on the same 200 equispaced points. We use $\|e\|_{L^2}=(\sum_ie_i^2\,\delta x)^{1/2}$ with $\delta x=2/199$, and $\|e\|_{L^\infty}=\max_i|e_i|$. The first version used a finite-difference reference with first-order wall rows. They halve the diffusion at the two wall nodes. Its error (up to $4\times10^{-3}$ near the walls) was small against PINN errors. It was not small against the classical baseline.}
 
@@ -34,7 +34,7 @@ The energy-constrained loss (Section~\ref{sec:energy-loss}) tries to enforce thi
 
 \emph{Vanilla PINN.} The second baseline is a space--time PINN, $u(x,t)\approx\mathcal N(x,t;\theta)$. It is a fully connected network with $\tanh$ activations and three hidden layers of width 64. The loss is $\mathcal L=\mathcal L_{\rm PDE}+\lambda_{\rm IC}\mathcal L_{\rm IC}+\lambda_{\rm BC}\mathcal L_{\rm BC}$ with $\lambda_{\rm IC}=\lambda_{\rm BC}=10$. Here $\mathcal L_{\rm PDE}$ is the mean-squared residual of Equation~\eqref{eq:AC} on an $80\times80$ collocation grid. All derivatives use automatic differentiation. $\mathcal L_{\rm IC}$ fits $u_0$. $\mathcal L_{\rm BC}$ penalizes $|\mathcal N_x(\pm1,t)|^2$. Training uses Adam (learning rate $10^{-3}$, cosine annealing) for 8000 epochs~\cite{Raissi,Wight,Mattey}. \rev{We also build a stronger variant of both PINNs. After Adam, we run full-batch L-BFGS on the same loss (``+ L-BFGS''). It uses at most 2000 iterations and 2500 loss evaluations, history 50 and a strong Wolfe line search. For B3 the vanilla PINN uses a $60\times120$ collocation grid.}
 
-\subsection{Coefficient-Space PINN (Spectral-PINN)}\label{sec:spectral}
+\subsection{Spectral-PINN}\label{sec:spectral}
 
 Let $u(x)=\sum_{k=0}^{K}c_kT_k(x)$ be a truncated Chebyshev series. Its derivative is $u'(x)=\sum_{k=0}^{K-1}b_kT_k(x)$. The coefficients follow from a backward recurrence:
 \begin{equation}\label{eq:cheb-recurrence}
@@ -63,7 +63,7 @@ The time average uses $100\,T$ equispaced collocation times in $[10^{-4},T]$. Fi
 \end{equation}
 Since $T_k'(\pm1)=(\pm1)^{k+1}k^2$, we get $\varphi_k'(\pm1)=0$. The $\varphi_k$ have distinct degrees $k+2$ for $k\ge1$, and $\varphi_0=1$. So they are linearly independent. The polynomials of degree $\le K$ with $p'(\pm1)=0$ form a space of dimension $K-1$. Two independent linear conditions cut $\mathbb P_K$ by two. So the $\varphi_k$ span this space. The Neumann condition holds exactly, $\mathcal L_{\rm BC}\equiv0$, and the boundary term of the energy balance (Section~\ref{sec:balance}) vanishes.}
 
-\subsection{Energy-Constrained Training}\label{sec:energy-loss}
+\subsection{Energy Penalty}\label{sec:energy-loss}
 
 We turn Theorem~\ref{thm:energy} into a training signal. We evaluate the discrete energy $E_\theta(t)$ on the spatial grid above, with exact spectral $u_x$. We use $M+1$ checkpoints $0=\tau_0<\dots<\tau_M=T$ with $M=10\,T$ (spacing $0.1$). We add the one-sided penalty
 \begin{equation}\label{eq:Lenergy}
@@ -73,7 +73,7 @@ We turn Theorem~\ref{thm:energy} into a training signal. We evaluate the discret
 
 \rev{An ``energy violation'' is an increase of the energy by more than $10^{-10}$ between consecutive points of an equispaced time grid. For the Spectral-PINN we compute the energy by Clenshaw--Curtis quadrature on the $4K+9$ nodes $\cos(j\pi/(4K+8))$. It is exact for the polynomial integrand. We count violations for spacings $0.02$, $0.002$ and $2\times10^{-4}$. For the vanilla PINN we use the trapezoidal rule on 1001 equispaced points, with $u_x$ by automatic differentiation. We count violations for spacing $0.02$ only.}
 
-\subsection{A-Posteriori Energy Balance for a Trained Trajectory}\label{sec:balance}
+\subsection{A-Posteriori Energy Balance}\label{sec:balance}
 
 \rev{Theorem~\ref{thm:energy} holds for exact solutions. A trained network solves the PDE only up to the residual $r=u_t-\varepsilon^2u_{xx}+f(u)$. In the soft variant, it meets the Neumann condition only up to a defect. The next result holds for \emph{every} differentiable coefficient trajectory. It needs nothing about the network beyond $\mathbf c\in C^1$. Here $\|\cdot\|$ and $\langle\cdot,\cdot\rangle$ are the norm and inner product of $L^2(-1,1)$.}
 
@@ -101,7 +101,7 @@ For $a=\mathbf c(t)$ and $v=\mathbf c'(t)$ we have $w=u_t$. So $E'=\langle G,u_t
 
 \rev{For $r=0$ and $\beta=0$ the identity reduces to Theorem~\ref{thm:energy}. The theorem does not say that a trained network dissipates energy. It does not say that $r$ is small. It says that the energy can grow only through the residual and the boundary defect. Both are computable a posteriori. The reason is that $r^2$ and the energy integrand are polynomials in $x$, of degree $6K$ and $4K$. We integrate the energy and all terms of the identity exactly by Clenshaw--Curtis quadrature on $4K+9$ nodes. We integrate $\|r\|^2$ by the same rule. Its relative accuracy is about \N{quad.max_rel} for the seed-42 network of each configuration of Section~\ref{sec:results-balance} (Appendix~\ref{app:balance}). With the hard Neumann basis, $\beta\equiv0$. We evaluate all terms for every Spectral-PINN trained for the forward problem (Section~\ref{sec:results-balance}).}
 
-\subsection{Inverse Problem: Recovering the Interface Parameter}\label{sec:inverse}
+\subsection{Inverse Problem}\label{sec:inverse}
 
 In the inverse problem $\varepsilon$ is unknown. We have synthetic observations $u_{\rm obs}$ of the reference solution with known $\varepsilon_{\rm true}$. They sit at $n_x=40$ equispaced points and at the five times $t\in\{0.2,0.4,0.6,0.8,1.0\}$. Some runs add Gaussian noise with standard deviation $\sigma$. The loss is $\mathcal L=\lambda_{\rm PDE}\mathcal L_{\rm PDE}(\varepsilon)+\lambda_{\rm IC}\mathcal L_{\rm IC}+\lambda_{\rm BC}\mathcal L_{\rm BC}+\lambda_{\rm data}\mathcal L_{\rm data}$. Here $\mathcal L_{\rm IC}=|\mathbf c(0)-\mathbf c_0|^2/(K+1)$ as in Equation~\eqref{eq:loss}, and $\mathcal L_{\rm data}=\langle(u_\theta(x_{\rm obs},t_{\rm obs})-u_{\rm obs})^2\rangle$. Unless stated otherwise, $(\lambda_{\rm PDE},\lambda_{\rm IC},\lambda_{\rm BC},\lambda_{\rm data})=(50,10,1,2)$.
 
@@ -115,7 +115,7 @@ We compare three estimators.
 
 \rev{The joint-Adam runs use $4000$ epochs (learning rate $2\times10^{-3}$, cosine annealing) after the 1000-epoch warm-up. Section~\ref{sec:results-inverse} lists the settings varied in the ablation.}
 
-\subsection{Two-Dimensional Symmetric Extension}\label{sec:2d}
+\subsection{Two-Dimensional Extension}\label{sec:2d}
 
 To test symmetry directly, we use the periodic domain $[-\pi,\pi]^2$. The initial condition is $u_0(x,y)=0.4\cos(2x)\cos(2y)$. It is invariant under $x\mapsto-x$, $y\mapsto-y$ and $x\leftrightarrow y$. The Laplacian and $f$ commute with these reflections. So the exact solution stays symmetric.
 
@@ -125,7 +125,7 @@ As a control, the vanilla PINN gets the periodic encoding $(\cos x,\sin x,\cos y
 
 We report the violation $S(t)=\langle(u(x,y,t)-u(-x,y,t))^2\rangle+\langle(u(x,y,t)-u(x,-y,t))^2\rangle$. We evaluate it on the endpoint-inclusive $49\times49$ grid $x_i=-\pi+ih$, $y_j=-\pi+jh$, $h=2\pi/48$. The reflection maps this grid onto itself (Appendix~\ref{app:sym}). This experiment is unchanged from the first version. It has no Neumann condition.
 
-\subsection{Implementation and Evaluation Protocol}\label{sec:protocol}
+\subsection{Protocol}\label{sec:protocol}
 
 \rev{All networks are multilayer perceptrons with $\tanh$ activations in double precision. They are trained with Adam. The one-dimensional runs used one CPU thread per run.}
 

@@ -22,7 +22,7 @@
 \caption{\rev{B3 ($\varepsilon=0.05$, $T=5$, seed 42): certified reference and trained networks at $t=1$, $3$ and $5$.}\label{fig:b3}}
 \end{figure}
 
-\subsection{Mode Number: The Large Degradation Reported Previously Was a Boundary-Penalty Artifact}\label{sec:results-k}
+\subsection{Mode Number and Boundary Penalty}\label{sec:results-k}
 
 \rev{The first version reported that the accuracy of the Spectral-PINN \emph{degrades} as the number of modes $K$ grows. It blamed an optimization bottleneck of the coefficient parameterization. This was wrong. The cause was the boundary penalty. Its effective weight on $u_x(\pm1)^2$ was $\lambda_{\rm BC}K^{-4}$. It vanished as $K$ grew. The trained as-submitted $K=64$ networks have wall slopes $|u_x(\pm1)|$ up to \N{kk.soft64.wall} instead of zero. The $K=128$ network reaches \N{kk.soft128.wall} (Table~\ref{tab:K}).}
 
@@ -41,15 +41,23 @@
 \caption{\rev{$L^2$ error at $t=1$ versus the mode number $K$ (B1; small symbols: individual seeds, large: mean). Curves: as-submitted soft penalty with effective weight $K^{-4}$; the same penalty rescaled to unit weight ($\lambda_{\rm BC}=K^4$); the revised Spectral-PINN at the default and at twice the default budget. The dashed line is the error of the reaction-only model.}\label{fig:K}}
 \end{figure}
 
-\subsection{Energy Penalty: Weight, Regimes and the Coinciding Energy Curves}\label{sec:results-energy}
+\subsection{Energy Penalty}\label{sec:results-energy}
 
 \rev{The first version used $\lambda_E=50$ in all penalized runs but did not report it.}
 
-\rev{\emph{Energy decreases in every run.} In B1 we trained \N{en.n_runs} Spectral-PINNs, with and without the penalty. They include the inaccurate networks of Section~\ref{sec:results-k} (errors up to \N{en.max_l2}) and the poor-trajectory regimes below. Every one decreases its energy on every interval of the grids with spacing $0.02$, $0.002$ and $2\times10^{-4}$. The vanilla PINNs of B1 (grid $0.02$ only) have \N{en.van_viol} increases in \N{mbp.n_van} runs.}
+\subsubsection{Energy Decreases in Every Run}
 
-\rev{\emph{The penalty is inactive.} For the revised $K=32$ network the energy drops by at least \N{en.min_step} per interval of length $0.02$. The penalty changes the energy trajectory by at most \N{en.max_diff}, comparing the same seed with and without it. So the two curves of Figure~\ref{fig:energy}(a) coincide. The zero violations of the first version cannot be attributed to the penalty. The penalty term is positive in \N{en.nonzero} training epochs of the five runs with $\lambda_E=50$. Table~\ref{tab:energy} varies $\lambda_E$ from $0$ to $5000$. The mean error stays between \N{en.lam.min} and \N{en.lam.max} for all six weights. The seed-to-seed SD at $\lambda_E=0$ is \N{en.lam.sd}. No network has an energy increase. The penalty is nonzero in at most \N{en.lam.max_nonzero} epoch per run. Its largest weighted value is \N{en.lam.maxpen}, at $\lambda_E=5000$.}
+\rev{In B1 we trained \N{en.n_runs} Spectral-PINNs, with and without the penalty. They include the inaccurate networks of Section~\ref{sec:results-k} (errors up to \N{en.max_l2}) and the poor-trajectory regimes below. Every one decreases its energy on every interval of the grids with spacing $0.02$, $0.002$ and $2\times10^{-4}$. The vanilla PINNs of B1 (grid $0.02$ only) have \N{en.van_viol} increases in \N{mbp.n_van} runs.}
 
-\rev{\emph{Poor-trajectory regimes.} We looked for regimes where the trajectory is poor. They are: a run cut to \N{reg.short_epochs} epochs, no warm-up, a ten times smaller learning rate with 1500 epochs, and $K=64$ with the as-submitted soft penalty (Table~\ref{tab:energy}, lower part). The truncated and slow runs have large errors (\N{reg.short.E0} and \N{reg.pde0.E0}). Their energy is still monotone without the penalty. The penalty is active in at most \N{reg.pde0.E50.maxnz} epochs per run. The errors with it (\N{reg.short.E50}, \N{reg.pde0.E50}) agree with those without it. For the as-submitted $K=64$ network the penalty is active in \N{reg.soft64.nz} epochs per run. It changes the error by less than the seed-to-seed scatter: \N{reg.soft64.E50} against \N{reg.soft64.E0} for the same seeds. It is slightly lower with the penalty for each of the three seeds.}
+\subsubsection{The Penalty Is Inactive}
+
+\rev{For the revised $K=32$ network the energy drops by at least \N{en.min_step} per interval of length $0.02$. The penalty changes the energy trajectory by at most \N{en.max_diff}, comparing the same seed with and without it. So the two curves of Figure~\ref{fig:energy}(a) coincide. The zero violations of the first version cannot be attributed to the penalty. The penalty term is positive in \N{en.nonzero} training epochs of the five runs with $\lambda_E=50$. Table~\ref{tab:energy} varies $\lambda_E$ from $0$ to $5000$. The mean error stays between \N{en.lam.min} and \N{en.lam.max} for all six weights. The seed-to-seed SD at $\lambda_E=0$ is \N{en.lam.sd}. No network has an energy increase. The penalty is nonzero in at most \N{en.lam.max_nonzero} epoch per run. Its largest weighted value is \N{en.lam.maxpen}, at $\lambda_E=5000$.}
+
+\subsubsection{Poor-Trajectory Regimes}
+
+\rev{We looked for regimes where the trajectory is poor. They are: a run cut to \N{reg.short_epochs} epochs, no warm-up, a ten times smaller learning rate with 1500 epochs, and $K=64$ with the as-submitted soft penalty (Table~\ref{tab:energy}, lower part). The truncated and slow runs have large errors (\N{reg.short.E0} and \N{reg.pde0.E0}). Their energy is still monotone without the penalty. The penalty is active in at most \N{reg.pde0.E50.maxnz} epochs per run. The errors with it (\N{reg.short.E50}, \N{reg.pde0.E50}) agree with those without it. For the as-submitted $K=64$ network the penalty is active in \N{reg.soft64.nz} epochs per run. It changes the error by less than the seed-to-seed scatter: \N{reg.soft64.E50} against \N{reg.soft64.E0} for the same seeds. It is slightly lower with the penalty for each of the three seeds.}
+
+\subsubsection{Training Without Warm-Up}
 
 \rev{The only regime with a substantial effect is training without warm-up. The untrained initial trajectory has increasing energy. The penalty is active in up to \N{reg.nowarm.E50.maxnz} epochs per run, with weighted values up to \N{reg.nowarm.E50.maxpen}. The result is \emph{worse}: \N{reg.nowarm.E50} against \N{reg.nowarm.E0} without the penalty. The error is larger for all three seeds, by factors of \N{reg.nowarm.factors}. In none of the \N{reg.n_runs} runs of these regimes does the final network have an energy increase. Monotone energy is thus not a diagnostic of accuracy here. Networks with errors of order one satisfy it.}
 
@@ -60,7 +68,7 @@
 \caption{\rev{Energy of the trained trajectory (B1, revised $K=32$, seed 42) with and without the energy penalty. (a)~$E(t)$. (b)~Absolute difference of the two curves, compared with the smallest decrement of $E$ per grid interval. (c)~Mean $L^2$ error versus $\lambda_E$ (five seeds).}\label{fig:energy}}
 \end{figure}
 
-\subsection{Maximum Bound Principle and the A-Posteriori Energy Balance}\label{sec:results-balance}
+\subsection{Maximum Bound and Energy Balance}\label{sec:results-balance}
 
 \rev{\emph{Maximum bound.} The exact solution satisfies $|u|\le1$. The certified reference of B1 has $\max|u|=\N{mbp.ref_max_t1}$ at $t=1$. Decreasing energy does not imply the bound~\cite{ref_Du2021b,ref_He2019}. We computed $\max_{x,t}|u_\theta|$ for every one-dimensional network trained on the forward problem. Table~\ref{tab:forward} gives the largest value per configuration.}
 
@@ -79,7 +87,9 @@
 
 \subsection{Inverse Problem}\label{sec:results-inverse}
 
-\rev{\emph{Joint Adam depends on the starting value.} The first version reported a ``robust $\sim38\%$ overestimation bias'' of $\varepsilon$. It blamed the loss weighting, the warm-up or the observation design, without an ablation. The bias is the footprint of the starting value and of the optimizer.}
+\subsubsection{Joint Adam Depends on the Starting Value}
+
+\rev{The first version reported a ``robust $\sim38\%$ overestimation bias'' of $\varepsilon$. It blamed the loss weighting, the warm-up or the observation design, without an ablation. The bias is the footprint of the starting value and of the optimizer.}
 
 \rev{With joint Adam (Section~\ref{sec:inverse}) the recovered value is $\hat\varepsilon\approx\N{inv.ratio_mean}\,\varepsilon_{\rm init}$. The range is \N{inv.ratio_range} over \N{inv.n_sweep} runs. This holds for every $\varepsilon_{\rm init}\in\{0.5,1,1.5,2,4\}\,\varepsilon_{\rm true}$, for $\varepsilon_{\rm true}\in\{0.05,0.1\}$ and for both the as-submitted and the revised network (Figure~\ref{fig:inverse}(a), Table~\ref{tab:inverse1}). All runs of the first version that gave $38\%$ started from $\varepsilon_{\rm init}=2\varepsilon_{\rm true}$. And $0.7\times2=1.4$ is the ``bias''.}
 
@@ -89,9 +99,13 @@
 
 \rev{The first version also reported noise experiments at $\varepsilon_{\rm true}=0.01$ ($40.2$, $40.2$ and $40.0\%$ for $\sigma=0$, $0.01$ and $0.05$) and one run at $\varepsilon_{\rm true}=0.05$ ($14.7\%$). They came from a script whose settings differed from those stated. Its output was not archived. We withdraw these numbers.}
 
-\rev{\emph{An estimator that does not depend on the start.} Variable projection (Section~\ref{sec:inverse}) uses a data-fitting phase and a large data weight. On noise-free data it recovers $\varepsilon$ with relative errors of \N{inv.vp_err_005} ($\varepsilon_{\rm true}=0.05$) and \N{inv.vp_err_01} ($0.1$) at $\lambda_{\rm data}=2000$ (Figure~\ref{fig:inverse}(b), Table~\ref{tab:inverse2}). It needs a large data weight and enough observation points. With $\lambda_{\rm data}=20$ the errors are \N{inv.vp.e0.05.ld20} and \N{inv.vp.e0.1.ld20}. With only 10 observation points the error is \N{inv.vp.nx10}. With $K=64$ the least-squares value of $\varepsilon^2$ collapsed to its lower bound $10^{-8}$ during training.}
+\subsubsection{Variable Projection}
 
-\rev{\emph{It is not robust to noise} (Table~\ref{tab:inverse3}, Figure~\ref{fig:inverse}(c)). With $\sigma=0.01$ it underestimates $\varepsilon$ by \N{inv.vpn.e0.05.n0.01} ($\varepsilon_{\rm true}=0.05$) and \N{inv.vpn.e0.1.n0.01} ($0.1$), averaged over five noise realizations. With $\sigma=0.05$ it collapses toward $\varepsilon=0$. The largest estimate is \N{inv.vpn.e0.1.n0.05.maxratio}$\,\varepsilon_{\rm true}$. A plausible cause, not investigated further: with a large data weight the network fits part of the noise. This raises $\|u_{xx}\|$ and lowers the least-squares value.}
+\rev{Variable projection (Section~\ref{sec:inverse}) uses a data-fitting phase and a large data weight. On noise-free data it recovers $\varepsilon$ with relative errors of \N{inv.vp_err_005} ($\varepsilon_{\rm true}=0.05$) and \N{inv.vp_err_01} ($0.1$) at $\lambda_{\rm data}=2000$ (Figure~\ref{fig:inverse}(b), Table~\ref{tab:inverse2}). It needs a large data weight and enough observation points. With $\lambda_{\rm data}=20$ the errors are \N{inv.vp.e0.05.ld20} and \N{inv.vp.e0.1.ld20}. With only 10 observation points the error is \N{inv.vp.nx10}. With $K=64$ the least-squares value of $\varepsilon^2$ collapsed to its lower bound $10^{-8}$ during training.}
+
+\subsubsection{Robustness to Noise}
+
+\rev{The estimator is not robust to noise (Table~\ref{tab:inverse3}, Figure~\ref{fig:inverse}(c)). With $\sigma=0.01$ it underestimates $\varepsilon$ by \N{inv.vpn.e0.05.n0.01} ($\varepsilon_{\rm true}=0.05$) and \N{inv.vpn.e0.1.n0.01} ($0.1$), averaged over five noise realizations. With $\sigma=0.05$ it collapses toward $\varepsilon=0$. The largest estimate is \N{inv.vpn.e0.1.n0.05.maxratio}$\,\varepsilon_{\rm true}$. A plausible cause, not investigated further: with a large data weight the network fits part of the noise. This raises $\|u_{xx}\|$ and lowers the least-squares value.}
 
 \rev{Classical least squares (Section~\ref{sec:inverse}) does better on the same realizations. Its mean errors are \N{inv.cl5.e0.05.n0.01} and \N{inv.cl5.e0.1.n0.01} for $\sigma=0.01$. They are \N{inv.cl5.e0.05.n0.05} and \N{inv.cl5.e0.1.n0.05} for $\sigma=0.05$. This agrees with the Cram\'er--Rao bound. Without noise it recovers the true value to better than $10^{-3}\%$, because the data come from the same solver.}
 
@@ -102,11 +116,13 @@
 \caption{\rev{(a) Joint Adam: $\hat\varepsilon/\varepsilon_{\rm true}$ versus the starting value, for the as-submitted and the revised network. The estimate follows $\approx0.7\,\varepsilon_{\rm init}$ (dotted: no change; dashed: the true value). (b) Variable projection: relative error versus the data weight, noise-free data. (c) Noisy data: relative errors of the variable-projection Spectral-PINN and of classical least squares on the same five noise realizations (horizontal axis: $\varepsilon_{\rm true}$, upper row; $\sigma$, lower row).}\label{fig:inverse}}
 \end{figure}
 
-\rev{\emph{Identifiability.} The data constrain $\varepsilon$ only through the term $\varepsilon^2u_{xx}$. This term is small on this benchmark. For our design (40 points, 5 times) the norm of the derivative of the data vector with respect to $\log\varepsilon$ is \N{ident.S001} at $\varepsilon=0.01$, \N{ident.S005} at $0.05$ and \N{ident.S01} at $0.1$.}
+\subsubsection{Identifiability}
+
+\rev{The data constrain $\varepsilon$ only through the term $\varepsilon^2u_{xx}$. This term is small on this benchmark. For our design (40 points, 5 times) the norm of the derivative of the data vector with respect to $\log\varepsilon$ is \N{ident.S001} at $\varepsilon=0.01$, \N{ident.S005} at $0.05$ and \N{ident.S01} at $0.1$.}
 
 \rev{With noise $\sigma=0.01$ the Cram\'er--Rao standard error of $\log\hat\varepsilon$ is \N{ident.se001} at $\varepsilon=0.01$ and \N{ident.se005} at $0.05$. Classical least squares has a root-mean-square error of \N{ident.cl001} at $0.01$ and \N{ident.cl005} at $0.05$ (\N{ident.n_rep} noise realizations). This matches the bound. At $\varepsilon=0.01$ no unbiased estimator can do better than about \N{ident.se001} with such data. The noise experiments at $\varepsilon=0.01$ in the first version were therefore not meaningful. The variable-projection network has errors of \N{inv.vp001.n0} without noise and \N{inv.vp001.n0.01} with noise at $\varepsilon=0.01$.}
 
-\subsection{Two-Dimensional Symmetry Preservation}\label{sec:2d-results}
+\subsection{Two-Dimensional Symmetry}\label{sec:2d-results}
 
 \rev{The two-dimensional results are unchanged from the first version. No Neumann condition is involved. We corrected the statements about them.} Table~\ref{tab:2d} gives the symmetry violation $S(t)$. The Fourier-Spectral-PINN stays at round-off: $S\in[\N{s2d.fmin},\N{s2d.fmax}]$ for $t\in[0,1]$ \rev{(one run). By the parity of the basis, $S$ is zero in exact arithmetic. The value shown is the round-off of the evaluation grid (Appendix~\ref{app:sym}), not an effect of training.} The vanilla PINN has the same periodic encoding. Its $S$ increases monotonically in all five seeds. It grows by a factor \N{s2d.growth} between $t=0$ and $t=1$ (seeds: \N{s2d.growth_range}).
 

@@ -458,7 +458,7 @@ This article extends a conference abstract~\cite{ICCMA2026abstract}. The abstrac
 \section{\texorpdfstring{\protect\textcolor{black}{Materials and Methods}}{Materials and Methods}}
 
 
-\subsection{Problem Formulation, Energy Dissipation and Benchmarks}\label{sec:problem}
+\subsection{Problem and Benchmarks}\label{sec:problem}
 
 Let $\Omega=[-1,1]$ and $t\in[0,T]$. We solve
 \begin{equation}\label{eq:AC}
@@ -484,7 +484,7 @@ Differentiate $E$ under the integral sign. Integrate $\int u_x u_{xt}\,dx$ by pa
 The energy-constrained loss (Section~\ref{sec:energy-loss}) tries to enforce this law approximately. \rev{Section~\ref{sec:balance} gives the counterpart for a network that does \emph{not} solve the PDE exactly.}
 
 
-\subsection{Reference Solution and Baseline Methods}\label{sec:cheb-baseline}
+\subsection{Reference and Baselines}\label{sec:cheb-baseline}
 
 \rev{\emph{Reference solution.} All errors are measured against a spectral reference. It uses Chebyshev collocation on Gauss--Lobatto nodes. The two Neumann rows eliminate the wall unknowns. Time stepping uses the stiff Radau integrator (rtol $10^{-11}$). For $T\le1$ we certified it in four ways: $N$-refinement, tighter tolerances, a second integrator and an independent finite-difference solution. For B3 we used $N$-refinement. Agreement is $\le10^{-8}$ in all cases (Appendix~\ref{app:ref}). Predictions and reference are compared on the same 200 equispaced points. We use $\|e\|_{L^2}=(\sum_ie_i^2\,\delta x)^{1/2}$ with $\delta x=2/199$, and $\|e\|_{L^\infty}=\max_i|e_i|$. The first version used a finite-difference reference with first-order wall rows. They halve the diffusion at the two wall nodes. Its error (up to $4\times10^{-3}$ near the walls) was small against PINN errors. It was not small against the classical baseline.}
 
@@ -493,7 +493,7 @@ The energy-constrained loss (Section~\ref{sec:energy-loss}) tries to enforce thi
 \emph{Vanilla PINN.} The second baseline is a space--time PINN, $u(x,t)\approx\mathcal N(x,t;\theta)$. It is a fully connected network with $\tanh$ activations and three hidden layers of width 64. The loss is $\mathcal L=\mathcal L_{\rm PDE}+\lambda_{\rm IC}\mathcal L_{\rm IC}+\lambda_{\rm BC}\mathcal L_{\rm BC}$ with $\lambda_{\rm IC}=\lambda_{\rm BC}=10$. Here $\mathcal L_{\rm PDE}$ is the mean-squared residual of Equation~\eqref{eq:AC} on an $80\times80$ collocation grid. All derivatives use automatic differentiation. $\mathcal L_{\rm IC}$ fits $u_0$. $\mathcal L_{\rm BC}$ penalizes $|\mathcal N_x(\pm1,t)|^2$. Training uses Adam (learning rate $10^{-3}$, cosine annealing) for 8000 epochs~\cite{Raissi,Wight,Mattey}. \rev{We also build a stronger variant of both PINNs. After Adam, we run full-batch L-BFGS on the same loss (``+ L-BFGS''). It uses at most 2000 iterations and 2500 loss evaluations, history 50 and a strong Wolfe line search. For B3 the vanilla PINN uses a $60\times120$ collocation grid.}
 
 
-\subsection{Coefficient-Space PINN (Spectral-PINN)}\label{sec:spectral}
+\subsection{Spectral-PINN}\label{sec:spectral}
 
 Let $u(x)=\sum_{k=0}^{K}c_kT_k(x)$ be a truncated Chebyshev series. Its derivative is $u'(x)=\sum_{k=0}^{K-1}b_kT_k(x)$. The coefficients follow from a backward recurrence:
 \begin{equation}\label{eq:cheb-recurrence}
@@ -523,7 +523,7 @@ The time average uses $100\,T$ equispaced collocation times in $[10^{-4},T]$. Fi
 Since $T_k'(\pm1)=(\pm1)^{k+1}k^2$, we get $\varphi_k'(\pm1)=0$. The $\varphi_k$ have distinct degrees $k+2$ for $k\ge1$, and $\varphi_0=1$. So they are linearly independent. The polynomials of degree $\le K$ with $p'(\pm1)=0$ form a space of dimension $K-1$. Two independent linear conditions cut $\mathbb P_K$ by two. So the $\varphi_k$ span this space. The Neumann condition holds exactly, $\mathcal L_{\rm BC}\equiv0$, and the boundary term of the energy balance (Section~\ref{sec:balance}) vanishes.}
 
 
-\subsection{\texorpdfstring{\protect\textcolor{black}{Energy-Constrained Training}}{Energy-Constrained Training}}\label{sec:energy-loss}
+\subsection{Energy Penalty}\label{sec:energy-loss}
 
 We turn Theorem~\ref{thm:energy} into a training signal. We evaluate the discrete energy $E_\theta(t)$ on the spatial grid above, with exact spectral $u_x$. We use $M+1$ checkpoints $0=\tau_0<\dots<\tau_M=T$ with $M=10\,T$ (spacing $0.1$). We add the one-sided penalty
 \begin{equation}\label{eq:Lenergy}
@@ -534,7 +534,7 @@ We turn Theorem~\ref{thm:energy} into a training signal. We evaluate the discret
 \rev{An ``energy violation'' is an increase of the energy by more than $10^{-10}$ between consecutive points of an equispaced time grid. For the Spectral-PINN we compute the energy by Clenshaw--Curtis quadrature on the $4K+9$ nodes $\cos(j\pi/(4K+8))$. It is exact for the polynomial integrand. We count violations for spacings $0.02$, $0.002$ and $2\times10^{-4}$. For the vanilla PINN we use the trapezoidal rule on 1001 equispaced points, with $u_x$ by automatic differentiation. We count violations for spacing $0.02$ only.}
 
 
-\subsection{A-Posteriori Energy Balance for a Trained Trajectory}\label{sec:balance}
+\subsection{A-Posteriori Energy Balance}\label{sec:balance}
 
 \rev{Theorem~\ref{thm:energy} holds for exact solutions. A trained network solves the PDE only up to the residual $r=u_t-\varepsilon^2u_{xx}+f(u)$. In the soft variant, it meets the Neumann condition only up to a defect. The next result holds for \emph{every} differentiable coefficient trajectory. It needs nothing about the network beyond $\mathbf c\in C^1$. Here $\|\cdot\|$ and $\langle\cdot,\cdot\rangle$ are the norm and inner product of $L^2(-1,1)$.}
 
@@ -563,7 +563,7 @@ For $a=\mathbf c(t)$ and $v=\mathbf c'(t)$ we have $w=u_t$. So $E'=\langle G,u_t
 \rev{For $r=0$ and $\beta=0$ the identity reduces to Theorem~\ref{thm:energy}. The theorem does not say that a trained network dissipates energy. It does not say that $r$ is small. It says that the energy can grow only through the residual and the boundary defect. Both are computable a posteriori. The reason is that $r^2$ and the energy integrand are polynomials in $x$, of degree $6K$ and $4K$. We integrate the energy and all terms of the identity exactly by Clenshaw--Curtis quadrature on $4K+9$ nodes. We integrate $\|r\|^2$ by the same rule. Its relative accuracy is about \N{quad.max_rel} for the seed-42 network of each configuration of Section~\ref{sec:results-balance} (Appendix~\ref{app:balance}). With the hard Neumann basis, $\beta\equiv0$. We evaluate all terms for every Spectral-PINN trained for the forward problem (Section~\ref{sec:results-balance}).}
 
 
-\subsection{\texorpdfstring{\protect\textcolor{black}{Inverse Problem: Recovering the Interface Parameter}}{Inverse Problem: Recovering the Interface Parameter}}\label{sec:inverse}
+\subsection{\texorpdfstring{\protect\textcolor{black}{Inverse Problem}}{Inverse Problem}}\label{sec:inverse}
 
 In the inverse problem $\varepsilon$ is unknown. We have synthetic observations $u_{\rm obs}$ of the reference solution with known $\varepsilon_{\rm true}$. They sit at $n_x=40$ equispaced points and at the five times $t\in\{0.2,0.4,0.6,0.8,1.0\}$. Some runs add Gaussian noise with standard deviation $\sigma$. The loss is $\mathcal L=\lambda_{\rm PDE}\mathcal L_{\rm PDE}(\varepsilon)+\lambda_{\rm IC}\mathcal L_{\rm IC}+\lambda_{\rm BC}\mathcal L_{\rm BC}+\lambda_{\rm data}\mathcal L_{\rm data}$. Here $\mathcal L_{\rm IC}=|\mathbf c(0)-\mathbf c_0|^2/(K+1)$ as in Equation~\eqref{eq:loss}, and $\mathcal L_{\rm data}=\langle(u_\theta(x_{\rm obs},t_{\rm obs})-u_{\rm obs})^2\rangle$. Unless stated otherwise, $(\lambda_{\rm PDE},\lambda_{\rm IC},\lambda_{\rm BC},\lambda_{\rm data})=(50,10,1,2)$.
 
@@ -578,7 +578,7 @@ We compare three estimators.
 \rev{The joint-Adam runs use $4000$ epochs (learning rate $2\times10^{-3}$, cosine annealing) after the 1000-epoch warm-up. Section~\ref{sec:results-inverse} lists the settings varied in the ablation.}
 
 
-\subsection{\texorpdfstring{\protect\textcolor{black}{Two-Dimensional Symmetric Extension}}{Two-Dimensional Symmetric Extension}}\label{sec:2d}
+\subsection{Two-Dimensional Extension}\label{sec:2d}
 
 To test symmetry directly, we use the periodic domain $[-\pi,\pi]^2$. The initial condition is $u_0(x,y)=0.4\cos(2x)\cos(2y)$. It is invariant under $x\mapsto-x$, $y\mapsto-y$ and $x\leftrightarrow y$. The Laplacian and $f$ commute with these reflections. So the exact solution stays symmetric.
 
@@ -589,7 +589,7 @@ As a control, the vanilla PINN gets the periodic encoding $(\cos x,\sin x,\cos y
 We report the violation $S(t)=\langle(u(x,y,t)-u(-x,y,t))^2\rangle+\langle(u(x,y,t)-u(x,-y,t))^2\rangle$. We evaluate it on the endpoint-inclusive $49\times49$ grid $x_i=-\pi+ih$, $y_j=-\pi+jh$, $h=2\pi/48$. The reflection maps this grid onto itself (Appendix~\ref{app:sym}). This experiment is unchanged from the first version. It has no Neumann condition.
 
 
-\subsection{Implementation and Evaluation Protocol}\label{sec:protocol}
+\subsection{Protocol}\label{sec:protocol}
 
 \rev{All networks are multilayer perceptrons with $\tanh$ activations in double precision. They are trained with Adam. The one-dimensional runs used one CPU thread per run.}
 
@@ -674,7 +674,7 @@ Spectral-PINN revised, $K=64$ & 2 & \ensuremath{(8.70\pm0.05)\times10^{-1}} & \e
 \end{figure}
 
 
-\subsection{Mode Number: The Large Degradation Reported Previously Was a Boundary-Penalty Artifact}\label{sec:results-k}
+\subsection{Mode Number and Boundary Penalty}\label{sec:results-k}
 
 \rev{The first version reported that the accuracy of the Spectral-PINN \emph{degrades} as the number of modes $K$ grows. It blamed an optimization bottleneck of the coefficient parameterization. This was wrong. The cause was the boundary penalty. Its effective weight on $u_x(\pm1)^2$ was $\lambda_{\rm BC}K^{-4}$. It vanished as $K$ grew. The trained as-submitted $K=64$ networks have wall slopes $|u_x(\pm1)|$ up to \N{kk.soft64.wall} instead of zero. The $K=128$ network reaches \N{kk.soft128.wall} (Table~\ref{tab:K}).}
 
@@ -716,15 +716,27 @@ Spectral-PINN revised, $K=64$ & 2 & \ensuremath{(8.70\pm0.05)\times10^{-1}} & \e
 \end{figure}
 
 
-\subsection{Energy Penalty: Weight, Regimes and the Coinciding Energy Curves}\label{sec:results-energy}
+\subsection{Energy Penalty}\label{sec:results-energy}
 
 \rev{The first version used $\lambda_E=50$ in all penalized runs but did not report it.}
 
-\rev{\emph{Energy decreases in every run.} In B1 we trained \N{en.n_runs} Spectral-PINNs, with and without the penalty. They include the inaccurate networks of Section~\ref{sec:results-k} (errors up to \N{en.max_l2}) and the poor-trajectory regimes below. Every one decreases its energy on every interval of the grids with spacing $0.02$, $0.002$ and $2\times10^{-4}$. The vanilla PINNs of B1 (grid $0.02$ only) have \N{en.van_viol} increases in \N{mbp.n_van} runs.}
 
-\rev{\emph{The penalty is inactive.} For the revised $K=32$ network the energy drops by at least \N{en.min_step} per interval of length $0.02$. The penalty changes the energy trajectory by at most \N{en.max_diff}, comparing the same seed with and without it. So the two curves of Figure~\ref{fig:energy}(a) coincide. The zero violations of the first version cannot be attributed to the penalty. The penalty term is positive in \N{en.nonzero} training epochs of the five runs with $\lambda_E=50$. Table~\ref{tab:energy} varies $\lambda_E$ from $0$ to $5000$. The mean error stays between \N{en.lam.min} and \N{en.lam.max} for all six weights. The seed-to-seed SD at $\lambda_E=0$ is \N{en.lam.sd}. No network has an energy increase. The penalty is nonzero in at most \N{en.lam.max_nonzero} epoch per run. Its largest weighted value is \N{en.lam.maxpen}, at $\lambda_E=5000$.}
+\subsubsection{Energy Decreases in Every Run}
 
-\rev{\emph{Poor-trajectory regimes.} We looked for regimes where the trajectory is poor. They are: a run cut to \N{reg.short_epochs} epochs, no warm-up, a ten times smaller learning rate with 1500 epochs, and $K=64$ with the as-submitted soft penalty (Table~\ref{tab:energy}, lower part). The truncated and slow runs have large errors (\N{reg.short.E0} and \N{reg.pde0.E0}). Their energy is still monotone without the penalty. The penalty is active in at most \N{reg.pde0.E50.maxnz} epochs per run. The errors with it (\N{reg.short.E50}, \N{reg.pde0.E50}) agree with those without it. For the as-submitted $K=64$ network the penalty is active in \N{reg.soft64.nz} epochs per run. It changes the error by less than the seed-to-seed scatter: \N{reg.soft64.E50} against \N{reg.soft64.E0} for the same seeds. It is slightly lower with the penalty for each of the three seeds.}
+\rev{In B1 we trained \N{en.n_runs} Spectral-PINNs, with and without the penalty. They include the inaccurate networks of Section~\ref{sec:results-k} (errors up to \N{en.max_l2}) and the poor-trajectory regimes below. Every one decreases its energy on every interval of the grids with spacing $0.02$, $0.002$ and $2\times10^{-4}$. The vanilla PINNs of B1 (grid $0.02$ only) have \N{en.van_viol} increases in \N{mbp.n_van} runs.}
+
+
+\subsubsection{The Penalty Is Inactive}
+
+\rev{For the revised $K=32$ network the energy drops by at least \N{en.min_step} per interval of length $0.02$. The penalty changes the energy trajectory by at most \N{en.max_diff}, comparing the same seed with and without it. So the two curves of Figure~\ref{fig:energy}(a) coincide. The zero violations of the first version cannot be attributed to the penalty. The penalty term is positive in \N{en.nonzero} training epochs of the five runs with $\lambda_E=50$. Table~\ref{tab:energy} varies $\lambda_E$ from $0$ to $5000$. The mean error stays between \N{en.lam.min} and \N{en.lam.max} for all six weights. The seed-to-seed SD at $\lambda_E=0$ is \N{en.lam.sd}. No network has an energy increase. The penalty is nonzero in at most \N{en.lam.max_nonzero} epoch per run. Its largest weighted value is \N{en.lam.maxpen}, at $\lambda_E=5000$.}
+
+
+\subsubsection{Poor-Trajectory Regimes}
+
+\rev{We looked for regimes where the trajectory is poor. They are: a run cut to \N{reg.short_epochs} epochs, no warm-up, a ten times smaller learning rate with 1500 epochs, and $K=64$ with the as-submitted soft penalty (Table~\ref{tab:energy}, lower part). The truncated and slow runs have large errors (\N{reg.short.E0} and \N{reg.pde0.E0}). Their energy is still monotone without the penalty. The penalty is active in at most \N{reg.pde0.E50.maxnz} epochs per run. The errors with it (\N{reg.short.E50}, \N{reg.pde0.E50}) agree with those without it. For the as-submitted $K=64$ network the penalty is active in \N{reg.soft64.nz} epochs per run. It changes the error by less than the seed-to-seed scatter: \N{reg.soft64.E50} against \N{reg.soft64.E0} for the same seeds. It is slightly lower with the penalty for each of the three seeds.}
+
+
+\subsubsection{Training Without Warm-Up}
 
 \rev{The only regime with a substantial effect is training without warm-up. The untrained initial trajectory has increasing energy. The penalty is active in up to \N{reg.nowarm.E50.maxnz} epochs per run, with weighted values up to \N{reg.nowarm.E50.maxpen}. The result is \emph{worse}: \N{reg.nowarm.E50} against \N{reg.nowarm.E0} without the penalty. The error is larger for all three seeds, by factors of \N{reg.nowarm.factors}. In none of the \N{reg.n_runs} runs of these regimes does the final network have an energy increase. Monotone energy is thus not a diagnostic of accuracy here. Networks with errors of order one satisfy it.}
 
@@ -767,7 +779,7 @@ $K=64$ as submitted, $\lambda_E=50$ & 3 & \ensuremath{(9.49\pm2.15)\times10^{-2}
 \end{figure}
 
 
-\subsection{Maximum Bound Principle and the A-Posteriori Energy Balance}\label{sec:results-balance}
+\subsection{Maximum Bound and Energy Balance}\label{sec:results-balance}
 
 \rev{\emph{Maximum bound.} The exact solution satisfies $|u|\le1$. The certified reference of B1 has $\max|u|=\N{mbp.ref_max_t1}$ at $t=1$. Decreasing energy does not imply the bound~\cite{ref_Du2021b,ref_He2019}. We computed $\max_{x,t}|u_\theta|$ for every one-dimensional network trained on the forward problem. Table~\ref{tab:forward} gives the largest value per configuration.}
 
@@ -810,7 +822,10 @@ B3 revised $K=64$ ($T=5$) & 2 & \ensuremath{3.6\times10^{-2}} & \ensuremath{3.2\
 
 \subsection{\texorpdfstring{\protect\textcolor{black}{Inverse Problem}}{Inverse Problem}}\label{sec:results-inverse}
 
-\rev{\emph{Joint Adam depends on the starting value.} The first version reported a ``robust $\sim38\%$ overestimation bias'' of $\varepsilon$. It blamed the loss weighting, the warm-up or the observation design, without an ablation. The bias is the footprint of the starting value and of the optimizer.}
+
+\subsubsection{Joint Adam Depends on the Starting Value}
+
+\rev{The first version reported a ``robust $\sim38\%$ overestimation bias'' of $\varepsilon$. It blamed the loss weighting, the warm-up or the observation design, without an ablation. The bias is the footprint of the starting value and of the optimizer.}
 
 \rev{With joint Adam (Section~\ref{sec:inverse}) the recovered value is $\hat\varepsilon\approx\N{inv.ratio_mean}\,\varepsilon_{\rm init}$. The range is \N{inv.ratio_range} over \N{inv.n_sweep} runs. This holds for every $\varepsilon_{\rm init}\in\{0.5,1,1.5,2,4\}\,\varepsilon_{\rm true}$, for $\varepsilon_{\rm true}\in\{0.05,0.1\}$ and for both the as-submitted and the revised network (Figure~\ref{fig:inverse}(a), Table~\ref{tab:inverse1}). All runs of the first version that gave $38\%$ started from $\varepsilon_{\rm init}=2\varepsilon_{\rm true}$. And $0.7\times2=1.4$ is the ``bias''.}
 
@@ -820,9 +835,15 @@ B3 revised $K=64$ ($T=5$) & 2 & \ensuremath{3.6\times10^{-2}} & \ensuremath{3.2\
 
 \rev{The first version also reported noise experiments at $\varepsilon_{\rm true}=0.01$ ($40.2$, $40.2$ and $40.0\%$ for $\sigma=0$, $0.01$ and $0.05$) and one run at $\varepsilon_{\rm true}=0.05$ ($14.7\%$). They came from a script whose settings differed from those stated. Its output was not archived. We withdraw these numbers.}
 
-\rev{\emph{An estimator that does not depend on the start.} Variable projection (Section~\ref{sec:inverse}) uses a data-fitting phase and a large data weight. On noise-free data it recovers $\varepsilon$ with relative errors of \N{inv.vp_err_005} ($\varepsilon_{\rm true}=0.05$) and \N{inv.vp_err_01} ($0.1$) at $\lambda_{\rm data}=2000$ (Figure~\ref{fig:inverse}(b), Table~\ref{tab:inverse2}). It needs a large data weight and enough observation points. With $\lambda_{\rm data}=20$ the errors are \N{inv.vp.e0.05.ld20} and \N{inv.vp.e0.1.ld20}. With only 10 observation points the error is \N{inv.vp.nx10}. With $K=64$ the least-squares value of $\varepsilon^2$ collapsed to its lower bound $10^{-8}$ during training.}
 
-\rev{\emph{It is not robust to noise} (Table~\ref{tab:inverse3}, Figure~\ref{fig:inverse}(c)). With $\sigma=0.01$ it underestimates $\varepsilon$ by \N{inv.vpn.e0.05.n0.01} ($\varepsilon_{\rm true}=0.05$) and \N{inv.vpn.e0.1.n0.01} ($0.1$), averaged over five noise realizations. With $\sigma=0.05$ it collapses toward $\varepsilon=0$. The largest estimate is \N{inv.vpn.e0.1.n0.05.maxratio}$\,\varepsilon_{\rm true}$. A plausible cause, not investigated further: with a large data weight the network fits part of the noise. This raises $\|u_{xx}\|$ and lowers the least-squares value.}
+\subsubsection{Variable Projection}
+
+\rev{Variable projection (Section~\ref{sec:inverse}) uses a data-fitting phase and a large data weight. On noise-free data it recovers $\varepsilon$ with relative errors of \N{inv.vp_err_005} ($\varepsilon_{\rm true}=0.05$) and \N{inv.vp_err_01} ($0.1$) at $\lambda_{\rm data}=2000$ (Figure~\ref{fig:inverse}(b), Table~\ref{tab:inverse2}). It needs a large data weight and enough observation points. With $\lambda_{\rm data}=20$ the errors are \N{inv.vp.e0.05.ld20} and \N{inv.vp.e0.1.ld20}. With only 10 observation points the error is \N{inv.vp.nx10}. With $K=64$ the least-squares value of $\varepsilon^2$ collapsed to its lower bound $10^{-8}$ during training.}
+
+
+\subsubsection{Robustness to Noise}
+
+\rev{The estimator is not robust to noise (Table~\ref{tab:inverse3}, Figure~\ref{fig:inverse}(c)). With $\sigma=0.01$ it underestimates $\varepsilon$ by \N{inv.vpn.e0.05.n0.01} ($\varepsilon_{\rm true}=0.05$) and \N{inv.vpn.e0.1.n0.01} ($0.1$), averaged over five noise realizations. With $\sigma=0.05$ it collapses toward $\varepsilon=0$. The largest estimate is \N{inv.vpn.e0.1.n0.05.maxratio}$\,\varepsilon_{\rm true}$. A plausible cause, not investigated further: with a large data weight the network fits part of the noise. This raises $\|u_{xx}\|$ and lowers the least-squares value.}
 
 \rev{Classical least squares (Section~\ref{sec:inverse}) does better on the same realizations. Its mean errors are \N{inv.cl5.e0.05.n0.01} and \N{inv.cl5.e0.1.n0.01} for $\sigma=0.01$. They are \N{inv.cl5.e0.05.n0.05} and \N{inv.cl5.e0.1.n0.05} for $\sigma=0.05$. This agrees with the Cram\'er--Rao bound. Without noise it recovers the true value to better than $10^{-3}\%$, because the data come from the same solver.}
 
@@ -922,12 +943,15 @@ $K=64$ ($\lambda_{\rm data}=2000$) & 0.05 & 0.00200 & --- & \ensuremath{1.6\time
 \caption{\rev{(a) Joint Adam: $\hat\varepsilon/\varepsilon_{\rm true}$ versus the starting value, for the as-submitted and the revised network. The estimate follows $\approx0.7\,\varepsilon_{\rm init}$ (dotted: no change; dashed: the true value). (b) Variable projection: relative error versus the data weight, noise-free data. (c) Noisy data: relative errors of the variable-projection Spectral-PINN and of classical least squares on the same five noise realizations (horizontal axis: $\varepsilon_{\rm true}$, upper row; $\sigma$, lower row).}\label{fig:inverse}}
 \end{figure}
 
-\rev{\emph{Identifiability.} The data constrain $\varepsilon$ only through the term $\varepsilon^2u_{xx}$. This term is small on this benchmark. For our design (40 points, 5 times) the norm of the derivative of the data vector with respect to $\log\varepsilon$ is \N{ident.S001} at $\varepsilon=0.01$, \N{ident.S005} at $0.05$ and \N{ident.S01} at $0.1$.}
+
+\subsubsection{Identifiability}
+
+\rev{The data constrain $\varepsilon$ only through the term $\varepsilon^2u_{xx}$. This term is small on this benchmark. For our design (40 points, 5 times) the norm of the derivative of the data vector with respect to $\log\varepsilon$ is \N{ident.S001} at $\varepsilon=0.01$, \N{ident.S005} at $0.05$ and \N{ident.S01} at $0.1$.}
 
 \rev{With noise $\sigma=0.01$ the Cram\'er--Rao standard error of $\log\hat\varepsilon$ is \N{ident.se001} at $\varepsilon=0.01$ and \N{ident.se005} at $0.05$. Classical least squares has a root-mean-square error of \N{ident.cl001} at $0.01$ and \N{ident.cl005} at $0.05$ (\N{ident.n_rep} noise realizations). This matches the bound. At $\varepsilon=0.01$ no unbiased estimator can do better than about \N{ident.se001} with such data. The noise experiments at $\varepsilon=0.01$ in the first version were therefore not meaningful. The variable-projection network has errors of \N{inv.vp001.n0} without noise and \N{inv.vp001.n0.01} with noise at $\varepsilon=0.01$.}
 
 
-\subsection{Two-Dimensional Symmetry Preservation}\label{sec:2d-results}
+\subsection{Two-Dimensional Symmetry}\label{sec:2d-results}
 
 \rev{The two-dimensional results are unchanged from the first version. No Neumann condition is involved. We corrected the statements about them.} Table~\ref{tab:2d} gives the symmetry violation $S(t)$. The Fourier-Spectral-PINN stays at round-off: $S\in[\N{s2d.fmin},\N{s2d.fmax}]$ for $t\in[0,1]$ \rev{(one run). By the parity of the basis, $S$ is zero in exact arithmetic. The value shown is the round-off of the evaluation grid (Appendix~\ref{app:sym}), not an effect of training.} The vanilla PINN has the same periodic encoding. Its $S$ increases monotonically in all five seeds. It grows by a factor \N{s2d.growth} between $t=0$ and $t=1$ (seeds: \N{s2d.growth_range}).
 
@@ -972,7 +996,7 @@ $K=64$ ($\lambda_{\rm data}=2000$) & 0.05 & 0.00200 & --- & \ensuremath{1.6\time
 \section{\texorpdfstring{\protect\textcolor{black}{Discussion}}{Discussion}}
 
 
-\subsection{What the Coefficient-Space Network Does and Does Not Achieve}\label{sec:niche}
+\subsection{What the Method Achieves}\label{sec:niche}
 
 \rev{Can a PINN compete with a classical spectral solver on the forward problem? In this study, no.}
 
@@ -991,7 +1015,7 @@ $K=64$ ($\lambda_{\rm data}=2000$) & 0.05 & 0.00200 & --- & \ensuremath{1.6\time
 \rev{This article offers a controlled test bed, diagnostics and design principles, and a list of pitfalls that we met (and partly fell into). It does not offer a new solver.}
 
 
-\subsection{Pitfalls Found in the First Version}
+\subsection{Pitfalls}
 
 \rev{Three conclusions of the first version did not survive a systematic check. Each rests on an easy mistake.}
 
@@ -1003,10 +1027,10 @@ $K=64$ ($\lambda_{\rm data}=2000$) & 0.05 & 0.00200 & --- & \ensuremath{1.6\time
 
 \rev{Two further flaws were found. B1 is reaction-dominated and almost independent of $\varepsilon$ for $\varepsilon\le0.01$. So the small-$\varepsilon$ experiments tested essentially one function. The initial condition also violated the boundary condition.}
 
-\rev{Three things exposed these flaws: a reviewer's remark, an audit of every number of the first version against its data, and a certified reference solution. The audit found 22 wrong statements among 77 and 7 that could not be verified. We recommend the same checks to anyone who benchmarks PINNs.}
+\rev{Two things exposed these flaws: an audit of every number of the first version against its data, and a certified reference solution. The audit found 22 wrong statements among 77 and 7 that could not be verified. We recommend the same checks to anyone who benchmarks PINNs.}
 
 
-\subsection{Energy Decay and Admissibility}\label{sec:energy-discussion}
+\subsection{Energy and Admissibility}\label{sec:energy-discussion}
 
 \rev{Monotone energy is necessary but weak.}
 
@@ -1053,7 +1077,7 @@ $K=64$ ($\lambda_{\rm data}=2000$) & 0.05 & 0.00200 & --- & \ensuremath{1.6\time
 
 \informedconsent{Not applicable.}
 
-\color{blue}\dataavailability{\label{sec:data-availability}\rev{All raw results of this article (one record per training run with the evaluation and energy-balance diagnostics, the trained weights of the one-dimensional forward-problem networks, the certified reference solutions and the classical baselines), the scripts that generate the results, tables and figures of the revision from these records, and the Python source code (PyTorch) of all methods are in the repository \url{https://github.com/Zhanars/SPINN_Allen_Khan} (revision~1: directories \texttt{code} and \texttt{data\_r1}; the two-dimensional results of the first version reported in Section~\ref{sec:2d-results}: directory \texttt{data}). The repository will be made public upon acceptance of this manuscript; until then, reviewers or readers can be granted immediate access by providing a GitHub username to the corresponding author. A copy of the raw results and of the Python scripts is provided in the Supplementary Materials (Data S1).}}
+\color{blue}\dataavailability{\label{sec:data-availability}\rev{All raw results of this article (one record per training run with the evaluation and energy-balance diagnostics, the trained weights of the one-dimensional forward-problem networks, the certified reference solutions and the classical baselines), the scripts that generate the results, tables and figures of the revision from these records, and the Python source code (PyTorch) of all methods are in the repository \url{https://github.com/Zhanars/SPINN_Allen_Khan} (revision~1: directories \texttt{code} and \texttt{data\_r1}; the two-dimensional results of the first version reported in Section~\ref{sec:2d-results}: directory \texttt{data}). The repository will be made public upon acceptance of this manuscript; until then, access can be granted on request: send a GitHub username to the corresponding author. A copy of the raw results and of the Python scripts is provided in the Supplementary Materials (Data S1).}}
 
 \acknowledgments{The authors thank Almaty Technological University for computational support. \rev{During the preparation of this manuscript and of its revision, the authors used Claude (Anthropic; via Claude Code; for the revision the models Claude Fable~5.1, Claude Opus~5.5 and Claude Sonnet~5.5, October 2026) for programming assistance (including the experiment, evaluation and audit scripts), for the analysis of the obtained results, for checking the numbers of the first version against the raw data, for drafting and editing parts of the text, and for translation. All results of the training runs and classical baselines of this revision that appear in the text, tables and figures are generated by scripts from the archived raw results, and the authors have reviewed and verified the output and take full responsibility for the content of this publication.}}
 
@@ -1107,7 +1131,7 @@ CPU & Central processing unit
 \rev{(iv)~The initial condition $x^2\cos(\pi x)$ of the first version has $u_{0,x}(-1)=2\neq0$. For a soft-variant network that fits $u_0$, the factor $u_x(-1,0)$ in $\beta$ is then not small at $t=0$. Whether $\beta$ is small depends on $u_t(\pm1,t)$ and must be measured. With the compatible initial condition~\eqref{eq:IC} and the exact Neumann basis, $\beta=0$ by construction.}
 
 
-\section{\texorpdfstring{\protect\textcolor{black}{Symmetry-Preservation Diagnostic}}{Symmetry-Preservation Diagnostic}}\label{app:sym}
+\section{Symmetry Diagnostic}\label{app:sym}
 
 We evaluated the reflection-symmetry violation $S(t)$ of the two-dimensional experiment (Section~\ref{sec:2d}) on an endpoint-inclusive grid. The grid is $x_i=-\pi+ih$ with $h=2\pi/(n-1)$, $i=0,\dots,n-1$ and $n=49$. It satisfies $x_{n-1-i}=-x_i$ \rev{up to floating-point round-off. For the computed nodes, $|x_{n-1-i}+x_i|\le9\times10^{-16}$.} The training grid is periodic and excludes the endpoint. Comparing it with its array reversal would give an artificial violation caused only by the discretization. The endpoint-inclusive grid avoids this.
 
@@ -1141,7 +1165,7 @@ Spectral-PINN as submitted, $K=64$ & 3 & \ensuremath{(6.41\pm0.94)\times10^{-2}}
 
 
 
-\section{Certified Reference Solution}\label{app:ref}
+\section{Reference Solution}\label{app:ref}
 
 \rev{All accuracy figures in this article are measured against a spectral reference solution. The unknowns are the values of $u$ at the Chebyshev--Gauss--Lobatto nodes $x_j=\cos(j\pi/N)$. The two rows $(Du)_0=(Du)_N=0$ of the differentiation matrix $D$ eliminate the wall unknowns. This is equivalent to a differential--algebraic system with algebraic boundary rows. So the Neumann condition holds exactly for $t>0$, even when $u_0$ does not satisfy it.}
 

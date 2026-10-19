@@ -93,3 +93,9 @@ Machine notes: everything is float64 with tiny networks, CPU only. ai.atu has 32
 
 * User request: the text was hard to read. Introduction, Methods, Results, Discussion, Conclusions, abstract, appendices, all table captions (generator `code/make_tex_r1.py`) and the response letter were rewritten with short sentences (mean sentence length of the body 49 -> 20 words, 62% -> 12% of sentences over 30 words). No number, claim or `\N{...}` key changed. Manuscript: 26 pages. The forward table floats (`place="t"`) to avoid a blank half page.
 * Style rule for further edits: one idea per sentence, no nested parentheses, details into tables or appendices.
+
+## 8. Update 2026-10-19 (evening): Word version, subsections, short headings
+
+* The undo request of the previous turn was cancelled by the user: the short-sentence texts (commit 50b572d) are the current ones.
+* Results 3.3 (energy penalty) and 3.5 (inverse problem) are split into subsubsections (3.3.1-3.3.4, 3.5.1-3.5.4); section headings shortened (e.g. "Mode Number and Boundary Penalty"). The text about a reviewer was removed from the Discussion; the Data Availability Statement now says "access can be granted on request".
+* Word version: `python manuscript/make_docx.py` writes `manuscript/manuscript_r1_clean.docx` (pandoc + python-docx; equations are native Word equations, wide tables sit on landscape pages, numbers of sections/tables/figures/equations/citations are resolved from the LaTeX .aux file, so run `build_r1.py` first). It is a plain Word layout, not the MDPI Word template.

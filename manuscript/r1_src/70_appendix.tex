@@ -18,7 +18,7 @@
 
 \rev{(iv)~The initial condition $x^2\cos(\pi x)$ of the first version has $u_{0,x}(-1)=2\neq0$. For a soft-variant network that fits $u_0$, the factor $u_x(-1,0)$ in $\beta$ is then not small at $t=0$. Whether $\beta$ is small depends on $u_t(\pm1,t)$ and must be measured. With the compatible initial condition~\eqref{eq:IC} and the exact Neumann basis, $\beta=0$ by construction.}
 
-\section{Symmetry-Preservation Diagnostic}\label{app:sym}
+\section{Symmetry Diagnostic}\label{app:sym}
 
 We evaluated the reflection-symmetry violation $S(t)$ of the two-dimensional experiment (Section~\ref{sec:2d}) on an endpoint-inclusive grid. The grid is $x_i=-\pi+ih$ with $h=2\pi/(n-1)$, $i=0,\dots,n-1$ and $n=49$. It satisfies $x_{n-1-i}=-x_i$ \rev{up to floating-point round-off. For the computed nodes, $|x_{n-1-i}+x_i|\le9\times10^{-16}$.} The training grid is periodic and excludes the endpoint. Comparing it with its array reversal would give an artificial violation caused only by the discretization. The endpoint-inclusive grid avoids this.
 

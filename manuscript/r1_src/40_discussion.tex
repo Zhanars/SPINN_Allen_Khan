@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Discussion}
 
-\subsection{What the Coefficient-Space Network Does and Does Not Achieve}\label{sec:niche}
+\subsection{What the Method Achieves}\label{sec:niche}
 
 \rev{Can a PINN compete with a classical spectral solver on the forward problem? In this study, no.}
 
@@ -19,7 +19,7 @@
 
 \rev{This article offers a controlled test bed, diagnostics and design principles, and a list of pitfalls that we met (and partly fell into). It does not offer a new solver.}
 
-\subsection{Pitfalls Found in the First Version}
+\subsection{Pitfalls}
 
 \rev{Three conclusions of the first version did not survive a systematic check. Each rests on an easy mistake.}
 
@@ -31,9 +31,9 @@
 
 \rev{Two further flaws were found. B1 is reaction-dominated and almost independent of $\varepsilon$ for $\varepsilon\le0.01$. So the small-$\varepsilon$ experiments tested essentially one function. The initial condition also violated the boundary condition.}
 
-\rev{Three things exposed these flaws: a reviewer's remark, an audit of every number of the first version against its data, and a certified reference solution. The audit found 22 wrong statements among 77 and 7 that could not be verified. We recommend the same checks to anyone who benchmarks PINNs.}
+\rev{Two things exposed these flaws: an audit of every number of the first version against its data, and a certified reference solution. The audit found 22 wrong statements among 77 and 7 that could not be verified. We recommend the same checks to anyone who benchmarks PINNs.}
 
-\subsection{Energy Decay and Admissibility}\label{sec:energy-discussion}
+\subsection{Energy and Admissibility}\label{sec:energy-discussion}
 
 \rev{Monotone energy is necessary but weak.}
 
